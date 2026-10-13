@@ -42,8 +42,10 @@ public struct BillCalculator: Sendable {
     public init() {}
 
     public func calculate(receipt: Receipt) -> BillSplitResult {
-        let participants = receipt.participants.sorted { $0.orderIndex < $1.orderIndex }
-        let participantIndexByID = Dictionary(uniqueKeysWithValues: participants.enumerated().map { ($1.id, $0) })
+        let participants = Self.orderedParticipants(receipt)
+        let participantIndexByID = Dictionary(
+            uniqueKeysWithValues: participants.enumerated().map { ($1.id, $0) }
+        )
 
         var adjustments: [RoundingAdjustment] = []
         var itemSubtotals = Array(repeating: 0, count: participants.count)
@@ -54,11 +56,11 @@ public struct BillCalculator: Sendable {
             for unitIndex in 0 ..< item.quantity {
                 let price = unitPrices[unitIndex]
                 let assigneeIDs = Self.assignees(for: item.id, unitIndex: unitIndex, in: receipt.assignments)
-                if assigneeIDs.isEmpty {
+                let assigneeIndices = Set(assigneeIDs.compactMap { participantIndexByID[$0] }).sorted()
+                if assigneeIndices.isEmpty {
                     isSettled = false
                     continue
                 }
-                let assigneeIndices = assigneeIDs.compactMap { participantIndexByID[$0] }.sorted()
                 let assigneeParticipants = assigneeIndices.map { participants[$0] }
                 let weights = assigneeParticipants.map { _ in 1 }
                 let pool = RoundingAdjustment.Pool.itemUnit(itemID: item.id, unitIndex: unitIndex)
@@ -124,15 +126,17 @@ public struct BillCalculator: Sendable {
 
     /// Assign every still-unclaimed unit to all participants (equal split per unit).
     public func splitRestEvenly(receipt: Receipt) -> Receipt {
-        let allIDs = receipt.participants.sorted { $0.orderIndex < $1.orderIndex }.map(\.id)
+        let allIDs = Self.orderedParticipants(receipt).map(\.id)
+        let validIDs = Set(allIDs)
         var assignmentMap = Dictionary(
-            uniqueKeysWithValues: receipt.assignments.map { (Self.assignmentKey(itemID: $0.itemID, unitIndex: $0.unitIndex), $0) }
+            receipt.assignments.map { (Self.assignmentKey(itemID: $0.itemID, unitIndex: $0.unitIndex), $0) },
+            uniquingKeysWith: { first, _ in first }
         )
 
         for item in receipt.items {
             for unitIndex in 0 ..< item.quantity {
                 let key = Self.assignmentKey(itemID: item.id, unitIndex: unitIndex)
-                let existing = assignmentMap[key]?.participantIDs ?? []
+                let existing = (assignmentMap[key]?.participantIDs ?? []).filter(validIDs.contains)
                 if existing.isEmpty {
                     assignmentMap[key] = ItemAssignment(itemID: item.id, unitIndex: unitIndex, participantIDs: allIDs)
                 }
@@ -154,6 +158,13 @@ public struct BillCalculator: Sendable {
     }
 
     // MARK: - Internals
+
+    static func orderedParticipants(_ receipt: Receipt) -> [Participant] {
+        var seen = Set<UUID>()
+        return receipt.participants
+            .sorted { $0.orderIndex < $1.orderIndex }
+            .filter { seen.insert($0.id).inserted }
+    }
 
     static func unitPrices(lineTotal: Int, quantity: Int) -> [Int] {
         let q = max(1, quantity)
