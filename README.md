@@ -32,6 +32,7 @@ Planning. No code yet. The first milestone is the assignment screen and calculat
 - [Calculation rules](docs/CALCULATION_RULES.md): how items, tax, tip, and rounding are allocated.
 - [Architecture](docs/ARCHITECTURE.md): planned technology and code layout.
 - [Roadmap](docs/ROADMAP.md): milestones and what is explicitly out of scope for launch.
+- [Design guide](docs/DESIGN_GUIDE.md): principles, starter palette, type scale, and screen-by-screen visual guidance.
 
 ## Tech stack (planned)
 
