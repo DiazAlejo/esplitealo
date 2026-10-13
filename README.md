@@ -23,14 +23,14 @@ The flow is linear, but you can go back and edit the receipt, assignments, or ti
 
 ## Status
 
-Planning. No code yet. The first milestone is the assignment screen and calculation engine, driven by a hardcoded sample receipt, before any camera or text recognition work.
+In development. The calculation engine (`BillCalculator`, a Swift package with unit tests) is implemented. Next is the assignment screen, driven by a hardcoded sample receipt, before any camera or text recognition work.
 
 ## Documentation
 
 - [Requirements](docs/REQUIREMENTS.md): MVP scope, functional requirements, and acceptance criteria.
 - [Screens](docs/SCREENS.md): screen-by-screen specification.
 - [Calculation rules](docs/CALCULATION_RULES.md): how items, tax, tip, and rounding are allocated.
-- [Architecture](docs/ARCHITECTURE.md): planned technology and code layout.
+- [Architecture](docs/ARCHITECTURE.md): technology and code layout.
 - [Roadmap](docs/ROADMAP.md): milestones and what is explicitly out of scope for launch.
 - [Design guide](docs/DESIGN_GUIDE.md): principles, starter palette, type scale, and screen-by-screen visual guidance.
 - [Tab analysis](docs/research/TAB_ANALYSIS.md): research on an existing bill-splitting app, with candidate rules (proposals, not decisions).

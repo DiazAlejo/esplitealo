@@ -38,7 +38,7 @@ Assignments: Alex $60.00 of items, Sam $40.00 of items (proportional tax and tip
 ## Assignment model (item-first)
 
 - The UI is item-first: tap a line (or unit), pick people. The engine only needs, per unit, the set of assigned participant ids.
-- A unit with **no** assigned participants is **unclaimed**.
+- A unit with **no valid** assigned participants is **unclaimed**. Assignee ids that match no participant are ignored, and duplicate ids and duplicate participants are collapsed, so each person counts once.
 - A bill with any unclaimed unit is **not settled**. Settlement and sharing require every unit to be claimed.
 - **Split the rest evenly** (product action): for each still-unclaimed unit, assign **all** participants with equal split on that unit. After this action, those units are claimed.
 
