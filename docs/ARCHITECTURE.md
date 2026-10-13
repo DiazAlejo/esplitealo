@@ -2,6 +2,26 @@
 
 Keep the code organized around the core domain logic so the calculation engine can be tested independently of the interface.
 
+## Calculation package (SwiftPM)
+
+The calculation engine lives in a Swift package at the repository root so `swift test` can run on the Mac without the Xcode app target:
+
+```
+EsplitealoCore/                    # Swift package root (Package.swift)
+├── Sources/EsplitealoCore/
+│   ├── Models/
+│   │   ├── Receipt.swift
+│   │   ├── ReceiptItem.swift
+│   │   ├── Participant.swift
+│   │   └── ItemAssignment.swift
+│   └── Services/
+│       └── BillCalculator.swift
+└── Tests/EsplitealoCoreTests/
+    └── BillCalculatorTests.swift
+```
+
+The Xcode app will embed this library later. File names match the planned app layout below.
+
 ## Planned layout
 
 ```
