@@ -33,6 +33,7 @@ Planning. No code yet. The first milestone is the assignment screen and calculat
 - [Architecture](docs/ARCHITECTURE.md): planned technology and code layout.
 - [Roadmap](docs/ROADMAP.md): milestones and what is explicitly out of scope for launch.
 - [Design guide](docs/DESIGN_GUIDE.md): principles, starter palette, type scale, and screen-by-screen visual guidance.
+- [Tab analysis](docs/research/TAB_ANALYSIS.md): research on an existing bill-splitting app, with candidate rules (proposals, not decisions).
 
 ## Tech stack (planned)
 
