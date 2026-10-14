@@ -35,6 +35,7 @@ Committed generator in `Sources/EsplitealoCore/OCRBenchmark/SyntheticReceiptGene
 - **Source:** [naver-clova-ix/cord-v2](https://huggingface.co/datasets/naver-clova-ix/cord-v2) (test split).
 - **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) — Clova AI / NAVER (Park et al., 2019). Attribution required if you publish results; do not commit images or annotations to the repo.
 - **Cache:** `~/Documents/firstmate/data/esplitealo-ocr-benchmark/cord-cache/` (`manifest.json`, `images/`, `ground_truth/`).
+- **Price normalization:** ground-truth prices are read with the same per-receipt number-format inference as the parser (`CordDatasetLoader.minor`), so whole-unit prices (`12`) and thousands-separated ones (`12.500`) compare equal to parser output.
 - **Product scope:** CORD is mostly Indonesian rupiah. `CordBenchmarkScope` marks IDR-style ground truth (large integer amounts, `17,000` / `60.000` shapes, IDR labels) as **out of product scope**. Headline PR/USD metrics use the synthetic set; CORD full-set numbers are for research comparison only.
 
 ## Metrics (JSON schema v1)
