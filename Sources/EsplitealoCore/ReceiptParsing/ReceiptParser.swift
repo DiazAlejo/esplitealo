@@ -395,7 +395,7 @@ private func repairWords(_ words: [String]) -> [String] {
 }
 
 private func dropCurrencyWords(_ words: inout [String]) {
-    let drop = Set(["$", "€", "£", "USD", "EUR", "Rp", "R$"])
+    let drop = Set(["$", "USD"])
     words.removeAll { drop.contains($0) }
 }
 
@@ -509,7 +509,7 @@ private func matchesTipTable(_ text: String) -> Bool {
 }
 
 private let subtotalKeywords = ["subtotal", "sub total", "sub-total", "subtot"]
-private let taxKeywords = ["tax", "iva", "vat", "ivu", "impuesto", "ipc", "igv", "ppn", "pajak", "sales tax"]
+private let taxKeywords = ["tax", "iva", "vat", "ivu", "impuesto", "sales tax"]
 private let tipKeywords = ["tip", "propina", "gratuity", "service", "servicio"]
 private let totalKeywords = ["total", "importe", "amount due", "grandtotal", "grand total"]
 private let discountKeywords = ["discount", "descuento", "off"]

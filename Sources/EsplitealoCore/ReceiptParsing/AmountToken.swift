@@ -126,15 +126,12 @@ struct AmountToken: Equatable {
 
     private static func stripCurrencyPrefix(_ s: String) -> String {
         var t = s
-        let prefixes = ["$", "€", "£", "Rp", "R$", "USD", "EUR"]
+        let prefixes = ["$", "USD"]
         for p in prefixes {
             if t.hasPrefix(p) {
                 t = String(t.dropFirst(p.count))
                 break
             }
-        }
-        if t.hasSuffix("€") {
-            t = String(t.dropLast())
         }
         return t.trimmingCharacters(in: .whitespaces)
     }
