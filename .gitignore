@@ -5,3 +5,11 @@
 !Tools/ScannerLab/ScannerLab.xcodeproj/**
 Tools/ScannerLab/ScannerLab.xcodeproj/project.xcworkspace/
 DerivedData/
+
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+build/
