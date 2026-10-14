@@ -219,6 +219,6 @@ final class BenchmarkReportComparisonTests: XCTestCase {
         let data = try JSONEncoder.benchmarkEncoder.encode(delta)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         let recallDelta = json?["itemRecallDelta"] as? Double
-        XCTAssertEqual(recallDelta, 0.1)
+        XCTAssertEqual(recallDelta ?? 0, 0.1, accuracy: 0.0001)
     }
 }
