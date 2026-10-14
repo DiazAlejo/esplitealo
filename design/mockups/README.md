@@ -7,7 +7,7 @@ Static, offline HTML design references for the Esplitéalo iOS app. They are **n
 1. In Finder, open this folder (`design/mockups/`).
 2. Double-click **`index.html`** to choose Spanish or English, or open **`es/index.html`** or **`en/index.html`** directly.
 
-Everything works over `file://` with no server and no network. Each screen mockup includes an **Español / English** switch in the toolbar; keep `es/` and `en/` side by side so those links work.
+Everything works over `file://` with no server and no network. Each screen mockup includes an **Español / English** switch in the toolbar; keep `es/`, `en/` and `_src/fonts/` side by side so those links and the fonts work.
 
 ## Contents
 
