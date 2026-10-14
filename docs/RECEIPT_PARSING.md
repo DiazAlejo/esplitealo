@@ -4,7 +4,7 @@ Pure Foundation logic in `EsplitealoCore` that turns on-device OCR output into a
 
 ## Input: `RecognizedText`
 
-`ReceiptScanner` (later, in the app target) will wrap `VNRecognizeTextRequest` and produce a `RecognizedText` value:
+`ReceiptScanner` in `EsplitealoCore/Scanning` wraps `VNRecognizeTextRequest` and produces a `RecognizedText` value (see `docs/SCANNING.md`):
 
 - `imageSize` in pixels
 - `lines` with full-line text, confidence, baseline angle, and per-word boxes
