@@ -33,7 +33,8 @@ No image preprocessing is applied. Word boxes come from each top candidate’s p
 | ---- | ---- |
 | `noTextFound` | No observations / empty lines after OCR |
 | `imageTooSmallOrUnreadable` | Image under 64×64 px, or median word height below ~12 px (accuracy breaks near 13 px; quality degrades below ~20 px per OCR research) |
-| `receiptTooLongForSinglePhoto` | Height ÷ width exceeds 4 (one-photo MVP; very tall receipts need multiple captures later) |
+| `receiptTooLongForSinglePhoto` | Height ÷ width exceeds 4, measured after applying `orientation` (one-photo MVP; very tall receipts need multiple captures later) |
+| `recognitionUnavailable` | Platform has no Vision (non-Vision stub recognizer) |
 
 Inject `TextRecognizing` stubs in unit tests for error paths.
 
