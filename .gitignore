@@ -1,4 +1,7 @@
 .build/
 .swiftpm/
 *.xcodeproj
+!Tools/ScannerLab/ScannerLab.xcodeproj
+!Tools/ScannerLab/ScannerLab.xcodeproj/**
+Tools/ScannerLab/ScannerLab.xcodeproj/project.xcworkspace/
 DerivedData/
