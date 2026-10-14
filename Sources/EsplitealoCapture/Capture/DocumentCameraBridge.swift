@@ -48,11 +48,10 @@ public struct DocumentCameraBridge: UIViewControllerRepresentable {
             _ controller: VNDocumentCameraViewController,
             didFinishWith scan: VNDocumentCameraScan
         ) {
-            guard scan.pageCount > 0 else {
-                onResult(.failure(.noImage))
+            if let error = DocumentCameraError.validatePageCount(scan.pageCount) {
+                onResult(.failure(error))
                 return
             }
-            // MVP: one photo per bill — use the first page only.
             let uiImage = scan.imageOfPage(at: 0)
             guard let cgImage = uiImage.cgImage else {
                 onResult(.failure(.noImage))
