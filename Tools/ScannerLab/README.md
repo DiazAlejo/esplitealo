@@ -20,9 +20,15 @@ Developer-only iOS utility to exercise Esplitealo’s on-device receipt OCR and 
 
 All processing stays on device; no network or analytics.
 
-## Command-line build (simulator, no signing)
+## Command-line build (no signing)
 
-From the repository root:
+From the repository root, compile-check for a physical device (matches CI):
+
+```bash
+Tools/ScannerLab/build-generic-ios.sh
+```
+
+Simulator (no signing):
 
 ```bash
 xcodebuild build \
@@ -32,6 +38,61 @@ xcodebuild build \
   -skipPackagePluginValidation \
   CODE_SIGNING_ALLOWED=NO
 ```
+
+For a **connected iPhone** with your team (does not commit any team ID):
+
+```bash
+Tools/ScannerLab/build-device.sh YOUR_TEAM_ID
+```
+
+Optional second argument is the device name as shown in Xcode’s device menu.
+
+## Troubleshooting
+
+### Swift compile error in `ContentView.swift` (`missing argument label 'amount:'`)
+
+**Symptom:** Xcode or `xcodebuild` fails while compiling `ContentView.swift` with:
+
+```text
+error: missing argument label 'amount:' in call
+```
+
+**Fix:** Use a current `main` branch (fixed in repo). Locally, `totalRow` calls must pass the second argument as `amount:`, for example `totalRow("Subtotal", amount: display.subtotal)`.
+
+**Verify without signing:**
+
+```bash
+Tools/ScannerLab/build-generic-ios.sh
+```
+
+### Signing and provisioning (owner-only)
+
+The repository intentionally has **no** development team. You must set these in Xcode for the **ScannerLab** target:
+
+1. **Signing & Capabilities** → **Team** → your Apple ID team.
+2. **Bundle Identifier** → unique under your account (for example `com.yourname.esplitealo.ScannerLab`).
+
+**Developer Mode (iOS 16+):** On the iPhone, **Settings → Privacy & Security → Developer Mode** → on, then restart when prompted. Without this, device installs from Xcode often fail.
+
+**Trust the developer certificate:** After first install, **Settings → General → VPN & Device Management** → your developer app → **Trust**.
+
+**Free Apple ID:** Provisioning profiles expire after about **7 days**; rebuild and reinstall when Xcode reports an expired profile.
+
+**Command-line device build** (paste failures back to the team):
+
+```bash
+Tools/ScannerLab/build-device.sh YOUR_TEAM_ID "Your iPhone Name"
+```
+
+If signing still fails, copy the **full** `xcodebuild` output from the first `error:` line through the final `** BUILD FAILED **` block (include any `Provisioning profile` / `Signing for` lines).
+
+### Deployment target
+
+The app target uses **iOS 17.0** (`IPHONEOS_DEPLOYMENT_TARGET`). Your phone must run iOS 17 or newer (typical current devices do).
+
+### Package plugins
+
+If SwiftPM asks about plugin trust, the project build uses `-skipPackagePluginValidation` (same as the scripts above).
 
 ## Unit tests (logic without camera UI)
 
@@ -47,4 +108,4 @@ ESPLITEALO_SKIP_VISION_INTEGRATION=1 swift test --filter ScannerLabKitTests
 
 ## CI note
 
-The GitHub **macOS** job runs `swift test` and does not build the Xcode app target. The Scanner Lab project is intentionally outside the required CI path so the main package check stays fast.
+The required **macOS** job runs `swift test` only. The optional **iOS Capture compile** job (non-blocking) also runs `Tools/ScannerLab/build-generic-ios.sh` logic so Scanner Lab compile errors are caught without slowing the main check.

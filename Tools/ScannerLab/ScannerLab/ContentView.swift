@@ -95,10 +95,10 @@ struct ContentView: View {
         }
 
         SectionHeader("Totals")
-        totalRow("Subtotal", display.subtotal)
-        totalRow("Tax", display.tax)
-        totalRow("Tip", display.tip)
-        totalRow("Total", display.total)
+        totalRow("Subtotal", amount: display.subtotal)
+        totalRow("Tax", amount: display.tax)
+        totalRow("Tip", amount: display.tip)
+        totalRow("Total", amount: display.total)
 
         SectionHeader("Reconciliation")
         Text(display.reconciliationSummary)

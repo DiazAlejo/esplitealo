@@ -91,3 +91,12 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Build Scanner Lab for generic iOS (no signing)
+        run: |
+          xcodebuild build \
+            -project Tools/ScannerLab/ScannerLab.xcodeproj \
+            -scheme ScannerLab \
+            -destination 'generic/platform=iOS' \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO
