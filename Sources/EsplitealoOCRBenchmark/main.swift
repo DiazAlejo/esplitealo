@@ -128,7 +128,7 @@ struct EsplitealoOCRBenchmarkCLI {
             """
             dataset=\(report.datasetName) receipts=\(agg.receiptCount)
             itemRecall=\(format(agg.itemRecall)) itemPrecision=\(format(agg.itemPrecision)) \
-            itemPriceAccuracy=\(format(agg.itemPriceAccuracy)) descAccuracy=\(format(agg.itemDescriptionAccuracy)) \
+            descAccuracy=\(format(agg.itemDescriptionAccuracy)) \
             qtyAccuracy=\(format(agg.quantityAccuracy))
             subtotalID=\(format(agg.subtotalIdentificationRate)) taxID=\(format(agg.taxIdentificationRate)) \
             totalID=\(format(agg.totalIdentificationRate)) reconciliation=\(format(agg.reconciliationAgreementRate))

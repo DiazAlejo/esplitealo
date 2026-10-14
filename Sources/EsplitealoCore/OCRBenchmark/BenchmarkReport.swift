@@ -49,7 +49,6 @@ public struct BenchmarkReportDelta: Codable, Equatable, Sendable {
     public var candidateRunID: String
     public var itemRecallDelta: Double
     public var itemPrecisionDelta: Double
-    public var itemPriceAccuracyDelta: Double
     public var itemDescriptionAccuracyDelta: Double
     public var quantityAccuracyDelta: Double
     public var subtotalIdentificationRateDelta: Double
@@ -66,7 +65,6 @@ public enum BenchmarkReportComparison {
             candidateRunID: candidate.runID,
             itemRecallDelta: delta(baseline.aggregate.itemRecall, candidate.aggregate.itemRecall),
             itemPrecisionDelta: delta(baseline.aggregate.itemPrecision, candidate.aggregate.itemPrecision),
-            itemPriceAccuracyDelta: delta(baseline.aggregate.itemPriceAccuracy, candidate.aggregate.itemPriceAccuracy),
             itemDescriptionAccuracyDelta: delta(
                 baseline.aggregate.itemDescriptionAccuracy,
                 candidate.aggregate.itemDescriptionAccuracy

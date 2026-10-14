@@ -402,9 +402,10 @@ private func dropCurrencyWords(_ words: inout [String]) {
 
 private func classify(_ line: LineFields) -> RowKind {
     let lower = canonicalKeywords(line.label)
-    if lower.contains("(qty") || lower.hasPrefix("qty ") { return .other }
+    let tokens = lower.split(separator: " ")
+    if tokens.contains(where: { $0.hasPrefix("(qty") }) || tokens.first == "qty" { return .other }
     if lower.contains("change due") { return .payment }
-    if lower.contains("no:") && !line.amounts.isEmpty { return .payment }
+    if tokens.contains("no:") && !line.amounts.isEmpty { return .payment }
     if matchesTipTable(lower) { return .tipTable }
     if fuzzySubtotalLine(lower) { return .subtotal }
     if matches(subtotalKeywords, lower) { return .subtotal }

@@ -213,6 +213,17 @@ final class ReceiptParserTests: XCTestCase {
         XCTAssertEqual(draft.items.count, 1)
     }
 
+    func testNoColonInsideWordDoesNotDropItem() {
+        let text = RecognizedTextTestBuilder.fromRowTexts([
+            "Casino: Platter 12.00",
+            "Tea 4.00",
+            "Subtotal 16.00",
+            "Total 16.00",
+        ])
+        let draft = parser.parse(text)
+        XCTAssertEqual(draft.items.count, 2)
+    }
+
     func testQtyFooterLineIsNotAnItem() {
         let text = RecognizedTextTestBuilder.fromRowTexts([
             "Soup 6.00",

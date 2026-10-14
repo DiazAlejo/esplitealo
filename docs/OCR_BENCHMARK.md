@@ -43,7 +43,6 @@ Per receipt and aggregate:
 | Metric | Meaning |
 | --- | --- |
 | `itemRecall` / `itemPrecision` | Multiset match on line totals (same rule as OCR research) |
-| `itemPriceAccuracy` | Share of matched items with correct line total |
 | `itemDescriptionAccuracy` | Matched items with name similarity ≥ 0.7 |
 | `quantityAccuracy` | Matched items with correct quantity |
 | `subtotalIdentificationRate` / `taxIdentificationRate` / `totalIdentificationRate` | Printed footer fields correct when present in ground truth |

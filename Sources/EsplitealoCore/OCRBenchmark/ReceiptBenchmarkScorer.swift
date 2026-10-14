@@ -18,7 +18,6 @@ public struct ReceiptPerReceiptScore: Codable, Equatable, Sendable {
     public var receiptID: String
     public var itemRecall: Double
     public var itemPrecision: Double
-    public var itemPriceAccuracy: Double
     public var itemDescriptionAccuracy: Double
     public var quantityAccuracy: Double
     public var subtotalCorrect: Bool
@@ -32,7 +31,6 @@ public struct BenchmarkAggregateMetrics: Codable, Equatable, Sendable {
     public var receiptCount: Int
     public var itemRecall: Double
     public var itemPrecision: Double
-    public var itemPriceAccuracy: Double
     public var itemDescriptionAccuracy: Double
     public var quantityAccuracy: Double
     public var subtotalIdentificationRate: Double
@@ -52,7 +50,6 @@ public struct ReceiptBenchmarkScorer: Sendable {
                 receiptID: groundTruth.id,
                 itemRecall: 0,
                 itemPrecision: 0,
-                itemPriceAccuracy: 0,
                 itemDescriptionAccuracy: 0,
                 quantityAccuracy: 0,
                 subtotalCorrect: fieldMatches(expected: groundTruth.subtotalMinor, actual: draft.subtotal?.minorUnits),
@@ -68,12 +65,10 @@ public struct ReceiptBenchmarkScorer: Sendable {
         let recall = groundTruth.items.isEmpty ? 1.0 : Double(matchedTruth) / Double(groundTruth.items.count)
         let precision = draft.items.isEmpty ? (groundTruth.items.isEmpty ? 1.0 : 0.0) : Double(matchedTruth) / Double(draft.items.count)
 
-        var priceHits = 0
         var descHits = 0
         var qtyHits = 0
         for pair in pairs {
             guard let truth = pair.truth else { continue }
-            priceHits += 1
             if StringSimilarity.normalized(pair.parsed.name, truth.name) >= Self.descriptionSimilarityThreshold {
                 descHits += 1
             }
@@ -81,7 +76,6 @@ public struct ReceiptBenchmarkScorer: Sendable {
                 qtyHits += 1
             }
         }
-        let priceAcc = matchedTruth == 0 ? 0.0 : Double(priceHits) / Double(matchedTruth)
         let descAcc = matchedTruth == 0 ? 0.0 : Double(descHits) / Double(matchedTruth)
         let qtyAcc = matchedTruth == 0 ? 0.0 : Double(qtyHits) / Double(matchedTruth)
 
@@ -110,7 +104,6 @@ public struct ReceiptBenchmarkScorer: Sendable {
             receiptID: groundTruth.id,
             itemRecall: recall,
             itemPrecision: precision,
-            itemPriceAccuracy: priceAcc,
             itemDescriptionAccuracy: descAcc,
             quantityAccuracy: qtyAcc,
             subtotalCorrect: subtotalOK,
@@ -127,7 +120,6 @@ public struct ReceiptBenchmarkScorer: Sendable {
                 receiptCount: 0,
                 itemRecall: 0,
                 itemPrecision: 0,
-                itemPriceAccuracy: 0,
                 itemDescriptionAccuracy: 0,
                 quantityAccuracy: 0,
                 subtotalIdentificationRate: 0,
@@ -147,7 +139,6 @@ public struct ReceiptBenchmarkScorer: Sendable {
             receiptCount: scores.count,
             itemRecall: avg(\.itemRecall),
             itemPrecision: avg(\.itemPrecision),
-            itemPriceAccuracy: avg(\.itemPriceAccuracy),
             itemDescriptionAccuracy: avg(\.itemDescriptionAccuracy),
             quantityAccuracy: avg(\.quantityAccuracy),
             subtotalIdentificationRate: rate(\.subtotalCorrect),

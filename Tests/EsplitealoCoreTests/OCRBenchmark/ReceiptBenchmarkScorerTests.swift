@@ -29,7 +29,6 @@ final class ReceiptBenchmarkScorerTests: XCTestCase {
         let result = scorer.score(draft: draft, groundTruth: truth)
         XCTAssertEqual(result.itemRecall, 1.0, accuracy: 0.001)
         XCTAssertEqual(result.itemPrecision, 1.0, accuracy: 0.001)
-        XCTAssertEqual(result.itemPriceAccuracy, 1.0, accuracy: 0.001)
         XCTAssertEqual(result.itemDescriptionAccuracy, 1.0, accuracy: 0.001)
         XCTAssertEqual(result.quantityAccuracy, 1.0, accuracy: 0.001)
         XCTAssertTrue(result.subtotalCorrect)
@@ -142,7 +141,6 @@ final class ReceiptBenchmarkScorerTests: XCTestCase {
             receiptID: "a",
             itemRecall: 1.0,
             itemPrecision: 1.0,
-            itemPriceAccuracy: 1.0,
             itemDescriptionAccuracy: 1.0,
             quantityAccuracy: 1.0,
             subtotalCorrect: true,
@@ -155,7 +153,6 @@ final class ReceiptBenchmarkScorerTests: XCTestCase {
             receiptID: "b",
             itemRecall: 0.5,
             itemPrecision: 0.5,
-            itemPriceAccuracy: 0.5,
             itemDescriptionAccuracy: 0.5,
             quantityAccuracy: 0.5,
             subtotalCorrect: false,
@@ -183,7 +180,6 @@ final class BenchmarkReportComparisonTests: XCTestCase {
                 receiptCount: 2,
                 itemRecall: 0.8,
                 itemPrecision: 0.9,
-                itemPriceAccuracy: 0.85,
                 itemDescriptionAccuracy: 0.75,
                 quantityAccuracy: 0.95,
                 subtotalIdentificationRate: 1.0,
@@ -203,7 +199,6 @@ final class BenchmarkReportComparisonTests: XCTestCase {
                 receiptCount: 2,
                 itemRecall: 0.9,
                 itemPrecision: 0.9,
-                itemPriceAccuracy: 0.9,
                 itemDescriptionAccuracy: 0.8,
                 quantityAccuracy: 0.95,
                 subtotalIdentificationRate: 1.0,
