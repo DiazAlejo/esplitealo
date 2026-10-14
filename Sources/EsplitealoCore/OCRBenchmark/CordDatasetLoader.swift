@@ -54,10 +54,14 @@ public enum CordGroundTruthParser {
     public static func parse(id: String, data: Data) throws -> ReceiptGroundTruth {
         let rootObject = try JSONSerialization.jsonObject(with: data)
         let json = unwrapRoot(rootObject)
-        let items = menuItems(from: json["menu"])
-        let subtotal = amountMinor(from: json["sub_total"], keys: ["subtotal_price", "price"])
-        let tax = amountMinor(from: json["sub_total"], keys: ["tax_price"]) ?? amountMinor(from: json["tax"], keys: ["price"])
-        let total = amountMinor(from: json["total"], keys: ["total_price", "price"])
+        let format = NumberFormatInference.infer(
+            from: priceStrings(in: json).compactMap(AmountToken.parse)
+        )
+        let items = menuItems(from: json["menu"], format: format)
+        let subtotal = amountMinor(from: json["sub_total"], keys: ["subtotal_price", "price"], format: format)
+        let tax = amountMinor(from: json["sub_total"], keys: ["tax_price"], format: format)
+            ?? amountMinor(from: json["tax"], keys: ["price"], format: format)
+        let total = amountMinor(from: json["total"], keys: ["total_price", "price"], format: format)
         return ReceiptGroundTruth(
             id: id,
             items: items,
@@ -75,13 +79,13 @@ public enum CordGroundTruthParser {
         return value as? [String: Any] ?? [:]
     }
 
-    private static func menuItems(from value: Any?) -> [GroundTruthItem] {
+    private static func menuItems(from value: Any?, format: NumberFormat) -> [GroundTruthItem] {
         if let array = value as? [[String: Any]] {
-            return array.compactMap { item(from: $0) }
+            return array.compactMap { item(from: $0, format: format) }
         }
         guard let menu = value as? [String: Any] else { return [] }
         if menu["nm"] is String {
-            if let item = itemFromFlatMenu(menu) { return [item] }
+            if let item = item(from: menu, format: format) { return [item] }
             return []
         }
         let names = indexedStrings(menu["nm"])
@@ -91,24 +95,20 @@ public enum CordGroundTruthParser {
         var items: [GroundTruthItem] = []
         for (index, name) in names.sorted(by: { $0.key < $1.key }) {
             let priceString = prices[index] ?? ""
-            guard let minor = digitsOnlyMinor(priceString) else { continue }
+            guard let minor = minor(priceString, format: format) else { continue }
             let qty = parseQuantity(counts[index] ?? "1")
             items.append(GroundTruthItem(name: name, quantity: qty, lineTotalMinor: minor))
         }
         return items
     }
 
-    private static func item(from dict: [String: Any]) -> GroundTruthItem? {
+    private static func item(from dict: [String: Any], format: NumberFormat) -> GroundTruthItem? {
         let name = (dict["nm"] as? String) ?? (dict["name"] as? String) ?? ""
         guard !name.isEmpty else { return nil }
         let priceRaw = (dict["price"] as? String) ?? (dict["itemsubtotal"] as? String) ?? (dict["price"] as? Int).map(String.init) ?? ""
-        guard let minor = digitsOnlyMinor(priceRaw) else { return nil }
+        guard let minor = minor(priceRaw, format: format) else { return nil }
         let qty = parseQuantity((dict["cnt"] as? String) ?? (dict["num"] as? String) ?? "1")
         return GroundTruthItem(name: name, quantity: qty, lineTotalMinor: minor)
-    }
-
-    private static func itemFromFlatMenu(_ menu: [String: Any]) -> GroundTruthItem? {
-        item(from: menu)
     }
 
     private static func indexedStrings(_ value: Any?) -> [String: String] {
@@ -127,22 +127,35 @@ public enum CordGroundTruthParser {
         return 1
     }
 
-    private static func amountMinor(from value: Any?, keys: [String]) -> Int? {
+    private static func amountMinor(from value: Any?, keys: [String], format: NumberFormat) -> Int? {
         guard let dict = value as? [String: Any] else {
-            if let price = value as? String { return digitsOnlyMinor(price) }
+            if let price = value as? String { return minor(price, format: format) }
             return nil
         }
         for key in keys {
-            if let price = dict[key] as? String, let minor = digitsOnlyMinor(price) { return minor }
-            if let price = dict[key] as? Int { return price }
+            if let price = dict[key] as? String, let value = minor(price, format: format) { return value }
+            if let price = dict[key] as? Int, let value = minor(String(price), format: format) { return value }
         }
         return nil
     }
 
-    /// CORD prices are often whole currency units without a decimal point; store as printed digits.
-    public static func digitsOnlyMinor(_ raw: String) -> Int? {
-        let digits = raw.filter(\.isNumber)
-        guard !digits.isEmpty else { return nil }
-        return Int(digits)
+    /// Interprets a printed price with the same per-receipt number format the parser infers,
+    /// so whole-unit prices ("12" on a USD receipt, "12.500" on an IDR one) compare equal to parser output.
+    public static func minor(_ raw: String, format: NumberFormat) -> Int? {
+        guard let token = AmountToken.parse(raw) else { return nil }
+        return NumberFormatInference.minorUnits(token, format: format)
+    }
+
+    private static func priceStrings(in value: Any) -> [String] {
+        if let dict = value as? [String: Any] {
+            return dict.flatMap { key, child -> [String] in
+                if let text = child as? String {
+                    return key.contains("price") || key.contains("subtotal") ? [text] : []
+                }
+                return priceStrings(in: child)
+            }
+        }
+        if let array = value as? [Any] { return array.flatMap(priceStrings) }
+        return []
     }
 }
