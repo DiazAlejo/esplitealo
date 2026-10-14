@@ -45,7 +45,7 @@ public struct ChavitoPalette: Equatable, Sendable {
     public var ground: ChavitoColor
 
     // Illustration colours are constant across appearances (tokens.css defines `--m-*` once, pink is the same
-    // #EA5A78 in dark); only the soft disc and the ground change.
+    // #EA5A78 in dark, and so is the soft pink disc); only the ground changes.
     public static let light = ChavitoPalette(
         fur: ChavitoColor(hex: 0x9AA5B1),
         furShade: ChavitoColor(hex: 0x5A6470),
@@ -68,7 +68,7 @@ public struct ChavitoPalette: Equatable, Sendable {
         nose: light.nose,
         tear: light.tear,
         white: light.white,
-        disc: ChavitoColor(hex: 0x4D2630),
+        disc: light.disc,
         ground: ChavitoColor(hex: 0x0F2A21)
     )
 

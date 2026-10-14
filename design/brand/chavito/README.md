@@ -12,8 +12,8 @@ Reference exports of Chavito, the Esplitealo raccoon, generated from the SwiftUI
 Variants, for each of `neutral`, `happy`, `thinking`, `worried`:
 
 - `chavito-<expression>`: the bare head on transparent ground. Identical in light and dark (illustration colours are constant; pink stays `#EA5A78`, the muzzle stays cream `#F5EEDF`).
-- `chavito-<expression>-disc`: Chavito on the soft pink disc, light (`#FCE8EC`, `--pink-soft`).
-- `chavito-<expression>-disc-on-dark`: the dark disc (`#4D2630`) on the dark ground `#0F2A21`.
+- `chavito-<expression>-disc`: Chavito on the soft pink disc, (`#FCE8EC`, the light `--pink-soft`).
+- `chavito-<expression>-disc-on-dark`: the same pink disc (`#FCE8EC`; pink does not shift in dark mode) on the dark ground `#0F2A21`.
 
 Regenerate after changing the artwork (the SVGs are also checked against the generator by `swift test`):
 
