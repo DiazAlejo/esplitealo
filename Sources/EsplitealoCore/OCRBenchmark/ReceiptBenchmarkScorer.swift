@@ -114,6 +114,18 @@ public struct ReceiptBenchmarkScorer: Sendable {
         )
     }
 
+    public static func scopeSplit(
+        receipts: [ReceiptPerReceiptScore],
+        inScopeIDs: Set<String>
+    ) -> BenchmarkScopeSplit {
+        let inScope = receipts.filter { inScopeIDs.contains($0.receiptID) }
+        let outScope = receipts.filter { !inScopeIDs.contains($0.receiptID) }
+        return BenchmarkScopeSplit(
+            inProductScope: aggregate(inScope),
+            outOfProductScope: aggregate(outScope)
+        )
+    }
+
     public static func aggregate(_ scores: [ReceiptPerReceiptScore]) -> BenchmarkAggregateMetrics {
         guard !scores.isEmpty else {
             return BenchmarkAggregateMetrics(

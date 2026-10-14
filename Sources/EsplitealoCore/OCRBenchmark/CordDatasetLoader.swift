@@ -3,6 +3,8 @@ import Foundation
 public struct CordReceiptRecord: Sendable {
     public var imageURL: URL
     public var groundTruth: ReceiptGroundTruth
+    public var groundTruthJSON: String
+    public var isInProductScope: Bool
 }
 
 /// Loads CORD v2 samples from a local cache (images + `*.gt.json` sidecars produced by `Scripts/fetch-cord-benchmark.py`).
@@ -22,8 +24,17 @@ public enum CordDatasetLoader {
                   FileManager.default.fileExists(atPath: imageURL.path)
             else { continue }
             let gtData = try Data(contentsOf: gtURL)
+            let jsonText = String(data: gtData, encoding: .utf8) ?? ""
             let parsed = try CordGroundTruthParser.parse(id: entry.id, data: gtData)
-            records.append(CordReceiptRecord(imageURL: imageURL, groundTruth: parsed))
+            let inScope = CordBenchmarkScope.isInProductScope(groundTruthJSON: jsonText, groundTruth: parsed)
+            records.append(
+                CordReceiptRecord(
+                    imageURL: imageURL,
+                    groundTruth: parsed,
+                    groundTruthJSON: jsonText,
+                    isInProductScope: inScope
+                )
+            )
         }
         return records
     }

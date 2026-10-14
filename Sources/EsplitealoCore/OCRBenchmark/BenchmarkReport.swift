@@ -12,6 +12,11 @@ public struct BenchmarkRunConfig: Codable, Equatable, Sendable {
     }
 }
 
+public struct BenchmarkScopeSplit: Codable, Equatable, Sendable {
+    public var inProductScope: BenchmarkAggregateMetrics
+    public var outOfProductScope: BenchmarkAggregateMetrics
+}
+
 public struct BenchmarkReport: Codable, Equatable, Sendable {
     public var schemaVersion: Int
     public var runID: String
@@ -20,6 +25,7 @@ public struct BenchmarkReport: Codable, Equatable, Sendable {
     public var config: BenchmarkRunConfig
     public var aggregate: BenchmarkAggregateMetrics
     public var receipts: [ReceiptPerReceiptScore]
+    public var scopeSplit: BenchmarkScopeSplit?
 
     public init(
         schemaVersion: Int = 1,
@@ -28,7 +34,8 @@ public struct BenchmarkReport: Codable, Equatable, Sendable {
         datasetName: String,
         config: BenchmarkRunConfig,
         aggregate: BenchmarkAggregateMetrics,
-        receipts: [ReceiptPerReceiptScore]
+        receipts: [ReceiptPerReceiptScore],
+        scopeSplit: BenchmarkScopeSplit? = nil
     ) {
         self.schemaVersion = schemaVersion
         self.runID = runID
@@ -37,6 +44,7 @@ public struct BenchmarkReport: Codable, Equatable, Sendable {
         self.config = config
         self.aggregate = aggregate
         self.receipts = receipts
+        self.scopeSplit = scopeSplit
     }
 
     public func jsonData() throws -> Data {

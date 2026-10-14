@@ -81,7 +81,7 @@ struct EsplitealoOCRBenchmarkCLI {
             let image = try loadCGImage(record.imageURL)
             return (image, record.groundTruth)
         }
-        let report = try await OCRBenchmarkHarness.evaluateVision(
+        var report = try await OCRBenchmarkHarness.evaluateVision(
             samples: pairs,
             datasetName: "cord-v2",
             config: BenchmarkRunConfig(
@@ -90,6 +90,8 @@ struct EsplitealoOCRBenchmarkCLI {
                 datasetPath: cacheDirectory.path
             )
         )
+        let inScopeIDs = Set(records.filter(\.isInProductScope).map(\.groundTruth.id))
+        report.scopeSplit = ReceiptBenchmarkScorer.scopeSplit(receipts: report.receipts, inScopeIDs: inScopeIDs)
         try writeReport(report, to: URL(fileURLWithPath: output))
         return report
         #else
@@ -134,6 +136,16 @@ struct EsplitealoOCRBenchmarkCLI {
             totalID=\(format(agg.totalIdentificationRate)) reconciliation=\(format(agg.reconciliationAgreementRate))
             """
         )
+        if let split = report.scopeSplit {
+            let ins = split.inProductScope
+            let out = split.outOfProductScope
+            print(
+                """
+                scope=inProduct receipts=\(ins.receiptCount) recall=\(format(ins.itemRecall)) totalID=\(format(ins.totalIdentificationRate))
+                scope=outOfProduct receipts=\(out.receiptCount) recall=\(format(out.itemRecall)) totalID=\(format(out.totalIdentificationRate))
+                """
+            )
+        }
     }
 
     private static func format(_ value: Double) -> String {
