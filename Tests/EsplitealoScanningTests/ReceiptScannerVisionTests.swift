@@ -15,18 +15,22 @@ final class ReceiptScannerVisionTests: XCTestCase {
     }
 
     private func skipIfVisionIntegrationDisabled() throws {
-        #if !canImport(AppKit)
-        throw XCTSkip("Synthetic receipt images are rendered with AppKit, which is macOS only")
-        #endif
+        #if canImport(AppKit)
         if ProcessInfo.processInfo.environment["ESPLITEALO_SKIP_VISION_INTEGRATION"] != nil {
             throw XCTSkip("Vision integration disabled for this run")
         }
+        #else
+        throw XCTSkip("Synthetic receipt images are rendered with AppKit, which is macOS only")
+        #endif
     }
 
     func testAccurateModeSupportsSpanishAndEnglish() throws {
-        let languages = try VNRecognizeTextRequest.supportedRecognitionLanguages(for: .accurate, revision: VNRecognizeTextRequestRevision3)
-        XCTAssertTrue(languages.contains("es-ES"))
-        XCTAssertTrue(languages.contains("en-US"))
+        var request = RecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        let languages = request.supportedRecognitionLanguages.map(\.maximalIdentifier)
+        for expected in ReceiptScanner.defaultRecognitionLanguages {
+            XCTAssertTrue(languages.contains(Locale.Language(identifier: expected).maximalIdentifier), expected)
+        }
     }
 
     func testPRIvuBistroEndToEnd() async throws {
