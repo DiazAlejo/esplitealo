@@ -11,10 +11,11 @@ body{padding:0 0 60px}
 .wrap{max-width:1500px;margin:0 auto;padding:0 24px}
 header.top{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between;padding:22px 0 10px}
 header.top h1{margin:0;font:400 30px/1.1 var(--f-title);letter-spacing:.02em;display:flex;gap:12px;align-items:center}
-header.top h1 .wordmark{font-size:30px}
+header.top h1 .wm{font-size:30px;position:relative;top:-.083em}
 header.top p{margin:6px 0 0;color:var(--page-ink2);font-size:15px;max-width:640px}
 .ctrls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;font-size:14px;color:var(--page-ink2)}
 .cta{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:var(--on-primary);font-weight:600;padding:12px 18px;border-radius:14px;text-decoration:none;border-bottom:3px solid var(--primary-lip)}
+.cta.alt{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
 .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 4px;position:sticky;top:0;z-index:20;background:var(--page);padding:10px 0;border-bottom:1px solid var(--line)}
 .flow a{color:var(--page-ink);text-decoration:none;font-size:14px;font-weight:600;padding:6px 12px;border-radius:999px;background:var(--page-card);border:1px solid var(--line)}
 .flow a:hover{border-color:var(--primary)}
@@ -22,6 +23,7 @@ header.top p{margin:6px 0 0;color:var(--page-ink2);font-size:15px;max-width:640p
 #groups{display:flex;flex-wrap:wrap;gap:34px 56px;align-items:flex-start;margin-top:26px}
 section.grp{scroll-margin-top:70px}
 section.grp>h2{margin:0 0 4px;font:400 24px var(--f-title);display:flex;gap:10px;align-items:baseline}
+section.grp>h2::before{content:"";flex:none;width:.62em;height:.62em;align-self:center;background:var(--pink);-webkit-mask:var(--div-mask) center/contain no-repeat;mask:var(--div-mask) center/contain no-repeat}
 section.grp>h2 span{font:500 14px var(--f-text);text-transform:none;color:var(--page-ink2)}
 .row{display:flex;flex-wrap:wrap;gap:22px 28px;margin-top:14px}
 figure{margin:0;width:__W__px}
@@ -41,9 +43,11 @@ figcaption a:hover{text-decoration:underline}
   <p id="intro"></p></div>
   <div class="ctrls">
     <span><span class="tb-label" id="l-mode"></span><span class="seg"><button data-theme-btn="light" id="b-light"></button><button data-theme-btn="dark" id="b-dark"></button></span></span>
+    <span><span class="tb-label" id="l-people"></span><span class="seg"><button data-people-btn="new" id="b-pnew"></button><button data-people-btn="old" id="b-pold"></button></span></span>
     <label style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="rm"> <span id="l-rm"></span></label>
     <span class="seg"><button aria-pressed="true" disabled id="lang-here"></button><a class="langsw" id="lang-sw"></a></span>
     <a class="cta" id="proto" href="prototype.html"></a>
+    <a class="cta alt" id="plan" href="../colors.html"></a>
   </div>
 </header>
 <nav class="flow" id="flow"></nav>
@@ -60,10 +64,12 @@ __MASCOT__
 (function(){
   var SCREENS = __SCREENS__, S = __S__, T = window.ESP_T, X = T.idx, L = T.lang;
   var H = function(id, v){ document.getElementById(id).innerHTML = v; };
-  H('h1', X.h1); H('intro', X.intro); H('l-mode', X.mode); H('b-light', X.light); H('b-dark', X.dark); H('l-rm', X.reduce); H('proto', X.proto); H('lang-here', T.thisLabel); H('lang-sw', T.otherLabel);
+  H('h1', X.h1); H('intro', X.intro); H('l-mode', X.mode); H('b-light', X.light); H('b-dark', X.dark); H('l-rm', X.reduce); H('proto', X.proto); H('plan', X.plan); H('l-people', X.people); H('b-pnew', X.peopleNew); H('b-pold', X.peopleOld); H('lang-here', T.thisLabel); H('lang-sw', T.otherLabel);
   document.getElementById('flow').setAttribute('aria-label', X.flow);
   document.getElementById('lang-sw').href = '../' + T.other + '/index.html';
   var root = document.documentElement, qs = new URLSearchParams(location.search);
+  var people = qs.get('people') === 'old' ? 'old' : 'new'; root.dataset.people = people; root.dataset.share = people;
+  function Q(t){ return 'theme=' + t + (people === 'old' ? '&people=old' : ''); }
   var theme = qs.get('theme'); try { theme = theme || localStorage.getItem('esp-theme'); } catch(e){}
   theme = theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   document.getElementById('logo').innerHTML = Raccoon.mark(40);
@@ -81,13 +87,21 @@ __MASCOT__
     theme = t; root.dataset.theme = t; try{localStorage.setItem('esp-theme',t);}catch(e){}
     document.querySelectorAll('[data-theme-btn]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.themeBtn===t); });
     frames().forEach(function(f){ try{ f.contentWindow.postMessage({esp:'theme',v:t},'*'); }catch(e){} });
-    document.querySelectorAll('a[href]').forEach(function(a){ if(/\.html/.test(a.getAttribute('href'))){ a.href = a.getAttribute('href').split('?')[0]+'?theme='+t; } });
+    document.querySelectorAll('a[href]').forEach(function(a){ if(/\.html/.test(a.getAttribute('href'))){ a.href = a.getAttribute('href').split('?')[0]+'?'+Q(t); } });
   }
   frames().forEach(function(f){
-    f.src = f.dataset.file+'?embed=1&theme='+theme;
-    f.addEventListener('load', function(){ try{ f.contentWindow.postMessage({esp:'theme',v:theme},'*'); f.contentWindow.postMessage({esp:'reduce',v:document.getElementById('rm').checked},'*'); }catch(e){} });
+    f.src = f.dataset.file+'?embed=1&'+Q(theme);
+    f.addEventListener('load', function(){ try{ f.contentWindow.postMessage({esp:'theme',v:theme},'*'); f.contentWindow.postMessage({esp:'people',v:people},'*'); f.contentWindow.postMessage({esp:'reduce',v:document.getElementById('rm').checked},'*'); }catch(e){} });
   });
   document.querySelectorAll('[data-theme-btn]').forEach(function(b){ b.onclick=function(){ setTheme(b.dataset.themeBtn); }; });
+  function setPeople(v){
+    people = v; root.dataset.people = v; root.dataset.share = v;
+    document.querySelectorAll('[data-people-btn]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.peopleBtn===v); });
+    frames().forEach(function(f){ try{ f.contentWindow.postMessage({esp:'people',v:v},'*'); }catch(e){} });
+    try{ var u = new URL(location.href); if(v==='old') u.searchParams.set('people','old'); else u.searchParams.delete('people'); history.replaceState(null,'',u.toString()); }catch(e){}
+    setTheme(theme);
+  }
+  document.querySelectorAll('[data-people-btn]').forEach(function(b){ b.onclick=function(){ setPeople(b.dataset.peopleBtn); }; b.setAttribute('aria-pressed', b.dataset.peopleBtn===people); });
   document.getElementById('rm').onchange=function(e){ root.dataset.reduce = e.target.checked?'1':'0'; frames().forEach(function(f){ try{ f.contentWindow.postMessage({esp:'reduce',v:e.target.checked},'*'); }catch(x){} }); };
   setTheme(theme);
 })();

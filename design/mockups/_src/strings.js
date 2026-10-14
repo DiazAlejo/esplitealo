@@ -16,7 +16,7 @@
     dateShort: '13 oct',
     paper: { addr: 'Calle Loíza 214 · Mesa 12', when: '10/13/26 · 7:42 PM · Mesera: Neidy', sub: 'Subtotal', tax: 'Impuesto 11.5%', service: 'Cargo por servicio 15%', total: 'TOTAL', thanks: '¡Gracias por su visita!' },
     /* chrome */
-    tb: { all: '← Todas las pantallas', mode: 'Modo', light: 'Claro', dark: 'Oscuro', demo: 'Datos de ejemplo', scan: 'Escaneo', mid: 'A medias', complete: 'Completo', service: 'Con servicio', reduce: 'Reducir movimiento',
+    tb: { all: '← Todas las pantallas', mode: 'Modo', light: 'Claro', dark: 'Oscuro', people: 'Colores de personas y de compartir', peopleNew: 'Propuestos', peopleOld: 'Anteriores', peopleNewTip: 'Colores propuestos de las personas y de la hoja de compartir', peopleOldTip: 'Colores de la versión anterior (para comparar)', demo: 'Datos de ejemplo', scan: 'Escaneo', mid: 'A medias', complete: 'Completo', service: 'Con servicio', reduce: 'Reducir movimiento',
       scanTip: 'Escaneo nuevo con un error de lectura', midTip: 'Cuatro amigos, 6 de 8 artículos marcados', completeTip: 'Todos los artículos marcados', serviceTip: 'El recibo trae cargo por servicio: la propina empieza en $0',
       lang: 'Idioma' },
     titles: { home: '1 · Inicio', capture: '2 · Cámara', processing: '3 · Procesando el escaneo', review: '4 · Chequear el recibo', people: '5 · Añadir personas', assign: '6 · Marcar artículos', totals: '7 · Totales y compartir' },
@@ -101,9 +101,9 @@
     mascot: { expr: { neutral: 'Chavito, el mapache', happy: 'Chavito, el mapache, contento', thinking: 'Chavito, el mapache, pensando', worried: 'Chavito, el mapache, preocupado' },
       home: 'Chavito, el mapache, con un recibo largo', processing: 'Chavito leyendo un recibo con una lupa', failed: 'Chavito, preocupado, con un recibo borroso', empty: 'Chavito esperando junto a cuatro sillas vacías', success: 'Chavito celebrando' },
     /* gallery */
-    idx: { title: 'Esplitéalo · diseños de pantallas', h1: '<span class="wordmark">Esplitéalo</span> · diseños de pantallas',
+    idx: { title: 'Esplitéalo · diseños de pantallas', h1: window.ESP_WM + ' · diseños de pantallas',
       intro: 'Siete pantallas dibujadas como HTML clicable dentro de un iPhone. Todos los teléfonos de abajo funcionan: toca filas, abre hojas, edita precios. Abre cualquier pantalla a tamaño completo o recorre todo el flujo en un solo teléfono.',
-      mode: 'Modo', light: 'Claro', dark: 'Oscuro', reduce: 'Reducir movimiento', proto: 'Abrir el prototipo completo →', flow: 'Flujo de pantallas', state: ' estado', states: ' estados', open: 'Abrir a tamaño completo ↗' }
+      mode: 'Modo', light: 'Claro', dark: 'Oscuro', people: 'Colores de personas y de compartir', peopleNew: 'Propuestos', peopleOld: 'Anteriores', plan: 'Plan de colores de personas y compartir (en inglés) →', reduce: 'Reducir movimiento', proto: 'Abrir el prototipo completo →', flow: 'Flujo de pantallas', state: ' estado', states: ' estados', open: 'Abrir a tamaño completo ↗' }
   };
 
   var en = {
@@ -114,7 +114,7 @@
     recent: [['Pinchos in Piñones', 'Oct 4', 6210, 3], ['Brunch in Santurce', 'Sep 28', 8740, 5]],
     dateShort: 'Oct 13',
     paper: { addr: 'Calle Loíza 214 · Table 12', when: '10/13/26 · 7:42 PM · Server: Neidy', sub: 'Subtotal', tax: 'Tax 11.5%', service: 'Service charge 15%', total: 'TOTAL', thanks: 'Thank you!' },
-    tb: { all: '← All screens', mode: 'Mode', light: 'Light', dark: 'Dark', demo: 'Demo data', scan: 'Scan', mid: 'Mid-way', complete: 'Complete', service: 'With service', reduce: 'Reduce motion',
+    tb: { all: '← All screens', mode: 'Mode', light: 'Light', dark: 'Dark', people: 'Person and share-sheet colors', peopleNew: 'Proposed', peopleOld: 'Previous', peopleNewTip: 'Proposed person and share-sheet colors', peopleOldTip: 'Previous version colors (to compare)', demo: 'Demo data', scan: 'Scan', mid: 'Mid-way', complete: 'Complete', service: 'With service', reduce: 'Reduce motion',
       scanTip: 'Fresh scan with an OCR mistake', midTip: 'Four friends, 6 of 8 items assigned', completeTip: 'All items assigned', serviceTip: 'The receipt has a service charge: tip starts at $0', lang: 'Language' },
     titles: { home: '1 · Home', capture: '2 · Capture', processing: '3 · Scan processing', review: '4 · Review receipt', people: '5 · Add people', assign: '6 · Assign items', totals: '7 · Totals and share' },
     haptic: { 'selection tick': 'selection tick', warning: 'warning', success: 'success' }, hapticWord: 'haptic',
@@ -183,9 +183,9 @@
     ok: { title: 'All settled up!', body: function (n, v) { return n + ' amounts sent, adding up to <b class="num" style="color:var(--ink)">' + v + '</b>. Nobody had to do math. I took care of it.'; }, again: 'Start a new bill', back: 'Back to totals' },
     mascot: { expr: { neutral: 'Chavito the raccoon', happy: 'Chavito the raccoon, happy', thinking: 'Chavito the raccoon, thinking', worried: 'Chavito the raccoon, worried' },
       home: 'Chavito the raccoon holding a long receipt', processing: 'Chavito reading a receipt with a magnifying glass', failed: 'Chavito, worried, holding a blurry receipt', empty: 'Chavito waiting beside four empty seats', success: 'Chavito celebrating' },
-    idx: { title: 'Esplitéalo · screen designs', h1: '<span class="wordmark">Esplitéalo</span> · screen designs',
+    idx: { title: 'Esplitéalo · screen designs', h1: window.ESP_WM + ' · screen designs',
       intro: 'Seven screens, drawn as clickable HTML in an iPhone frame. Every phone below is live: tap rows, open sheets, edit prices. Open any screen full size, or click through the whole flow in one phone.',
-      mode: 'Mode', light: 'Light', dark: 'Dark', reduce: 'Reduce motion', proto: 'Open full prototype →', flow: 'Screen flow', state: ' state', states: ' states', open: 'Open full size ↗' }
+      mode: 'Mode', light: 'Light', dark: 'Dark', people: 'Person and share-sheet colors', peopleNew: 'Proposed', peopleOld: 'Previous', plan: 'Person and share-sheet color plan →', reduce: 'Reduce motion', proto: 'Open full prototype →', flow: 'Screen flow', state: ' state', states: ' states', open: 'Open full size ↗' }
   };
 
   root.ESP_I18N = { es: es, en: en };
