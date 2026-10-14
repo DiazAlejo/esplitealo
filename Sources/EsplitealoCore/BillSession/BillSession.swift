@@ -42,15 +42,29 @@ public struct BillSession: Sendable {
 
     public var phase: BillSessionPhase {
         if participants.isEmpty { return .draft }
+        if draft.total == nil { return .missingPrintedTotal }
         if !draft.reconciliation.reconciles, !mismatchAcknowledged { return .mismatch }
         if !unassignedUnits.isEmpty { return .needsAssignment }
         if canShare { return .ready }
-        if !draft.reconciliation.reconciles { return .mismatch }
-        return .needsAssignment
+        return .totals
+    }
+
+    public var shareBlockReason: ShareBlockReason? {
+        if canShare { return nil }
+        if draft.total == nil { return .missingPrintedTotal }
+        if !unassignedUnits.isEmpty { return .unassignedItems }
+        if !draft.reconciliation.reconciles { return .receiptMismatch }
+        if !financialTotalsMatch { return .receiptMismatch }
+        return .receiptMismatch
     }
 
     public var canShare: Bool {
-        draft.reconciliation.reconciles && splitResult.isSettled && financialTotalsMatch
+        guard draft.total != nil else { return false }
+        guard draft.reconciliation.reconciles, splitResult.isSettled, financialTotalsMatch else { return false }
+        if let printed = printedReceiptTotalCents {
+            return derivedBillTotalCents == printed + sessionTipCents
+        }
+        return false
     }
 
     public var sessionTipCents: Int {
@@ -59,18 +73,30 @@ public struct BillSession: Sendable {
         return BillCalculator.tipAmount(tip: tip, itemsSubtotal: itemsSubtotal, taxCents: tax)
     }
 
-    public var printedReceiptTotalCents: Int {
-        draft.total?.minorUnits ?? 0
+    public var printedReceiptTotalCents: Int? {
+        draft.total.map(\.minorUnits)
+    }
+
+    /// Tip/gratuity printed on the receipt (allocated across people; not session tip).
+    public var receiptTipOnBillCents: Int {
+        guard serviceChargeCents == 0 else { return 0 }
+        return draft.tip?.minorUnits ?? 0
+    }
+
+    public var derivedBillTotalCents: Int {
+        let items = draft.items.reduce(0) { $0 + $1.lineTotal.minorUnits }
+        let tax = draft.tax?.minorUnits ?? 0
+        return items + tax + serviceChargeCents + receiptTipOnBillCents + sessionTipCents
     }
 
     public var confirmedBillTotalCents: Int {
-        printedReceiptTotalCents + sessionTipCents
+        derivedBillTotalCents
     }
 
     private var financialTotalsMatch: Bool {
         guard splitResult.isSettled else { return false }
         let sum = personBreakdowns.map(\.totalOwedCents).reduce(0, +)
-        return sum == confirmedBillTotalCents
+        return sum == derivedBillTotalCents
     }
 
     public var splitResult: BillSplitResult {
@@ -82,6 +108,7 @@ public struct BillSession: Sendable {
         public var itemSubtotalCents: Int
         public var taxShareCents: Int
         public var serviceShareCents: Int
+        public var receiptTipShareCents: Int
         public var tipShareCents: Int
         public var totalOwedCents: Int
         public var adjustments: [RoundingAdjustment]
@@ -98,9 +125,15 @@ public struct BillSession: Sendable {
             participants: ordered,
             weights: weights
         )
+        let receiptTipShares = SessionPoolAllocator.allocate(
+            amount: receiptTipOnBillCents,
+            participants: ordered,
+            weights: weights
+        )
         return ordered.enumerated().map { offset, participant in
             let share = split.shares.first { $0.participantID == participant.id }
             let service = serviceShares[offset]
+            let receiptTip = receiptTipShares[offset]
             let items = share?.itemSubtotalCents ?? 0
             let tax = share?.taxShareCents ?? 0
             let tipShare = share?.tipShareCents ?? 0
@@ -109,8 +142,9 @@ public struct BillSession: Sendable {
                 itemSubtotalCents: items,
                 taxShareCents: tax,
                 serviceShareCents: service,
+                receiptTipShareCents: receiptTip,
                 tipShareCents: tipShare,
-                totalOwedCents: items + tax + service + tipShare,
+                totalOwedCents: items + tax + service + receiptTip + tipShare,
                 adjustments: share?.adjustments ?? []
             )
         }

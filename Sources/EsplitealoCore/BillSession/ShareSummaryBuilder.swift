@@ -4,7 +4,8 @@ public enum ShareSummaryBuilder {
     public static func build(for session: BillSession, language: ShareLanguage) -> String {
         let strings = ShareSummaryStrings.bundle(for: language)
         let date = language == .es ? session.dateLabel : session.dateLabelEnglish
-        let bill = MoneyFormatting.usd(cents: session.printedReceiptTotalCents)
+        guard let printedTotal = session.printedReceiptTotalCents else { return "" }
+        let bill = MoneyFormatting.usd(cents: printedTotal)
         let tipCents = session.sessionTipCents
         let tipLabel =
             switch session.tip {

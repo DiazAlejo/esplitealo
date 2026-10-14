@@ -2,9 +2,17 @@ import Foundation
 
 public enum BillSessionPhase: Equatable, Sendable {
     case draft
-    case needsAssignment
+    case missingPrintedTotal
     case mismatch
+    case needsAssignment
+    case totals
     case ready
+}
+
+public enum ShareBlockReason: Equatable, Sendable {
+    case missingPrintedTotal
+    case receiptMismatch
+    case unassignedItems
 }
 
 public enum AddParticipantResult: Equatable, Sendable {

@@ -42,18 +42,22 @@ Holds:
 
 - Default session tip is 20% pre-tax; tip starts at 0% when `serviceChargeCents` or a receipt tip line is present.
 - `splitResult` and `personBreakdowns` call `BillCalculator`; service shares use the same largest-remainder rule via `SessionPoolAllocator`.
-- `canShare` requires reconciliation, full assignment, and person totals summing to `confirmedBillTotalCents` (printed receipt total + session tip).
+- `confirmedBillTotalCents` is always **derived** from allocated components: items + tax + `serviceChargeCents` + `receiptTipOnBillCents` (from `draft.tip` when there is no service charge) + session tip. Person totals must equal that sum exactly.
+- `printedReceiptTotalCents` is optional (`nil` when the draft has no printed total). A missing total is never treated as zero; `phase` is `.missingPrintedTotal` and sharing is blocked with `shareBlockReason == .missingPrintedTotal`.
+- `canShare` additionally requires reconciliation, full assignment, person totals matching the derived total, and `derivedBillTotalCents == printedReceiptTotal + sessionTipCents` when a printed total exists.
 
 ### Phase (`BillSessionPhase`)
 
 | Phase | Meaning |
 | ----- | ------- |
 | `draft` | No participants yet |
+| `missingPrintedTotal` | No printed receipt total to reconcile against |
 | `mismatch` | Receipt numbers do not reconcile and the user has not acknowledged |
 | `needsAssignment` | Unclaimed units remain |
+| `totals` | Assigned; user can review totals but not share yet |
 | `ready` | `canShare` is true |
 
-Mismatch blocks sharing but may be acknowledged to continue; sharing stays blocked until the receipt reconciles.
+After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it moves through assignment and `.totals` as usual while `canShare` stays false until the receipt reconciles. `shareBlockReason` exposes why sharing is blocked (`missingPrintedTotal`, `receiptMismatch`, `unassignedItems`).
 
 ## Share text
 

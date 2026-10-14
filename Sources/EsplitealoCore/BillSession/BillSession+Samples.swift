@@ -77,6 +77,52 @@ extension BillSession {
         return session
     }
 
+    static func sampleMismatchFullyAssigned() -> BillSession {
+        var session = sampleMismatch()
+        let item = session.draft.items[0]
+        session.assignUnit(itemID: item.id, unitIndex: 0, participantIDs: [session.participants[0].id])
+        return session
+    }
+
+    static func sampleReadyToShareWithPrintedTip() -> BillSession {
+        let alexID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        let samID = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+        let alexItem = DraftItem(
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000001")!,
+            name: "Alex plate",
+            quantity: 1,
+            lineTotal: DraftAmount(minorUnits: 6000)
+        )
+        let samItem = DraftItem(
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000002")!,
+            name: "Sam plate",
+            quantity: 1,
+            lineTotal: DraftAmount(minorUnits: 4000)
+        )
+        var draft = ReceiptDraft(
+            items: [alexItem, samItem],
+            subtotal: DraftAmount(minorUnits: 10_000),
+            tax: DraftAmount(minorUnits: 1000),
+            tip: DraftAmount(minorUnits: 2000),
+            total: DraftAmount(minorUnits: 13_000)
+        )
+        draft = ReceiptDraftEditing.reconcile(draft)
+        let alex = Participant(id: alexID, name: "Alex", orderIndex: 0)
+        let sam = Participant(id: samID, name: "Sam", orderIndex: 1)
+        return BillSession(
+            draft: draft,
+            merchantName: "Fonda Doña Lola",
+            dateLabel: "13 oct",
+            dateLabelEnglish: "Oct 13",
+            participants: [alex, sam],
+            assignments: [
+                ItemAssignment(itemID: alexItem.id, unitIndex: 0, participantIDs: [alexID]),
+                ItemAssignment(itemID: samItem.id, unitIndex: 0, participantIDs: [samID]),
+            ],
+            tip: .percentage(percent: 0, basis: .preTaxSubtotal)
+        )
+    }
+
     static func sampleWithServiceCharge() -> BillSession {
         var draft = ReceiptDraft(
             items: [DraftItem(name: "Plate", quantity: 1, lineTotal: DraftAmount(minorUnits: 10_100))],
