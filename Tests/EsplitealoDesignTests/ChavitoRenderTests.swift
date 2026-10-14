@@ -95,16 +95,16 @@ final class ChavitoRenderTests: XCTestCase {
         }
     }
 
-    func testDiscColourFollowsAppearance() throws {
+    func testDiscColourDoesNotShiftInDark() throws {
         // 208 pt wide disc: 1 pt per art unit. Pixel (20, 104) is far left of centre, clear of the head.
         let light = try render(chavito(.neutral, size: 208, disc: true, dark: false)).pixel(20, 104)
         XCTAssertEqual(light.r, 0xFC, accuracy: 4)
         XCTAssertEqual(light.g, 0xE8, accuracy: 4)
         XCTAssertEqual(light.b, 0xEC, accuracy: 4)
         let dark = try render(chavito(.neutral, size: 208, disc: true, dark: true)).pixel(20, 104)
-        XCTAssertEqual(dark.r, 0x4D, accuracy: 4)
-        XCTAssertEqual(dark.g, 0x26, accuracy: 4)
-        XCTAssertEqual(dark.b, 0x30, accuracy: 4)
+        XCTAssertEqual(dark.r, 0xFC, accuracy: 4)
+        XCTAssertEqual(dark.g, 0xE8, accuracy: 4)
+        XCTAssertEqual(dark.b, 0xEC, accuracy: 4)
     }
 
     func testBareHeadIsIdenticalInLightAndDark() throws {

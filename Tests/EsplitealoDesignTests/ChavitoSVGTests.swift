@@ -59,10 +59,11 @@ final class ChavitoSVGTests: XCTestCase {
         XCTAssertFalse(svg.contains("#FBF7EF"))
     }
 
-    func testDarkDiscSitsOnDarkGroundAndKeepsPinkAndCream() {
+    func testDarkDiscSitsOnDarkGroundWithTheSamePinkDiscAndCream() {
         let svg = ChavitoSVG.document(for: .init(expression: .happy, disc: true, appearance: .dark))
         XCTAssertTrue(svg.contains("<rect x=\"-4\" y=\"10\" width=\"208\" height=\"208\" fill=\"#0F2A21\"/>"))
-        XCTAssertTrue(svg.contains("fill=\"#4D2630\""))
+        XCTAssertTrue(svg.contains("<circle cx=\"100\" cy=\"114\" r=\"104\" fill=\"#FCE8EC\"/>"))
+        XCTAssertFalse(svg.contains("#4D2630"))
         XCTAssertTrue(svg.contains("#EA5A78"))
         XCTAssertTrue(svg.contains("#F5EEDF"))
     }

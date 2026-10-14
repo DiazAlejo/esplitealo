@@ -31,10 +31,10 @@ final class ChavitoPaletteTests: XCTestCase {
         XCTAssertEqual(ChavitoPalette.dark.color(for: .cream).hexString, "#F5EEDF")
     }
 
-    func testSoftDiscFollowsPinkSoftToken() {
-        // light: pink 14% on white; dark: pink 24% on #1B1519 (tokens.css section 3)
+    func testDiscIsTheSamePinkTintInLightAndDark() {
+        // pink 14% on white (the light --pink-soft); the owner decided pink does not shift in dark mode
         XCTAssertEqual(ChavitoPalette.light.color(for: .disc).hexString, "#FCE8EC")
-        XCTAssertEqual(ChavitoPalette.dark.color(for: .disc).hexString, "#4D2630")
+        XCTAssertEqual(ChavitoPalette.dark.color(for: .disc).hexString, "#FCE8EC")
     }
 
     func testGroundColours() {
