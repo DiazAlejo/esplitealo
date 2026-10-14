@@ -1,0 +1,2 @@
+"NSCameraUsageDescription" = "Scanner Lab necesita la cámara para escanear recibos y probar el OCR en el dispositivo.";
+"NSPhotoLibraryUsageDescription" = "Scanner Lab necesita acceso a fotos para elegir una imagen de recibo y probar el OCR.";

@@ -12,6 +12,16 @@ public struct ReceiptParser: Sendable {
         return parseRows(rows)
     }
 
+    /// Human-readable rebuilt row lines for debugging (Scanner Lab and fixtures).
+    public func rebuiltRowDescriptions(from text: RecognizedText) -> [String] {
+        RowBuilder.rows(from: text.lines).map { row in
+            if row.cells.isEmpty {
+                return row.words.map(\.text).joined(separator: " ")
+            }
+            return row.cells.map(\.text).joined(separator: " | ")
+        }
+    }
+
     func parseRows(_ rows: [ReceiptRow]) -> ReceiptDraft {
         var classified: [ParsedLine] = []
         var rowIndexByEntry: [Int] = []
