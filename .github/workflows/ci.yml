@@ -14,15 +14,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The job id and name stay "macOS": branch protection requires the "CI / macOS" check.
   macOS:
     name: macOS
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode 16.4
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
 
       - name: Show toolchain
         run: |
@@ -47,17 +48,40 @@ jobs:
           ESPLITEALO_SKIP_VISION_INTEGRATION: "1"
         run: swift test
 
+  ios-simulator:
+    name: iOS Simulator tests
+    runs-on: macos-26
+    timeout-minutes: 30
+    needs: macOS
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+
+      - name: Pick an iOS 18 simulator
+        id: simulator
+        run: echo "udid=$(Scripts/ios-simulator-udid.sh 18)" >> "$GITHUB_OUTPUT"
+
+      - name: Run package tests on the iOS 18 simulator
+        run: |
+          xcodebuild test \
+            -scheme EsplitealoCore-Package \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO
+
   vision-integration:
     name: Vision integration
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 45
     needs: macOS
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode 16.4
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
 
       - name: Cache SwiftPM
         uses: actions/cache@v4
@@ -74,15 +98,15 @@ jobs:
 
   ios-capture:
     name: iOS Capture compile
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 25
     needs: macOS
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode 16.4
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
 
       - name: Build EsplitealoCapture for iOS Simulator
         run: |

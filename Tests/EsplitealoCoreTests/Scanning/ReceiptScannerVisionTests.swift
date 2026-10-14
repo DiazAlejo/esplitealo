@@ -14,6 +14,9 @@ final class ReceiptScannerVisionTests: XCTestCase {
     }
 
     private func skipIfVisionIntegrationDisabled() throws {
+        #if !canImport(AppKit)
+        throw XCTSkip("Synthetic receipt images are rendered with AppKit, which is macOS only")
+        #endif
         if ProcessInfo.processInfo.environment["ESPLITEALO_SKIP_VISION_INTEGRATION"] != nil {
             throw XCTSkip("Vision integration disabled for this run")
         }
