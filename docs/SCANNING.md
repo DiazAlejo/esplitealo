@@ -57,3 +57,5 @@ Compiled only on iOS (`#if canImport(UIKit)` / VisionKit / PhotosUI). macOS `swi
 | iOS simulator compile of `EsplitealoCapture` (see task notes) | PhotosPicker on device |
 
 Parser and calculator behavior are unchanged; tests replay JSON fixtures under `Tests/Fixtures/Receipts/` without Vision.
+
+Full accuracy benchmarks (Vision on synthetic + CORD v2) are **not** in CI; run `swift run EsplitealoOCRBenchmark` locally ([OCR_BENCHMARK.md](OCR_BENCHMARK.md)).
