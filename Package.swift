@@ -10,14 +10,20 @@ let package = Package(
     products: [
         .library(name: "EsplitealoCore", targets: ["EsplitealoCore"]),
         .library(name: "EsplitealoCapture", targets: ["EsplitealoCapture"]),
+        .library(name: "ScannerLabKit", targets: ["ScannerLabKit"]),
     ],
     targets: [
         .target(name: "EsplitealoCore"),
         .target(name: "EsplitealoCapture", dependencies: ["EsplitealoCore"]),
+        .target(name: "ScannerLabKit", dependencies: ["EsplitealoCore"]),
         .testTarget(name: "EsplitealoCoreTests", dependencies: ["EsplitealoCore"]),
         .testTarget(
             name: "EsplitealoCaptureTests",
             dependencies: ["EsplitealoCapture"]
+        ),
+        .testTarget(
+            name: "ScannerLabKitTests",
+            dependencies: ["ScannerLabKit"]
         ),
     ]
 )
