@@ -1,5 +1,6 @@
 import XCTest
 @testable import EsplitealoCore
+@testable import OCRBenchmarkKit
 
 final class CordBenchmarkScopeTests: XCTestCase {
     func testIndonesianCommaThousandsOutOfScope() {

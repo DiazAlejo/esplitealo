@@ -4,24 +4,55 @@ import PackageDescription
 let package = Package(
     name: "EsplitealoCore",
     platforms: [
-        .iOS(.v17),
-        .macOS(.v14),
+        .iOS(.v18),
+        .macOS(.v15),
     ],
     products: [
         .library(name: "EsplitealoCore", targets: ["EsplitealoCore"]),
+        .library(name: "EsplitealoScanning", targets: ["EsplitealoScanning"]),
         .library(name: "EsplitealoCapture", targets: ["EsplitealoCapture"]),
+        .library(name: "OCRBenchmarkKit", targets: ["OCRBenchmarkKit"]),
         .executable(name: "EsplitealoOCRBenchmark", targets: ["EsplitealoOCRBenchmark"]),
         .library(name: "ScannerLabKit", targets: ["ScannerLabKit"]),
     ],
     targets: [
+        // Pure bill logic: models, receipt parsing, bill session, calculator.
+        // Foundation only, so it stays portable (Linux, and Android later).
         .target(name: "EsplitealoCore"),
+        // Apple-only scanning: Vision OCR, CoreGraphics and ImageIO image handling.
+        .target(name: "EsplitealoScanning", dependencies: ["EsplitealoCore"]),
         .target(name: "EsplitealoCapture", dependencies: ["EsplitealoCore"]),
+        // Developer-only OCR benchmark; the app never links it.
+        .target(
+            name: "OCRBenchmarkKit",
+            dependencies: ["EsplitealoCore", "EsplitealoScanning"]
+        ),
         .executableTarget(
             name: "EsplitealoOCRBenchmark",
-            dependencies: ["EsplitealoCore"]
+            dependencies: ["EsplitealoCore", "EsplitealoScanning", "OCRBenchmarkKit"]
         ),
-        .target(name: "ScannerLabKit", dependencies: ["EsplitealoCore"]),
-        .testTarget(name: "EsplitealoCoreTests", dependencies: ["EsplitealoCore"]),
+        .target(
+            name: "ScannerLabKit",
+            dependencies: ["EsplitealoCore", "EsplitealoScanning"]
+        ),
+        // Shared helpers for test targets (not a product).
+        .target(
+            name: "EsplitealoTestSupport",
+            dependencies: ["EsplitealoCore"],
+            path: "Tests/EsplitealoTestSupport"
+        ),
+        .testTarget(
+            name: "EsplitealoCoreTests",
+            dependencies: ["EsplitealoCore", "EsplitealoTestSupport"]
+        ),
+        .testTarget(
+            name: "EsplitealoScanningTests",
+            dependencies: ["EsplitealoCore", "EsplitealoScanning"]
+        ),
+        .testTarget(
+            name: "OCRBenchmarkKitTests",
+            dependencies: ["EsplitealoCore", "OCRBenchmarkKit", "EsplitealoTestSupport"]
+        ),
         .testTarget(
             name: "EsplitealoCaptureTests",
             dependencies: ["EsplitealoCapture"]

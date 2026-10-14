@@ -1,6 +1,7 @@
 import CoreGraphics
 import XCTest
 @testable import EsplitealoCore
+@testable import EsplitealoScanning
 
 final class ReceiptScannerPolicyTests: XCTestCase {
     func testRejectsExtremeAspectRatioBeforeOCR() async {

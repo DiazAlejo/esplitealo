@@ -1,6 +1,7 @@
 import CoreGraphics
 import EsplitealoCapture
 import EsplitealoCore
+import EsplitealoScanning
 import ImageIO
 import PhotosUI
 import ScannerLabKit

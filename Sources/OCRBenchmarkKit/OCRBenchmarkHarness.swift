@@ -1,4 +1,6 @@
 import CoreGraphics
+import EsplitealoCore
+import EsplitealoScanning
 import Foundation
 
 public enum OCRBenchmarkHarness {

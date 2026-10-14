@@ -1,5 +1,6 @@
 import CoreGraphics
 import EsplitealoCore
+import EsplitealoScanning
 import XCTest
 @testable import ScannerLabKit
 

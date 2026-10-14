@@ -1,9 +1,9 @@
 import Foundation
-@testable import EsplitealoCore
+import EsplitealoCore
 
-enum RecognizedTextTestBuilder {
+public enum RecognizedTextTestBuilder {
     /// Lays out each row left-to-right with synthetic word boxes (one cell per row).
-    static func fromRowTexts(
+    public static func fromRowTexts(
         _ rows: [String],
         imageWidth: Double = 420,
         lineHeight: Double = 22,
@@ -33,7 +33,7 @@ enum RecognizedTextTestBuilder {
     }
 
     /// Splits name (left) and price (right) into separate Vision-style observations on the same row.
-    static func fromNamePricePairs(
+    public static func fromNamePricePairs(
         _ pairs: [(name: String, price: String)],
         imageWidth: Double = 420,
         lineHeight: Double = 22

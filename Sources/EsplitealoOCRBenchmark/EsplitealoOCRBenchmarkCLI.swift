@@ -1,7 +1,9 @@
 import CoreGraphics
 import EsplitealoCore
+import EsplitealoScanning
 import Foundation
 import ImageIO
+import OCRBenchmarkKit
 
 @main
 struct EsplitealoOCRBenchmarkCLI {

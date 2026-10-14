@@ -1,4 +1,5 @@
 import CoreGraphics
+import EsplitealoCore
 import Foundation
 import ImageIO
 
@@ -11,7 +12,7 @@ public struct VisionTextRecognizer: TextRecognizing, Sendable {
     public func recognize(
         image: CGImage,
         orientation: CGImagePropertyOrientation
-    ) async throws -> RecognizedText {
+    ) async throws -> EsplitealoCore.RecognizedText {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = true
@@ -35,7 +36,7 @@ public struct VisionTextRecognizer: TextRecognizing, Sendable {
     private static func makeRecognizedText(
         observations: [VNRecognizedTextObservation],
         size: (width: Int, height: Int)
-    ) -> RecognizedText {
+    ) -> EsplitealoCore.RecognizedText {
         let width = CGFloat(size.width)
         let height = CGFloat(size.height)
         func pixelRect(_ box: CGRect) -> PixelRect {
@@ -87,7 +88,7 @@ public struct VisionTextRecognizer: TextRecognizing, Sendable {
             )
         }
 
-        return RecognizedText(
+        return EsplitealoCore.RecognizedText(
             imageSize: ImageSize(width: Double(size.width), height: Double(size.height)),
             lines: lines,
             engine: engineLabel

@@ -145,6 +145,20 @@ struct AmountToken: Equatable {
     }
 }
 
+/// Public entry points to price parsing for callers outside the module (the OCR benchmark).
+public enum PriceStringParsing {
+    /// Infers the receipt's number format from printed prices, ignoring strings that are not prices.
+    public static func inferFormat(from priceStrings: [String]) -> NumberFormat {
+        NumberFormatInference.infer(from: priceStrings.compactMap(AmountToken.parse))
+    }
+
+    /// Interprets one printed price in the given number format, or nil when it is not a price.
+    public static func minorUnits(of raw: String, format: NumberFormat) -> Int? {
+        guard let token = AmountToken.parse(raw) else { return nil }
+        return NumberFormatInference.minorUnits(token, format: format)
+    }
+}
+
 enum NumberFormatInference {
     static func infer(from tokens: [AmountToken], preferred: NumberFormat? = nil) -> NumberFormat {
         var dot = 0

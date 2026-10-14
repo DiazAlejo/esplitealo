@@ -1,3 +1,4 @@
+import EsplitealoCore
 import Foundation
 
 public enum ReceiptScanError: Error, Equatable, Sendable {

@@ -1,4 +1,5 @@
 import CoreGraphics
+import EsplitealoCore
 import Foundation
 
 #if canImport(AppKit)

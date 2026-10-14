@@ -1,3 +1,4 @@
+import EsplitealoCore
 import Foundation
 
 /// Marks CORD receipts outside Esplitealo product scope (Spanish/English, Puerto Rico, USD).

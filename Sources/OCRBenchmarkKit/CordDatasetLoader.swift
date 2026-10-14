@@ -1,3 +1,4 @@
+import EsplitealoCore
 import Foundation
 
 public struct CordReceiptRecord: Sendable {
@@ -54,9 +55,7 @@ public enum CordGroundTruthParser {
     public static func parse(id: String, data: Data) throws -> ReceiptGroundTruth {
         let rootObject = try JSONSerialization.jsonObject(with: data)
         let json = unwrapRoot(rootObject)
-        let format = NumberFormatInference.infer(
-            from: priceStrings(in: json).compactMap(AmountToken.parse)
-        )
+        let format = PriceStringParsing.inferFormat(from: priceStrings(in: json))
         let items = menuItems(from: json["menu"], format: format)
         let subtotal = amountMinor(from: json["sub_total"], keys: ["subtotal_price", "price"], format: format)
         let tax = amountMinor(from: json["sub_total"], keys: ["tax_price"], format: format)
@@ -142,8 +141,7 @@ public enum CordGroundTruthParser {
     /// Interprets a printed price with the same per-receipt number format the parser infers,
     /// so whole-unit prices ("12" on a USD receipt, "12.500" on an IDR one) compare equal to parser output.
     public static func minor(_ raw: String, format: NumberFormat) -> Int? {
-        guard let token = AmountToken.parse(raw) else { return nil }
-        return NumberFormatInference.minorUnits(token, format: format)
+        PriceStringParsing.minorUnits(of: raw, format: format)
     }
 
     private static func priceStrings(in value: Any) -> [String] {

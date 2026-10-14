@@ -1,5 +1,7 @@
 import XCTest
 @testable import EsplitealoCore
+import EsplitealoTestSupport
+@testable import OCRBenchmarkKit
 
 final class OCRBenchmarkHarnessTests: XCTestCase {
     func testParserHarnessScoresFixtureReceipt() throws {
@@ -43,7 +45,6 @@ final class OCRBenchmarkHarnessTests: XCTestCase {
     private func fixtureURL(named: String) throws -> URL {
         let path = #filePath
         let root = URL(fileURLWithPath: path)
-            .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appendingPathComponent("Fixtures/Receipts/\(named).recognized.json")

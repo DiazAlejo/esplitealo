@@ -1,6 +1,7 @@
 import Vision
 import XCTest
 @testable import EsplitealoCore
+@testable import EsplitealoScanning
 
 #if canImport(Vision)
 final class ReceiptScannerVisionTests: XCTestCase {

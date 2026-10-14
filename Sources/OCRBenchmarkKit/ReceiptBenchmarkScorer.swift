@@ -1,3 +1,4 @@
+import EsplitealoCore
 import Foundation
 
 public enum BenchmarkFailureReason: String, Codable, Equatable, Sendable {

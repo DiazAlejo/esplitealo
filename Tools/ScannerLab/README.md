@@ -88,7 +88,7 @@ If signing still fails, copy the **full** `xcodebuild` output from the first `er
 
 ### Deployment target
 
-The app target uses **iOS 17.0** (`IPHONEOS_DEPLOYMENT_TARGET`). Your phone must run iOS 17 or newer (typical current devices do).
+The app target uses **iOS 18.0** (`IPHONEOS_DEPLOYMENT_TARGET`), the same minimum as the package. Your phone must run iOS 18 or newer (every iPhone that runs iOS 17 can run iOS 18).
 
 ### Package plugins
 
