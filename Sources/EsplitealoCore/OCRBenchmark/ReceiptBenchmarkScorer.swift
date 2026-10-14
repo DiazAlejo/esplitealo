@@ -188,6 +188,18 @@ public struct ReceiptBenchmarkScorer: Sendable {
         if let expected = groundTruth.expectsReconciles {
             return draft.reconciles == expected
         }
+        let itemsSum = draft.items.reduce(0) { $0 + $1.lineTotal.minorUnits }
+            + draft.adjustments.reduce(0) { $0 + $1.amount.minorUnits }
+        if let sub = groundTruth.subtotalMinor {
+            let expectedReconciles = itemsSum == sub
+            return draft.reconciles == expectedReconciles
+        }
+        if let total = groundTruth.totalMinor {
+            let tax = groundTruth.taxMinor ?? 0
+            let tip = groundTruth.tipMinor ?? 0
+            let expectedReconciles = itemsSum == total - tax - tip
+            return draft.reconciles == expectedReconciles
+        }
         return true
     }
 }
