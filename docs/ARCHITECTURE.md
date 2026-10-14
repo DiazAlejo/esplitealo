@@ -13,11 +13,19 @@ EsplitealoCore/                    # Swift package root (Package.swift)
 │   │   ├── Receipt.swift
 │   │   ├── ReceiptItem.swift
 │   │   ├── Participant.swift
-│   │   └── ItemAssignment.swift
+│   │   ├── ItemAssignment.swift
+│   │   ├── RecognizedText.swift
+│   │   └── ReceiptDraft.swift
+│   ├── ReceiptParsing/
+│   │   ├── RowBuilder.swift
+│   │   ├── AmountToken.swift
+│   │   └── ReceiptParser.swift
 │   └── Services/
 │       └── BillCalculator.swift
 └── Tests/EsplitealoCoreTests/
-    └── BillCalculatorTests.swift
+    ├── BillCalculatorTests.swift
+    ├── ReceiptParsing/
+    └── Fixtures/Receipts/
 ```
 
 The Xcode app will embed this library later. File names match the planned app layout below.
