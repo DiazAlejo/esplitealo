@@ -53,16 +53,16 @@ Per receipt and aggregate:
 
 Environment: Apple Silicon Mac, macOS, Vision **accurate** mode, geometry row builder + `ReceiptParser`.
 
-| Dataset | Receipts | Item recall | Item precision | Item price acc. | Total ID rate | Reconciliation agree. |
+| Dataset | Receipts | Item recall | Item precision | Total ID rate | Reconciliation agree. |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Synthetic PR (15 variants) | 15 | **1.00** | 0.99 | **1.00** | 0.93 | 0.93 |
-| CORD v2 (after parser hardening) | 100 | **0.62** | **0.60** | 0.70 | 0.60 | 0.76 |
+| Synthetic PR (15 variants) | 15 | **1.00** | 0.99 | 0.93 | 0.93 |
+| CORD v2 (after parser hardening) | 100 | **0.62** | **0.60** | 0.60 | 0.76 |
 
 **Research reference** (same pipeline class, M1, 100 CORD images): ~**76.7%** item recall, ~84% precision (`data/esplitealo-ocr-research/report.md` in firstmate task data, §6.1). This branch’s CORD numbers are lower partly because ground-truth prices are compared as digit-stripped integers (IDR-style) while the product parser targets **USD cents / Puerto Rico**; footer/payment classification fixes improved precision (~0.30 → ~0.60) with stricter reconciliation scoring.
 
 ### Parser hardening (test-first)
 
-- Payment / card slip lines (`EDC`, `No:`, `change due`) no longer become items.
+- Payment / card slip lines (`EDC`, `change due`, `No:` followed by an amount) no longer become items.
 - Footer `(Qty …)` lines ignored.
 - See `ReceiptParserTests` and `docs/RECEIPT_PARSING.md`.
 
