@@ -57,7 +57,11 @@ Holds:
 | `totals` | Assigned; user can review totals but not share yet |
 | `ready` | `canShare` is true |
 
-After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it moves through assignment and `.totals` as usual while `canShare` stays false until the receipt reconciles. `shareBlockReason` exposes why sharing is blocked (`missingPrintedTotal`, `receiptMismatch`, `unassignedItems`, `discountNeedsManualAdjustment`). Receipts with discount/adjustment lines are not allocated across people: the tip basis and bill total use the net subtotal, but `canShare` stays false and the share text is empty until discounts are handled manually.
+After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it moves through assignment and `.totals` as usual while `canShare` stays false until the receipt reconciles. `shareBlockReason` exposes why sharing is blocked (`missingPrintedTotal`, `receiptMismatch`, `unassignedItems`, `discountNeedsManualAdjustment`).
+
+### Parser adjustments (discounts)
+
+`ReceiptDraft.adjustments` (for example parser discount lines) are included in `netItemsSubtotalCents`, the session tip basis, and `derivedBillTotalCents`, matching `ReceiptReconciliationEngine`. v1 does **not** allocate discounts across people ([R-29](REQUIREMENTS.md), [calculation rules](CALCULATION_RULES.md), [roadmap](ROADMAP.md)). While any adjustment rows remain, `hasUnallocatedAdjustments` is true, `canShare` is false, and `shareBlockReason` is `discountNeedsManualAdjustment` even when the receipt reconciles. The user must net discounts into item prices or remove adjustment rows; sharing unblocks automatically once adjustments are empty and totals still reconcile. Proportional discount allocation is a future product decision.
 
 ## Share text
 
