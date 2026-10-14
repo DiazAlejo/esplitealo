@@ -34,3 +34,7 @@ Conversion to the bill-splitting `Receipt` model (participants, assignments, tip
 - Fixture tests load `*.recognized.json` + `*.expected.json` (includes macOS Vision recordings of synthetic receipts and hand-written adversarial geometry).
 
 Regenerate Vision fixtures locally with the throwaway script in firstmate task data (`record_ocr.swift`); only JSON is committed.
+
+## Accuracy benchmark
+
+Scoring helpers live in `Sources/EsplitealoCore/OCRBenchmark/`. CI runs **metric unit tests only**; full Vision benchmarks use the `EsplitealoOCRBenchmark` executable (see [OCR_BENCHMARK.md](OCR_BENCHMARK.md)). Payment and footer lines (`change due`, card slip `No:`, `(Qty …)`) are classified out of the item list so totals are not double-counted.
