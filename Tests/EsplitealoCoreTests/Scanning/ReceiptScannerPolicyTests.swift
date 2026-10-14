@@ -68,6 +68,43 @@ final class ReceiptScannerPolicyTests: XCTestCase {
         }
     }
 
+    func testRotatedOrientationSwapsDimensionsForAspectRatio() async {
+        let stub = StubTextRecognizer { _, _ in
+            XCTFail("recognizer should not run for aspect-ratio rejection")
+            return RecognizedText(imageSize: ImageSize(width: 100, height: 500), lines: [])
+        }
+        let scanner = ReceiptScanner(recognizer: stub, maximumSinglePhotoAspectRatio: 4)
+
+        do {
+            _ = try await scanner.recognize(image: Self.solidImage(width: 500, height: 100), orientation: .right)
+            XCTFail("expected receiptTooLongForSinglePhoto")
+        } catch let error as ReceiptScanError {
+            XCTAssertEqual(
+                error,
+                .receiptTooLongForSinglePhoto(aspectRatio: 5, maximumAspectRatio: 4)
+            )
+        } catch {
+            XCTFail("unexpected error \(error)")
+        }
+    }
+
+    func testRotatedOrientationAcceptsImageThatIsUprightWide() async throws {
+        let line = RecognizedLine(
+            text: "TOTAL",
+            confidence: 1,
+            rect: PixelRect(x: 0, y: 0, width: 100, height: 30),
+            baselineAngle: 0,
+            words: [RecognizedWord(text: "TOTAL", rect: PixelRect(x: 0, y: 0, width: 100, height: 30))]
+        )
+        let stub = StubTextRecognizer { _, _ in
+            RecognizedText(imageSize: ImageSize(width: 500, height: 100), lines: [line])
+        }
+        let scanner = ReceiptScanner(recognizer: stub, maximumSinglePhotoAspectRatio: 4)
+
+        let result = try await scanner.recognize(image: Self.solidImage(width: 100, height: 500), orientation: .right)
+        XCTAssertEqual(result.lines.count, 1)
+    }
+
     private static func solidImage(width: Int, height: Int) -> CGImage {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let context = CGContext(
