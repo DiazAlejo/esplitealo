@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-people="new" data-share="new">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Esplitéalo · color plan: brand, pink, people</title>
+<link rel="icon" href="data:,">
+<style>
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,__UNKEMPT_REG_B64__) format("woff2")}
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:700;font-display:swap;src:url(data:font/woff2;base64,__UNKEMPT_B64__) format("woff2")}
+__TOKENS__
+:root{
+  --f-text:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro",system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-title:"Unkempt","Marker Felt","Chalkboard SE",ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;
+  --f-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 var(--f-text);-webkit-font-smoothing:antialiased}
+main{max-width:1120px;margin:0 auto;padding:0 20px 80px}
+header.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding:24px 0 8px}
+h1{margin:0;font:400 32px/1.15 var(--f-title);letter-spacing:.02em}
+__WORDMARK_CSS__
+h1 .wm{font-size:30px}
+h2{font:400 26px/1.2 var(--f-title);margin:44px 0 6px;letter-spacing:.01em}
+h3{font:600 17px/1.3 var(--f-text);margin:26px 0 6px}
+p{margin:0 0 12px;max-width:78ch}
+.sub{color:var(--ink2)}
+a{color:var(--primary);font-weight:600}
+.seg{display:inline-flex;background:var(--page-card);border:1px solid var(--line);border-radius:10px;padding:2px}
+.seg button{font:inherit;font-size:13px;font-weight:600;padding:5px 11px;border-radius:8px;color:var(--ink2);background:none;border:0;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.ctrls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:14px;color:var(--ink2)}
+.toc{display:flex;flex-wrap:wrap;gap:6px 10px;margin:10px 0 0;padding:0;list-style:none}
+.toc a{display:inline-block;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--page-card);color:var(--ink);text-decoration:none;font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:12px 0;overflow-x:auto}   /* v4: wide tables scroll inside their card instead of widening the page at phone width */
+.note{background:var(--well);border-radius:12px;padding:12px 14px;margin:12px 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--hair);text-align:left;vertical-align:middle}
+th{font-size:12px;font-weight:600;color:var(--ink2);text-transform:none;white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pass{color:var(--primary);font-weight:700}.fail{color:var(--warn);font-weight:700}
+code,.hex{font:12.5px var(--f-mono)}
+.sw{display:flex;flex-wrap:wrap;gap:10px}
+.sw figure{margin:0;width:104px}
+.sw .chip{height:56px;border-radius:12px;border:1px solid var(--hair);display:flex;align-items:flex-end;padding:6px 8px;font:600 12px var(--f-mono)}
+.sw figcaption{font-size:12px;line-height:1.35;margin-top:5px;color:inherit;opacity:.85}
+.sw figcaption b{display:block;color:inherit;font-size:13px}
+.strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px;border-radius:14px}
+.strip .lbl{font-size:12px;font-weight:600;width:112px;flex:none}
+.av{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:600 17px/1 var(--f-text);flex:none}
+.pcol{display:flex;flex-direction:column;gap:4px;align-items:center;width:84px;font:11.5px/1.3 var(--f-mono);text-align:center}
+.pcol .nm{font:600 12.5px var(--f-text)}
+.cols{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.dots{display:flex;gap:6px;padding:8px 10px;border-radius:12px;align-items:center}
+.dots span{width:26px;height:26px;border-radius:50%;display:inline-block}
+.dots label{font-size:11.5px;width:70px;flex:none}
+.use{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;align-items:start}
+.use .tag{font-weight:700;border-radius:999px;padding:1px 10px;font-size:12px;white-space:nowrap;text-align:center}
+.tag.yes{background:var(--ok-bg);color:var(--primary)}
+.tag.no{background:var(--warn-bg);color:var(--warn)}
+.demo{display:flex;flex-wrap:wrap;gap:18px 26px;margin-top:10px}
+.demo figure{margin:0}
+.demo .ph{position:relative;width:250px;height:524px;border-radius:40px}
+.demo iframe{position:absolute;left:0;top:0;width:414px;height:868px;border:0;transform:scale(.6037);transform-origin:top left;background:transparent;color-scheme:normal}
+.demo figcaption{margin-top:8px;font-size:13px;color:var(--ink2);max-width:250px}
+.demo figcaption b{display:block;color:var(--ink);font-size:14px}
+.pair{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.tagline{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;margin-bottom:6px}
+.tagline.new{background:var(--ok-bg);color:var(--primary)}.tagline.old{background:var(--well);color:var(--ink2)}
+.pinkbar{height:10px;border-radius:5px;background:var(--pink);width:100%;max-width:240px}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+  <h1>__WORDMARK__ · color plan: brand, pink, people and share sheet</h1>
+  <div class="ctrls">
+    <span><span id="l-mode">Page mode</span> <span class="seg"><button data-theme-btn="light">Light</button><button data-theme-btn="dark">Dark</button></span></span>
+    <a href="es/index.html">Spanish mockups</a><a href="en/index.html">English mockups</a>
+  </div>
+</header>
+<p class="sub">Everything on this page is read live from <code>_src/tokens.css</code> (inlined into this page by <code>build.py</code>), so after a logo-palette change and a rebuild the numbers, swatches and simulations update by themselves. The screens below are the real mockup pages in iframes.</p>
+<ul class="toc">
+  <li><a href="#brand">1 · Brand base</a></li><li><a href="#pink">2 · Where the pink goes (v4)</a></li><li><a href="#wordmark">2b · The wordmark</a></li><li><a href="#people">3 · Person colors</a></li>
+  <li><a href="#rose">4 · Rose decision</a></li><li><a href="#screens">5 · On the screens</a></li><li><a href="#share">6 · Share sheet</a></li><li><a href="#how">7 · Compare and edit</a></li>
+</ul>
+
+<h2 id="brand">1 · Brand base</h2>
+<p>Cream is the paper, green is the primary, pink is the accent. Neutral surfaces stay warm cream tints; the dark appearance is a deep basil-black so the cream and green still read as one family. Pink has <b>one</b> token (<code>--brand-pink</code>) with its own dark-mode line.</p>
+<div id="brandSw"></div>
+<h3>Contrast, every pairing used (light and dark)</h3>
+<p class="sub">Text pairs need 4.5:1; graphics and controls 3:1 (WCAG 2.2). “n/a” means the pair is intentionally not used.</p>
+<div class="card"><table id="brandTbl"></table></div>
+
+<h2 id="pink">2 · Where the pink goes now (v4), and where it never goes</h2>
+<p>The owner could hardly see the pink in v3 (only five of the 23 screens had any, and only the Home had a pink shape bigger than a few pixels). v4 makes it the brand sparkle: small bold shapes that repeat on nearly every screen, while the app still reads as cream and green. Each row is one token in <code>_src/tokens.css</code> section 3b; the contrast numbers are computed live from those tokens.</p>
+<div class="card"><table id="pinkUse"></table></div>
+<p class="sub">“State” rows carry a state (current step, selected chip, progress), so they need 3:1 against their ground and never stand alone: each has a second signal (the words “Step 2 of 5”, the count “6 of 8”, a filled thumb, an avatar ring). “Decor” rows are illustration and decoration. Pink on the green button is 1.56:1, so the button never carries pink itself: the ÷ sits on a white (dark: near-black) chip.</p>
+<h3>Pink at a glance (the live pages)</h3>
+<div id="pinkDemos"></div>
+<div class="card">
+<div class="use">
+  <span class="tag yes">USE</span><span><b>Shapes, icons and decoration:</b> the ÷ motif, progress dots and bars, selected-state underlines and rails, the primary button chip, camera corners and shutter ring, Chavito's nose, cheeks, tongue and coin, the success disc and confetti.</span>
+  <span class="tag yes">USE</span><span><b>Large soft discs:</b> behind Chavito (Home, camera denied, success).</span>
+  <span class="tag no">NEVER</span><span><b>Small text.</b> Pink is 3.15:1 on cream (5.3:1 on the dark paper). If text ever needs the accent it uses <code>--pink-ink</code> (5.1:1 on paper). Large bold text may be pink only where it meets 3:1; nothing is today.</span>
+  <span class="tag no">NEVER</span><span><b>Where warn belongs:</b> unassigned rows, mismatch banners, the failed-scan and remove-person screens keep their red-orange; pink never fills a row or banner, never sits beside the warning glyph, and is never dashed. The only dashed pink thing is the camera's receipt-edge guide, which is on a dark viewfinder far from any warning.</span>
+  <span class="tag no">NEVER</span><span><b>Person avatars and the share bar segments.</b> A person must never look like the brand or like an error. The thin pink rule under the share bar is separate from the segments.</span>
+  <span class="tag no">NEVER</span><span><b>Text on a pink fill</b> or pink on the green button (1.56:1). The only text on pink is the “1¢” on Chavito's coin and the check in the “just assigned” badge, both small illustration marks (5.3:1 in dark ink).</span>
+  <span class="tag no">NEVER</span><span><b>The OK state.</b> “Adds up” banners and ✓ marks stay green: green means done and correct, pink means look here, or celebrate.</span>
+</div></div>
+<h2 id="wordmark">2b · The wordmark: the acute on the É</h2>
+<p>ESPLITÉALO is the logo's outlined wordmark (Unkempt Bold) with the acute as its own path, so it takes <code>--wm-accent</code> (the pink, with its dark value) while the letters take <code>--wm-ink</code> (the normal title ink). The real text “Esplitéalo” stays in the page, invisible, for copy, search and screen readers. The logo lockup draws the letters in green; to match it exactly, point <code>--wm-ink</code> at <code>var(--primary)</code> (one line).</p>
+<div class="card" id="wmSizes" style="display:flex;flex-wrap:wrap;gap:20px 34px;align-items:flex-end">__WORDMARK_SIZES__</div>
+<h3>Pink next to the other state colors</h3>
+<div class="card"><table id="pinkTbl"></table></div>
+<p class="sub" id="pinkWarnNote"></p>
+
+<h2 id="people">3 · Person colors: the palette</h2>
+<p>Eight muted, earthy tones for the letter avatars, chosen to harmonize with cream, green and pink without ever being them. Every slot has a light-mode fill (white letter) and a dark-mode tint (dark letter). They were found by a constrained search (hue families, chroma limits, letter contrast, distance from the brand colors, and the color-vision simulations below) and then checked by eye. Slot order puts the most different colors first, because most bills have 2 to 4 people.</p>
+<div id="peopleSw"></div>
+<h3>Under color-vision deficiency (simulation, Machado 2009, severity 1.0)</h3>
+<p class="sub">A simulation, not a test with people. The avatar always shows an initial and a name, so color is never the only signal; the table shows the closest pairs so you know where it is hardest.</p>
+<div id="cvdStrips"></div>
+<div class="card"><table id="cvdTbl"></table></div>
+<h3>Distance from the brand colors (ΔE00, higher is safer; 20+ reads as clearly different)</h3>
+<div class="card"><table id="brandDist"></table></div>
+
+<h2 id="rose">4 · The Rose person color</h2>
+<div id="roseBox" class="card"></div>
+
+<h2 id="screens">5 · How they look on the screens</h2>
+<p>Left: the proposed colors (default). Right: the previous colors (<code>?people=old</code>). Both are the live mockup pages. Use the page mode switch above to flip all of them between light and dark.</p>
+<div id="demos"></div>
+
+<h2 id="share">6 · Share sheet plan</h2>
+<p>The share sheet follows the brand and the person palette: a cream surface, the one green primary action, neutral tiles for the other apps, person colors only on the little avatars, and pink only in the success state.</p>
+<div class="card"><table id="shareTbl"></table></div>
+
+<h2 id="how">7 · Compare and edit</h2>
+<div class="card">
+<p><b>Compare:</b> add <code>?people=old</code> to any page (for example <code>es/07c-share.html?people=old</code>), or use the “Person and share-sheet colors” switch in the toolbar of every page and on the screen grid. It switches the person colors and the share sheet together; <code>?share=old</code> switches the share sheet only. The proposed colors are the default.</p>
+<p><b>Edit:</b> every color is in <code>_src/tokens.css</code> (one file). The three brand colors and the dark pink are in section 1; the person palette in section 4; the share sheet in section 5. Then run <code>python3 _src/build.py .</code> in this folder.</p>
+</div>
+</main>
+<script>
+(function(){
+  /* ---------- color math ---------- */
+  var root = document.documentElement;
+  function h2r(h){ h=h.replace('#',''); return [0,2,4].map(function(i){ return parseInt(h.slice(i,i+2),16); }); }
+  function r2h(c){ return '#'+c.map(function(v){ return Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0'); }).join('').toUpperCase(); }
+  function lin(v){ v/=255; return v<=0.04045 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); }
+  function unlin(v){ return 255*(v<=0.0031308 ? v*12.92 : 1.055*Math.pow(v,1/2.4)-0.055); }
+  function lum(h){ var c=h2r(h).map(lin); return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2]; }
+  function cr(a,b){ var x=lum(a), y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05); }
+  function lab(h){ var c=h2r(h).map(lin); var X=(0.4124564*c[0]+0.3575761*c[1]+0.1804375*c[2])/0.95047, Y=0.2126729*c[0]+0.7151522*c[1]+0.0721750*c[2], Z=(0.0193339*c[0]+0.1191920*c[1]+0.9503041*c[2])/1.08883;
+    function f(t){ return t>216/24389 ? Math.cbrt(t) : (24389/27*t+16)/116; } var fx=f(X), fy=f(Y), fz=f(Z); return [116*fy-16,500*(fx-fy),200*(fy-fz)]; }
+  function de(h1,h2){ var A=lab(h1), B=lab(h2), rad=Math.PI/180, L1=A[0],a1=A[1],b1=A[2],L2=B[0],a2=B[1],b2=B[2];
+    var C1=Math.hypot(a1,b1), C2=Math.hypot(a2,b2), Cb=(C1+C2)/2, G=0.5*(1-Math.sqrt(Math.pow(Cb,7)/(Math.pow(Cb,7)+Math.pow(25,7))));
+    var a1p=(1+G)*a1, a2p=(1+G)*a2, C1p=Math.hypot(a1p,b1), C2p=Math.hypot(a2p,b2), h1p=(Math.atan2(b1,a1p)/rad+360)%360, h2p=(Math.atan2(b2,a2p)/rad+360)%360;
+    var dL=L2-L1, dC=C2p-C1p, dh=h2p-h1p; if(C1p*C2p===0) dh=0; else if(dh>180) dh-=360; else if(dh<-180) dh+=360;
+    var dH=2*Math.sqrt(C1p*C2p)*Math.sin(dh*rad/2), Lb=(L1+L2)/2, Cbp=(C1p+C2p)/2, hb=h1p+h2p;
+    if(C1p*C2p!==0){ if(Math.abs(h1p-h2p)>180) hb=(h1p+h2p+(h1p+h2p<360?360:-360))/2; else hb=hb/2; }
+    var T=1-0.17*Math.cos((hb-30)*rad)+0.24*Math.cos(2*hb*rad)+0.32*Math.cos((3*hb+6)*rad)-0.20*Math.cos((4*hb-63)*rad);
+    var dTh=30*Math.exp(-Math.pow((hb-275)/25,2)), Rc=2*Math.sqrt(Math.pow(Cbp,7)/(Math.pow(Cbp,7)+Math.pow(25,7)));
+    var Sl=1+0.015*Math.pow(Lb-50,2)/Math.sqrt(20+Math.pow(Lb-50,2)), Sc=1+0.045*Cbp, Sh=1+0.015*Cbp*T, Rt=-Math.sin(2*dTh*rad)*Rc;
+    return Math.sqrt(Math.pow(dL/Sl,2)+Math.pow(dC/Sc,2)+Math.pow(dH/Sh,2)+Rt*(dC/Sc)*(dH/Sh)); }
+  var CVD = { protan:[[0.152286,1.052583,-0.204868],[0.114503,0.786281,0.099216],[-0.003882,-0.048116,1.051998]],
+              deutan:[[0.367322,0.860646,-0.227968],[0.280085,0.672501,0.047413],[-0.011820,0.042940,0.968881]],
+              tritan:[[1.255528,-0.076749,-0.178779],[-0.078411,0.930809,0.147602],[0.004733,0.691367,0.303900]] };
+  function sim(h,k){ if(k==='normal') return h; if(k==='gray'){ var v=unlin(lum(h)); return r2h([v,v,v]); }
+    var c=h2r(h).map(lin), M=CVD[k]; return r2h(M.map(function(r){ return unlin(Math.max(0,Math.min(1,r[0]*c[0]+r[1]*c[1]+r[2]*c[2]))); })); }
+  var KINDS=['normal','protan','deutan','tritan','gray'], KN={normal:'Normal',protan:'Protanopia',deutan:'Deuteranopia',tritan:'Tritanopia',gray:'Grayscale'};
+
+  /* ---------- live token snapshots ---------- */
+  var cv=document.createElement('canvas'); cv.width=cv.height=1; var cx=cv.getContext('2d',{willReadFrequently:true});
+  var probe=document.createElement('i'); probe.style.cssText='position:absolute;left:-99px;top:0;width:1px;height:1px'; document.body.appendChild(probe);
+  function resolve(token){ probe.style.color=''; probe.style.color='var(--'+token+')'; var s=getComputedStyle(probe).color; cx.clearRect(0,0,1,1); cx.fillStyle='#000'; cx.fillStyle=s; cx.fillRect(0,0,1,1); var d=cx.getImageData(0,0,1,1).data; return r2h([d[0],d[1],d[2]]); }
+  var TOK=['wm-ink','wm-accent','step-now','step-done','meter-fill','pick','coin-bg','coin-mark','focus-ring','total-mark','split-rule','quote-bar','cam-accent','cam-bg','m-nose','m-cream','pop-ring','paper','surface','well','ink','ink2','line','primary','primary-lip','on-primary','warn','warn-bg','warn-soft','ok-bg','ok-soft','pink','pink-ink','pink-soft','pink-mid','on-pink','p1','p2','p3','p4','p5','p6','p7','p8','on-p','sh-doc-bg','sh-doc-fg','sh-prev-bg','sh-prev-ink','sh-app1-bg','sh-app1-fg','sh-app2-bg','sh-app2-fg','sh-app3-bg','sh-app3-fg','sh-app4-bg','sh-app4-fg','sh-surface','sh-ok-disc','m-coin','m-coin-ink','m-coin-edge'];
+  function snap(theme,people){ var s0=[root.dataset.theme,root.dataset.people,root.dataset.share]; root.dataset.theme=theme; root.dataset.people=people; root.dataset.share=people; var o={}; TOK.forEach(function(t){ o[t]=resolve(t); }); root.dataset.theme=s0[0]; root.dataset.people=s0[1]; root.dataset.share=s0[2]; return o; }
+  var S={ light:snap('light','new'), dark:snap('dark','new'), lightOld:snap('light','old'), darkOld:snap('dark','old') };
+  var NEW=['Denim','Ochre','Plum','Umber','Lagoon','Stone','Heather','Slate'], OLD=['Blue','Clay','Violet','Teal','Rose','Olive','Mustard','Slate'];
+  var P=function(s){ return [1,2,3,4,5,6,7,8].map(function(i){ return s['p'+i]; }); };
+  function sw(hex,name,note,on){ return '<figure><div class="chip" style="background:'+hex+';color:'+(on||(cr(hex,'#FFFFFF')>=cr(hex,'#1F2A24')?'#FFFFFF':'#1F2A24'))+'">'+hex+'</div><figcaption><b>'+name+'</b>'+(note||'')+'</figcaption></figure>'; }
+  function badge(v,min){ return '<span class="'+(v>=min?'pass':'fail')+'">'+(v>=min?'✓ ':'✗ ')+'</span>'; }
+  function ratio(f,b,min,mode){ var s=mode==='l'?S.light:S.dark; var v=cr(s[f]||f,s[b]||b); return '<td class="num">'+badge(v,min)+v.toFixed(2)+':1</td>'; }
+
+  /* ---------- 1. brand ---------- */
+  document.getElementById('brandSw').innerHTML =
+    ['light','dark'].map(function(m){ var s=S[m]; return '<div class="card" style="background:'+s.paper+';color:'+s.ink+';border-color:'+s.line+'"><b>'+(m==='light'?'Light':'Dark')+'</b><div class="sw" style="margin-top:8px">'+
+      sw(s.paper,'paper','cream ground')+sw(s.surface,'surface','cards, sheets')+sw(s.well,'well','inputs, preview')+sw(s.primary,'primary','green')+sw(s['primary-lip'],'primary-lip','basil, button lip')+
+      sw(s.pink,'pink','accent shapes')+sw(s['pink-ink'],'pink-ink','text-safe pink')+sw(s['pink-soft'],'pink-soft','soft disc')+sw(s.warn,'warn','red-orange, states')+sw(s['ok-bg'],'ok-bg','green tint')+sw(s.ink,'ink','')+sw(s.ink2,'ink2','')+'</div></div>'; }).join('');
+  var rows=[
+    ['Body text','ink','paper',4.5],['Body text on card or sheet','ink','surface',4.5],['Body text on well (inputs, preview)','ink','well',4.5],
+    ['Secondary text','ink2','paper',4.5],['Secondary text on card or sheet','ink2','surface',4.5],['Secondary text on well','ink2','well',4.5],
+    ['Links, quiet buttons','primary','paper',4.5],['Links on card or sheet','primary','surface',4.5],['Primary button label','on-primary','primary',4.5],
+    ['Warn text (unassigned, mismatch)','warn','paper',4.5],['Warn text on its tinted row','warn','warn-soft',4.5],['Body text on warn banner','ink','warn-bg',4.5],
+    ['Green text on the OK tint','primary','ok-bg',4.5],['Body text on the OK tint','ink','ok-bg',4.5],['Text-safe pink on paper (if ever used)','pink-ink','paper',4.5],['Text-safe pink on card','pink-ink','surface',4.5],
+    ['Graphic: pink ÷ mark on paper','pink','paper',3],['Graphic: pink tip underline on the white segment','pink','surface',3],['Graphic: green meter, checks on paper','primary','paper',3],['Graphic: warn glyph on its tint','warn','warn-soft',3],
+    ['Decor only: pink on the soft disc','pink','pink-soft',0],['Not allowed for text: white on pink','#FFFFFF','pink',0],['Coin label (illustration): dark ink on pink','on-pink','pink',0]
+  ];
+  document.getElementById('brandTbl').innerHTML='<tr><th>Pair</th><th class="num">Needs</th><th class="num">Light</th><th class="num">Dark</th></tr>'+rows.map(function(r){ var sp=r[3]===0; return '<tr><td>'+r[0]+'</td><td class="num">'+(sp?'n/a':r[3]+':1')+'</td>'+['l','d'].map(function(m){ var s=m==='l'?S.light:S.dark; var v=cr(s[r[1]]||r[1],s[r[2]]||r[2]); return '<td class="num">'+(sp?'':badge(v,r[3]))+v.toFixed(2)+':1</td>'; }).join('')+'</tr>'; }).join('');
+  document.getElementById('pinkTbl').innerHTML='<tr><th>Pair</th><th class="num">ΔE00 light</th><th class="num">ΔE00 dark</th><th class="num">under protan / deutan / tritan (light)</th></tr>'+[['pink vs warn','pink','warn'],['pink vs primary green','pink','primary'],['pink-soft vs warn-soft (tints)','pink-soft','warn-soft'],['pink vs pink-ink','pink','pink-ink']].map(function(r){
+    return '<tr><td>'+r[0]+'</td><td class="num">'+de(S.light[r[1]],S.light[r[2]]).toFixed(1)+'</td><td class="num">'+de(S.dark[r[1]],S.dark[r[2]]).toFixed(1)+'</td><td class="num">'+['protan','deutan','tritan'].map(function(k){ return de(sim(S.light[r[1]],k),sim(S.light[r[2]],k)).toFixed(1); }).join(' / ')+'</td></tr>'; }).join('');
+
+  (function(){ function mn(m){ var s=S[m], v=de(s.pink,s.warn); ['protan','deutan','tritan'].forEach(function(k){ v=Math.min(v,de(sim(s.pink,k),sim(s.warn,k))); }); return v; }
+    document.getElementById('pinkWarnNote').textContent='Pink and warn are ΔE00 '+de(S.light.pink,S.light.warn).toFixed(0)+' apart in light and '+de(S.dark.pink,S.dark.warn).toFixed(0)+' in dark; under the three color-vision simulations the closest they get is '+mn('light').toFixed(0)+' (light) and '+mn('dark').toFixed(0)+' (dark). Their lightness also differs. They are never used for the same job: pink is a shape, warn always comes with an icon or words.'; })();
+
+  /* ---------- 2. pink uses (v4) ---------- */
+  var USE=[
+    ['Wordmark ESPLITÉALO on Home, gallery, plan and landing pages','the acute of the É','--wm-accent','wm-accent','paper','logo'],
+    ['Home: ÷ sticker, Chavito’s blush, tongue and nose; soft disc','shapes, illustration','--pink / --m-nose','m-nose','paper','decor'],
+    ['02, 02b Camera: scan corners, receipt-edge guide, shutter ring','icon accents on the viewfinder','--cam-accent','cam-accent','cam-bg','state:3'],
+    ['03 Processing: the sliding bar and the scan line','progress shape (the words are the signal)','--meter-fill','meter-fill','paper','state:3'],
+    ['04 to 07 nav: progress dots, the current step is a pink pill','state shape; “Step 2 of 5” is the second signal','--step-now','step-now','paper','state:3'],
+    ['04 to 07: ÷ before screen titles and sheet titles','decoration','--pink','pink','paper','decor'],
+    ['06 Assign: progress bar fill','state shape; “6 of 8” is the second signal','--meter-fill','meter-fill','paper','state:3'],
+    ['06: selected chip underline, selected item row rail, picked person row rail','selected state; avatar ring, tint and check are the second signal','--pick','pick','paper','state:3'],
+    ['06: unassigned → assigned moment: pink rail and check badge on the row','moment (1.8 s), the row text changes too','--pop-ring','pop-ring','paper','state:3'],
+    ['07 Totals: underline of the selected tip segment','selected state; the white thumb and bold label are the second signal','--pick','pick','surface','state:3'],
+    ['07 Totals: underline of the bill total','marker','--total-mark','total-mark','paper','state:3'],
+    ['07 Totals: rule under the share bar (the whole bill, split)','decoration','--split-rule','split-rule','paper','state:3'],
+    ['Primary buttons (Scan, Use photo, Continue, Next, Review split, Share, New bill): ÷ on a round chip','accent detail; pink itself is never on the green','--coin-mark on --coin-bg','coin-mark','coin-bg','state:3'],
+    ['Inputs: focus ring and caret','focus indicator','--focus-ring','focus-ring','surface','state:3'],
+    ['07c Share sheet: bar beside the message preview','decoration','--quote-bar','quote-bar','well','decor'],
+    ['07d Success: disc, confetti, ÷ sticker; check marks in the toolbar controls','celebration','--pink / --pop-ring','pop-ring','paper','decor']
+  ];
+  document.getElementById('pinkUse').innerHTML='<tr><th>Where</th><th>What it is</th><th>Token</th><th class="num">Light</th><th class="num">Dark</th><th class="num">on its ground</th><th class="num">light</th><th class="num">dark</th></tr>'+USE.map(function(u){
+    var g=u[4], min=/state/.test(u[5])?3:0;
+    function cell(m){ var s=m==='l'?S.light:S.dark; var gr=s[g]; if(u[4]==='cam-bg'||u[4]==='coin-bg'||true){ gr=s[g]; } var v=cr(s[u[3]],gr); return '<td class="num">'+(min?badge(v,min):'')+v.toFixed(2)+':1'+(min?'':' <span class="sub">'+(u[5]==='logo'?'logo':'decor')+'</span>')+'</td>'; }
+    return '<tr><td>'+u[0]+'</td><td class="sub">'+u[1]+'</td><td><code>'+u[2]+'</code></td><td class="num"><span class="hex">'+S.light[u[3]]+'</span></td><td class="num"><span class="hex">'+S.dark[u[3]]+'</span></td><td class="num">'+u[4]+'</td>'+cell('l')+cell('d')+'</tr>'; }).join('');
+  var PD=[['01-home.html','Home'],['02-capture.html','Camera'],['03-processing.html','Processing'],['04-review.html','Review'],['06-assign.html','Assign'],['07-totals.html','Totals'],['07d-success.html','Success']];
+  document.getElementById('pinkDemos').innerHTML='<div class="demo">'+PD.map(function(d){ return '<figure><div class="ph"><iframe loading="lazy" title="'+d[1]+'" data-src="en/'+d[0]+'"></iframe></div><figcaption><b>'+d[1]+'</b></figcaption></figure>'; }).join('')+'</div>';
+
+  /* ---------- 3. people ---------- */
+  function avs(arr,on,bg,names){ return '<div class="strip" style="background:'+bg+'">'+arr.map(function(c,i){ return '<div class="pcol"><span class="av" style="background:'+c+';color:'+on+'">'+names[i][0]+'</span><span class="nm" style="color:inherit">'+names[i]+'</span><span>'+c+'</span><span>'+cr(c,on).toFixed(1)+':1</span></div>'; }).join('')+'</div>'; }
+  document.getElementById('peopleSw').innerHTML =
+    '<div class="grid2"><div><span class="tagline new">Proposed · light</span>'+avs(P(S.light),S.light['on-p'],S.light.paper,NEW)+'</div><div><span class="tagline new">Proposed · dark</span>'+avs(P(S.dark),S.dark['on-p'],S.dark.paper,NEW).replace('class="strip"','class="strip" style="color:'+S.dark.ink+'"')+'</div></div>'+
+    '<div class="grid2" style="margin-top:12px"><div><span class="tagline old">Previous · light</span>'+avs(P(S.lightOld),S.lightOld['on-p'],S.lightOld.paper,OLD)+'</div><div><span class="tagline old">Previous · dark</span>'+avs(P(S.darkOld),S.darkOld['on-p'],S.darkOld.paper,OLD).replace('class="strip"','class="strip" style="color:'+S.dark.ink+'"')+'</div></div>'+
+    '<p class="sub" style="margin-top:8px">Under each swatch: hex, then the contrast of the avatar letter on that fill (needs 4.5:1). In light mode every fill is also at least 4.5:1 against the cream paper, so the dots and bars pass the 3:1 graphics rule too.</p>';
+  function cvdStrip(arr,bg,lbl,ink){ return '<div style="margin:6px 0"><div style="font-size:12px;font-weight:600;margin:6px 0 2px">'+lbl+'</div>'+KINDS.map(function(k){ return '<div class="dots" style="background:'+bg+';color:'+ink+'"><label>'+KN[k]+'</label>'+arr.map(function(c){ return '<span style="background:'+sim(c,k)+'"></span>'; }).join('')+'</div>'; }).join('')+'</div>'; }
+  document.getElementById('cvdStrips').innerHTML='<div class="grid2">'+cvdStrip(P(S.light).concat([S.light.pink,S.light.primary,S.light.warn]),S.light.paper,'Light: 8 people, then pink, green, warn',S.light.ink)+cvdStrip(P(S.dark).concat([S.dark.pink,S.dark.primary,S.dark.warn]),S.dark.paper,'Dark: 8 people, then pink, green, warn',S.dark.ink)+'</div>';
+  function closest(arr,names,k){ var out=[]; for(var i=0;i<arr.length;i++) for(var j=i+1;j<arr.length;j++) out.push([de(sim(arr[i],k),sim(arr[j],k)),names[i]+' / '+names[j]]); out.sort(function(a,b){ return a[0]-b[0]; }); return out.slice(0,3).map(function(o){ return o[1]+' '+o[0].toFixed(1); }).join(' · '); }
+  document.getElementById('cvdTbl').innerHTML='<tr><th>Simulation</th><th>Closest three pairs, light (ΔE00)</th><th>Closest three pairs, dark (ΔE00)</th></tr>'+KINDS.map(function(k){ return '<tr><td>'+KN[k]+'</td><td>'+closest(P(S.light),NEW,k)+'</td><td>'+closest(P(S.dark),NEW,k)+'</td></tr>'; }).join('');
+  function nearest(arr,names,m,brandKeys){ return arr.map(function(c,i){ var s=m==='l'?S.light:S.dark; var best=null; brandKeys.forEach(function(k){ var d=de(c,s[k]); if(!best||d<best[0]) best=[d,k]; }); return [names[i],c,best]; }); }
+  var bk=['pink','warn','primary','primary-lip'];
+  document.getElementById('brandDist').innerHTML='<tr><th>Person color</th><th class="num">hex (light)</th><th>nearest brand color</th><th class="num">ΔE00</th><th class="num">hex (dark)</th><th>nearest</th><th class="num">ΔE00</th></tr>'+
+    '<tr><td colspan="7"><b>Proposed</b></td></tr>'+nearest(P(S.light),NEW,'l',bk).map(function(r,i){ var d=nearest(P(S.dark),NEW,'d',['pink','warn','primary'])[i]; return '<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td><td>'+r[2][1]+'</td><td class="num">'+badge(r[2][0],15)+r[2][0].toFixed(0)+'</td><td class="num">'+d[1]+'</td><td>'+d[2][1]+'</td><td class="num">'+badge(d[2][0],15)+d[2][0].toFixed(0)+'</td></tr>'; }).join('')+
+    '<tr><td colspan="7"><b>Previous</b> (for the record)</td></tr>'+nearest(P(S.lightOld),OLD,'l',bk).map(function(r,i){ var d=nearest(P(S.darkOld),OLD,'d',['pink','warn','primary'])[i]; return '<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td><td>'+r[2][1]+'</td><td class="num">'+badge(r[2][0],15)+r[2][0].toFixed(0)+'</td><td class="num">'+d[1]+'</td><td>'+d[2][1]+'</td><td class="num">'+badge(d[2][0],15)+d[2][0].toFixed(0)+'</td></tr>'; }).join('');
+
+  /* ---------- 4. rose ---------- */
+  var rose=S.lightOld.p5, roseD=S.darkOld.p5, teal=S.lightOld.p4, clay=S.lightOld.p2;
+  document.getElementById('roseBox').innerHTML=
+    '<div class="sw">'+sw(rose,'Rose (previous)','person 5, light')+sw(S.light.pink,'Brand pink','new accent')+sw(roseD,'Rose (previous, dark)','person 5, dark')+sw(S.light.p3,'Plum (proposed)','replaces Rose, light')+sw(S.dark.p3,'Plum (proposed, dark)','dark')+'</div>'+
+    '<p style="margin-top:12px"><b>Decision: drop Rose.</b> The previous Rose is only ΔE00 '+de(rose,S.light.pink).toFixed(1)+' (ΔE76 '+'≈21'+') from the new pink and '+de(roseD,S.dark.pink).toFixed(1)+' in dark: a person would look like the brand accent. It is replaced by Plum, a deep muted aubergine (ΔE00 '+de(S.light.p3,S.light.pink).toFixed(0)+' from the pink, much darker and less saturated), with a lilac-mauve in dark mode (ΔE00 '+de(S.dark.p3,S.dark.pink).toFixed(0)+'). While measuring I found two more previous colors in the same trouble: <b>Teal</b> '+teal+' is only ΔE00 '+de(teal,S.light.primary).toFixed(1)+' from the app green, and <b>Clay</b> '+clay+' is ΔE00 '+de(clay,S.light.warn).toFixed(1)+' from the warn red; both are replaced too (Lagoon, a darker blue-teal; Umber, a dark brown). Olive and Mustard were dropped as well: Olive sits near the green, and the gold family is where the old accent lived.</p>';
+
+  /* ---------- 5. screens ---------- */
+  var DEMOS=[['05b-people.html','Add people','people list with letter avatars'],['06-assign.html','Mark items: chips and dots','person strip, item dots, stacked avatars'],['06b-assign-sheet.html','Mark items: assign sheet','person rows with avatars and checks'],['07-totals.html','Totals','share bar and person rows'],['07c-share.html','Share sheet','header avatars, preview, tiles'],['07d-success.html','Success','pink disc, confetti, avatars']];
+  var theme='light';
+  function demoHtml(){ return '<div class="demo">'+DEMOS.map(function(d){ return ['new','old'].map(function(w){ return '<figure><span class="tagline '+w+'">'+(w==='new'?'Proposed':'Previous')+'</span><div class="ph"><iframe loading="lazy" title="'+d[1]+' ('+w+')" data-src="en/'+d[0]+'" data-people="'+w+'"></iframe></div><figcaption><b>'+d[1]+'</b>'+d[2]+'</figcaption></figure>'; }).join(''); }).join('')+'</div>'; }
+  document.getElementById('demos').innerHTML=demoHtml();
+  function loadFrames(){ document.querySelectorAll('#demos iframe').forEach(function(f){ f.src=f.dataset.src+'?embed=1&theme='+theme+'&people='+f.dataset.people; }); document.querySelectorAll('#pinkDemos iframe').forEach(function(f){ f.src=f.dataset.src+'?embed=1&theme='+theme; }); }
+
+  /* ---------- 6. share ---------- */
+  var shareRows=[
+    ['Sheet surface','sh-surface','—','the cream surface; the dimmed Totals behind it keeps the paper color'],
+    ['Header tile (document icon)','sh-doc-fg','sh-doc-bg','green glyph on a soft green tint'],
+    ['Header avatars: lowest of the 8 fills vs the sheet','MINP','sh-surface','the only place person colors appear in the sheet (letters stay at 4.5:1, see section 3)'],
+    ['Message preview text','sh-prev-ink','sh-prev-bg','mono text on the cream well; the text names people, it is never colored'],
+    ['Primary action: Messages tile','sh-app1-fg','sh-app1-bg','the single green action'],
+    ['Mail tile','sh-app2-fg','sh-app2-bg','neutral well tile, ink glyph'],
+    ['Notes tile','sh-app3-fg','sh-app3-bg','neutral well tile, ink glyph'],
+    ['Copy tile','sh-app4-fg','sh-app4-bg','neutral well tile, ink glyph'],
+    ['Tile labels and footnote','ink2','sh-surface','secondary text'],
+    ['Cancel (quiet button)','primary','sh-surface','green text'],
+    ['Success: soft pink disc behind Chavito','pink','sh-ok-disc','decor; the green check badge carries the meaning'],
+    ['Success: avatars: lowest of the 8 fills vs the paper','MINP','paper','person colors only on avatars']
+  ];
+  document.getElementById('shareTbl').innerHTML='<tr><th>Element</th><th class="num">Light</th><th class="num">Dark</th><th>Notes</th></tr>'+shareRows.map(function(r){ if(r[2]==='—') return '<tr><td>'+r[0]+'</td><td class="num">'+S.light[r[1]]+'</td><td class="num">'+S.dark[r[1]]+'</td><td>'+r[3]+'</td></tr>';
+    var min=/glyph|Tile|tile|disc|Header avatars|avatars|Success/.test(r[0])?3:4.5; return '<tr><td>'+r[0]+'</td>'+['light','dark'].map(function(m){ var s=S[m]; var v=r[1]==='MINP'?Math.min.apply(null,[1,2,3,4,5,6,7,8].map(function(i){ return cr(s['p'+i],s[r[2]]); })):cr(s[r[1]],s[r[2]]); return '<td class="num">'+badge(v,min)+v.toFixed(2)+':1</td>'; }).join('')+'<td>'+r[3]+'</td></tr>'; }).join('');
+
+  /* ---------- page mode ---------- */
+  function setTheme(t){ theme=t; root.dataset.theme=t; document.querySelectorAll('[data-theme-btn]').forEach(function(b){ b.setAttribute('aria-pressed',b.dataset.themeBtn===t); }); loadFrames(); }
+  document.querySelectorAll('[data-theme-btn]').forEach(function(b){ b.onclick=function(){ setTheme(b.dataset.themeBtn); }; });
+  var qs=new URLSearchParams(location.search); setTheme(qs.get('theme')==='dark'?'dark':(qs.get('theme')==='light'?'light':(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')));
+  window.__SNAP=S;
+})();
+</script>
+</body>
+</html>

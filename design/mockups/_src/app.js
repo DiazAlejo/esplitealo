@@ -6,6 +6,14 @@
   var root = document.documentElement;
   var qs = new URLSearchParams(location.search);
   var EMBED = qs.get('embed') === '1';
+  // Person + share-sheet colours: proposed (default) or previous. ?people=old|new switches both; ?share=old|new overrides the share sheet only.
+  function setPeople(v) {
+    root.dataset.people = v === 'old' ? 'old' : 'new';
+    root.dataset.share = root.dataset.people;
+    document.querySelectorAll('[data-people-btn]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.peopleBtn === root.dataset.people); });
+    try { var u = new URL(location.href); if (root.dataset.people === 'old') u.searchParams.set('people', 'old'); else u.searchParams.delete('people'); u.searchParams.delete('share'); history.replaceState(null, '', u.toString()); } catch (e) {}
+  }
+  function keepQ() { var p = []; p.push('theme=' + root.dataset.theme); if (root.dataset.people === 'old') p.push('people=old'); return p.join('&'); }
 
   /* ------------------------------------------------------------ helpers */
   function fmt(c) { var n = c < 0; c = Math.abs(c); return (n ? '−' : '') + '$' + Math.floor(c / 100) + '.' + ('0' + (c % 100)).slice(-2); }
@@ -34,6 +42,9 @@
     };
     return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + (P[n] || '') + '</svg>';
   }
+
+  // The ÷ motif (two dots and a bar) from the logo: pink, decorative, never carries meaning on its own.
+  var DIV = '<svg class="divmark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.6" r="2.5"/><rect x="3" y="10.4" width="18" height="3.2" rx="1.6"/><circle cx="12" cy="19.4" r="2.5"/></svg>';
 
   /* ------------------------------------------------------------ sample data */
   var PRICES = [400, 500, 1400, 2200, 1800, 1400, 1500, 900]; // the receipt exactly as printed (juice, beer, starter, mains, dessert)
@@ -97,7 +108,10 @@
     b.rows.forEach(function (r) { t += X.person(person(r.id).name, fmt(r.total), fmt(r.items), fmt(r.tax), svc ? fmt(r.service) : '', fmt(r.tip)); });
     return t + X.close(fmt(b.total));
   }
-  function stepLabel(n) { return '<span class="step">' + T.step(n) + '</span>'; }
+  function stepLabel(n) { // five dots (done in green, the current step in pink, the rest quiet) plus the words, which stay the real signal
+    var d = ''; for (var i = 1; i <= 5; i++) d += '<i class="' + (i < n ? 'done' : i === n ? 'now' : '') + '"></i>';
+    return '<span class="step"><span class="steps" aria-hidden="true">' + d + '</span>' + T.step(n) + '</span>';
+  }
   function nav(label, to, step) {
     return '<div class="nav"><button class="back" data-act="go" data-to="' + to + '">' + ic('back') + esc(label) + '</button>' + (step ? stepLabel(step) : '') + '</div>';
   }
@@ -121,7 +135,7 @@
     var H = T.home;
     return '<div class="view"><div class="scroll" data-scroll="home" style="padding-top:4px">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;height:48px;margin:0 -4px 0 0">' +
-        '<div style="display:flex;align-items:center;gap:8px">' + R.mark(34) + '<span class="wordmark">' + T.brand + '</span></div>' +
+        '<div class="brand" style="display:flex;align-items:center;gap:8px">' + R.mark(34) + window.ESP_WM + '</div>' +
         '<button class="back" style="padding:0 6px" data-act="sheet" data-type="how" aria-label="' + esc(H.how) + '">' + ic('help') + '<span style="font-size:15px;margin-left:4px">' + H.how + '</span></button></div>' +
       '<div style="display:flex;justify-content:center;margin:2px 0 6px">' + R.scenes.home(250) + '</div>' +
       '<div style="display:flex;justify-content:center;margin:0 0 10px"><span class="say">' + H.bubble + '</span></div>' +
@@ -140,19 +154,19 @@
     var C = T.cap;
     if (S.cap === 'denied') {
       return '<div class="view">' + nav(C.cancel, 'home') + '<div class="scroll" style="display:flex;flex-direction:column;justify-content:center;gap:16px;padding-bottom:60px">' +
-        '<div class="card" style="padding:24px 20px;text-align:center"><div style="display:flex;justify-content:center">' + R.svg('thinking', 110) + '</div>' +
+        '<div class="card" style="padding:24px 20px;text-align:center"><div style="display:flex;justify-content:center"><span class="disc">' + R.svg('thinking', 100) + '<svg class="stk" viewBox="0 0 24 24" aria-hidden="true" fill="var(--pink)">' + R.DIVG + '</svg></span></div>' +
         '<h2 class="t-title" style="margin:6px 0 8px;font-size:24px">' + C.deniedTitle + '</h2>' +
         '<p class="t-sub" style="margin:0 0 18px">' + C.deniedBody + '</p>' +
         '<button class="btn btn-primary" data-act="toast" data-msg="' + esc(C.settingsToast) + '">' + C.openSettings + '</button></div>' +
         '<button class="btn btn-secondary" data-act="start-photo">' + ic('photo') + C.choose + '</button></div></div>';
     }
     var shot = S.cap === 'captured';
-    return '<div class="view dark-view" style="background:#000;padding-top:0"><div class="vf' + (shot ? ' frozen' : '') + '">' +
-      '<div class="table"></div>' + paper({ fs: 11.5, style: 'position:absolute;left:50%;top:50%;width:262px;margin:-232px 0 0 -131px;transform:rotate(-2.2deg)' }) +
+    return '<div class="view dark-view" style="background:var(--dev-island);padding-top:0"><div class="vf' + (shot ? ' frozen' : '') + '">' +
+      '<div class="table"></div><div class="edge' + (shot ? ' snap' : '') + '" style="position:absolute;left:50%;top:50%;width:262px;margin:-232px 0 0 -131px;transform:rotate(-2.2deg)">' + paper({ fs: 11.5, style: 'position:relative' }) + '</div>' +
       '<div class="brk" style="left:36px;top:178px"></div><div class="brk r" style="right:36px;top:178px"></div><div class="brk b" style="left:36px;bottom:208px"></div><div class="brk br" style="right:36px;bottom:208px"></div></div>' +
       '<div class="cam-top"><button class="cam-btn" data-act="go" data-to="home">' + C.cancel + '</button>' + (shot ? '' : '<button class="cam-btn" data-act="toast" data-msg="' + esc(C.flashToast) + '" aria-label="' + C.flash + '">' + ic('bolt') + '</button>') + '</div>' +
       '<div class="guide-pill">' + (shot ? ic('check') + C.looks : ic('info') + C.guide) + '</div>' +
-      (shot ? '<div class="cam-bottom" style="gap:10px"><button class="btn btn-primary" data-act="use-photo">' + C.use + '</button><button class="btn btn-secondary" data-act="retake" style="background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.6)">' + C.retake + '</button></div>'
+      (shot ? '<div class="cam-bottom" style="gap:10px"><button class="btn btn-primary" data-act="use-photo">' + C.use + '</button><button class="btn btn-secondary" data-act="retake" style="background:var(--cam-ghost);color:var(--cam-ink);border-color:var(--cam-edge)">' + C.retake + '</button></div>'
         : '<div class="cam-bottom row"><button class="lib" data-act="start-photo"><span class="lib-th">' + ic('photo') + '</span>' + C.choose + '</button><button class="shutter" data-act="shutter" aria-label="' + C.shutter + '"><i></i></button><span style="width:76px"></span></div>') +
       '<div class="flash" id="flash"></div></div>';
   };
@@ -227,24 +241,23 @@
   };
 
   function chipsHTML() {
-    return '<div class="chips-wrap"><div class="group-label" style="margin:0 20px 6px;font-size:12px">' + T.asg.chips + '</div><div class="chips" data-scroll="chips">' + S.people.map(function (p) {
+    return '<div class="chips-wrap"><div class="group-label" style="margin:0 20px 2px;font-size:12px">' + T.asg.chips + '</div><div class="chips" data-scroll="chips">' + S.people.map(function (p) {
       return '<button class="chip s' + p.slot + (S.paint === p.id ? ' on' : '') + '" data-act="paint" data-id="' + p.id + '" data-chip="' + p.id + '" aria-pressed="' + (S.paint === p.id) + '">' +
-        '<span class="chip-top">' + av(p) + '<b>' + esc(p.name) + '</b></span>' + amt('chip' + p.id, subtotalOf(p.id)) + '</button>';
+        av(p) + '<span class="chip-tx"><b>' + esc(p.name) + '</b>' + amt('chip' + p.id, subtotalOf(p.id)) + '</span></button>';
     }).join('') + '</div></div>';
   }
   function itemRowHTML(it) {
     var A_ = T.asg, who = S.people.filter(function (p) { return it.who.indexOf(p.id) >= 0; });
-    var cls = 'irow', r2 = '', bar = '';
+    var cls = 'irow' + (S.sheet && S.sheet.type === 'assign' && S.sheet.id === it.id ? ' sel' : ''), r2 = '', bar = '';
     if (!who.length) {
       cls += ' un' + (S.warn ? ' pulse' : '');
-      r2 = '<span class="pill warn">' + ic('warn') + A_.unassigned + '</span><span class="t-foot">' + A_.tapChoose + '</span>';
+      r2 = '<span class="un-dot">' + ic('warn') + '</span><span class="un-t">' + A_.unassigned + '</span><span class="t-foot">' + A_.tapChoose + '</span>';
     } else {
       var sh = shareOf(it), vals = who.map(function (p) { return sh[p.id]; });
-      bar = '<i class="bar">' + who.map(function (p) { return '<s class="s' + p.slot + '"></s>'; }).join('') + '</i>';
-      if (who.length === 1) r2 = av(who[0]) + '<span class="t-sub" style="color:var(--ink)">' + esc(who[0].name) + '</span>';
+      if (who.length === 1) r2 = av(who[0], 'sm') + '<span>' + esc(who[0].name) + '</span>';
       else {
         var same = vals.every(function (v) { return v === vals[0]; });
-        r2 = '<span class="av-stack">' + who.map(function (p) { return av(p); }).join('') + '</span><span class="t-foot" style="color:var(--ink2)">' + (same ? A_.equal(fmt(vals[0])) : A_.equalMix(vals.map(fmt).join(' · '))) + '</span>';
+        r2 = '<span class="av-stack">' + who.map(function (p) { return av(p, 'sm'); }).join('') + '</span><span class="t-foot">' + (same ? A_.equal(fmt(vals[0])) : A_.equalMix(vals.map(fmt).join(' · '))) + '</span>';
       }
     }
     return '<div class="' + cls + '" role="button" tabindex="0" data-act="item" data-id="' + it.id + '" aria-label="' + esc(A_.aria(it.name, fmt(it.price), who.map(function (p) { return p.name; }).join(', '))) + '">' + bar +
@@ -261,7 +274,7 @@
     if (extra) { var firsts = S.people.filter(function (p) { return sh[p.id] === Math.max.apply(null, vals); }).map(function (p) { return p.name; }); note = A_.extra(who, it.price % who, firsts); }
     return '<div class="scrim" data-act="close"></div><div class="sheet' + (LAST.sheetOpen === 'assign' ? ' still' : '') + '" role="dialog" aria-label="' + esc(A_.sheetLabel(it.name)) + '"><div class="grab"></div>' +
       '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h3>' + esc(it.name) + '</h3>' + amt('sh-price', it.price) + '</div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px"><span class="t-sub">' + A_.who + '</span><button class="link" style="min-height:36px;font-size:15px" data-act="everyone" data-id="' + it.id + '">' + (it.who.length === S.people.length ? A_.clear : A_.everyone) + '</button></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px"><span class="t-sub">' + A_.who + '</span><button class="link" style="min-width:44px;justify-content:flex-end;font-size:15px" data-act="everyone" data-id="' + it.id + '">' + (it.who.length === S.people.length ? A_.clear : A_.everyone) + '</button></div>' +
       '<div class="prows">' + rows + '</div><div class="t-foot" style="margin:10px 2px 12px;min-height:34px">' + note + '</div><button class="btn btn-primary" data-act="close">' + A_.done + '</button></div>';
   }
   V.assign = function () {
@@ -273,9 +286,9 @@
       '<div class="head" style="padding-bottom:10px"><div style="display:flex;align-items:baseline;justify-content:space-between"><h1 class="t-title">' + A_.title + '</h1><span class="t-sub num" style="color:' + (all ? 'var(--primary)' : 'var(--ink2)') + ';font-weight:600">' + A_.progress(done, n) + (all ? ' ✓' : '') + '</span></div>' +
       '<div class="meter' + (all ? ' done' : '') + '" role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + done + '" aria-label="' + esc(A_.meter) + '" style="margin-top:10px"><i style="width:' + (n ? Math.round(done / n * 100) : 0) + '%"></i></div></div>' +
       chipsHTML() +
-      (paintName ? '<div class="paintbar s' + person(S.paint).slot + '"><span>' + A_.paintBar(esc(paintName)) + '</span><button class="link" style="min-height:36px" data-act="paint" data-id="' + S.paint + '">' + A_.done + '</button></div>' : '') +
+      (paintName ? '<div class="paintbar s' + person(S.paint).slot + '"><span>' + A_.paintBar(esc(paintName)) + '</span><button class="link" style="min-width:44px;justify-content:flex-end" data-act="paint" data-id="' + S.paint + '">' + A_.done + '</button></div>' : '') +
       '<div class="scroll" data-scroll="assign" style="padding-top:8px;padding-bottom:12px">' +
-      (S.warn && left.length ? '<div class="banner warn" role="alert" style="margin-bottom:10px">' + '<span class="b-ico">' + ic('warn') + '</span><div><b>' + A_.warnTitle(left.length) + '</b><div class="t-foot">' + A_.warnBody(left.length) + '</div><button class="btn btn-secondary sm" data-act="split-rest" style="margin-top:10px;background:var(--surface)">' + A_.restEven + '</button></div></div>' : '') +
+      (S.warn && left.length ? '<div class="banner flat warn" role="alert" style="margin-bottom:10px">' + '<span class="b-ico">' + ic('warn') + '</span><div><b>' + A_.warnTitle(left.length) + '</b><div class="t-foot">' + A_.warnBody(left.length) + '</div><button class="btn btn-secondary sm" data-act="split-rest" style="margin-top:10px;background:var(--surface)">' + A_.restEven + '</button></div></div>' : '') +
       '<div class="ilist">' + S.items.map(itemRowHTML).join('') + '</div>' +
       (S.paint ? '' : '<p class="t-foot" style="text-align:center;margin:14px 20px 0">' + A_.foot + '</p>') + '</div>' +
       '<div class="footer bar"><div class="t-foot" style="display:flex;justify-content:center;font-size:14px">' + footTxt + '</div><button class="btn btn-primary" id="rsbtn" data-act="review-split">' + A_.btn(all ? 0 : left.length) + '</button></div></div>' +
@@ -286,9 +299,9 @@
     var X = T.tot, b = bill(), tip = tipCents(), svc = S.receipt.service || 0, conf = S.receipt.total + tip, un = unassigned(), iss = issues();
     var ok = !un.length && b.total === conf, short = iss[0];
     var banner;
-    if (un.length) banner = '<div class="banner warn" role="alert"><span class="b-ico">' + ic('warn') + '</span><div><b>' + X.notSettled + '</b><div class="t-foot">' + X.notSettledBody(un.length, fmt(sum(un, function (i) { return i.price; }))) + '</div></div></div>';
-    else if (!ok) banner = '<div class="banner warn" role="alert"><div class="rc-wrap">' + R.svg('worried', 64) + '</div><div><b>' + X.offTitle(fmt(Math.abs(b.total - conf))) + '</b><div class="t-foot" style="color:var(--ink)">' + X.offBody(short && short.kind === 'subtotal' ? fmt(short.items) : null, fmt(S.receipt.subtotal)) + X.offFix + '</div></div></div>';
-    else banner = '<div class="banner ok" style="align-items:center;padding:10px 14px"><span class="b-ico" style="margin:0">' + ic('check') + '</span><div style="flex:1"><b class="num">' + X.okTitle(fmt(b.total)) + '</b><div class="t-foot">' + X.okSub + '</div></div></div>';
+    if (un.length) banner = '<div class="banner flat warn" role="alert"><span class="b-ico">' + ic('warn') + '</span><div><b>' + X.notSettled + '</b><div class="t-foot">' + X.notSettledBody(un.length, fmt(sum(un, function (i) { return i.price; }))) + '</div></div></div>';
+    else if (!ok) banner = '<div class="banner flat warn" role="alert"><div class="rc-wrap">' + R.svg('worried', 64) + '</div><div><b>' + X.offTitle(fmt(Math.abs(b.total - conf))) + '</b><div class="t-foot" style="color:var(--ink)">' + X.offBody(short && short.kind === 'subtotal' ? fmt(short.items) : null, fmt(S.receipt.subtotal)) + X.offFix + '</div></div></div>';
+    else banner = '<div class="banner flat ok" style="align-items:center"><span class="b-ico" style="margin:0">' + ic('check') + '</span><div style="flex:1"><b class="num">' + X.okTitle(fmt(b.total)) + '</b><div class="t-foot">' + X.okSub + '</div></div></div>';
 
     var seg = [15, 18, 20].map(function (p) { return '<button data-act="tip" data-pct="' + p + '" aria-pressed="' + (S.tip.mode === 'pct' && S.tip.pct === p) + '">' + p + '%</button>'; }).join('') +
       '<button data-act="tip" data-pct="custom" aria-pressed="' + (S.tip.mode === 'custom') + '">' + X.custom + '</button>';
@@ -298,14 +311,13 @@
     var total = Math.max(1, b.total);
     var bar = '<div class="sbar" role="img" aria-label="' + X.barAria + '">' + b.rows.map(function (r) {
       var p = person(r.id), pc = r.total / total * 100;
-      return '<span class="s' + p.slot + '" style="width:' + pc + '%">' + (pc > 12 ? esc(p.name.charAt(0)) : '') + '</span>';
-    }).join('') + '</div><div class="legend">' + b.rows.map(function (r) { var p = person(r.id); return '<span class="s' + p.slot + '"><i></i>' + esc(p.name) + ' ' + Math.round(r.total / total * 100) + '%</span>'; }).join('') + '</div>';
+      return '<span class="s' + p.slot + '" style="width:' + pc + '%"></span>';
+    }).join('') + '</div><div class="sbar-rule" aria-hidden="true"></div><div class="legend">' + b.rows.map(function (r) { var p = person(r.id); return '<span class="s' + p.slot + '"><i></i>' + esc(p.name) + ' ' + Math.round(r.total / total * 100) + '%</span>'; }).join('') + '</div>';
 
     var cards = b.rows.map(function (r) {
       var p = person(r.id), open = S.expanded[p.id], adj = r.itemAdj.length + r.taxAdj + r.serviceAdj + r.tipAdj;
-      return '<div class="pcard s' + p.slot + (open ? ' open' : '') + '"><button class="pc-h" data-act="expand" data-id="' + p.id + '" aria-expanded="' + !!open + '"><div class="pc-top">' + av(p, 'lg') + '<b class="t-head" style="flex:1;font-size:19px">' + esc(p.name) + '</b>' + amt('pt' + p.id, r.total, 't-display') + '</div>' +
-        '<div class="t-foot pc-line">' + X.line(fmt(r.items), fmt(r.tax), svc ? fmt(r.service) : '', fmt(r.tip)) + '</div>' +
-        (adj ? '<div style="margin-top:6px"><span class="pill neutral">' + X.rounding(adj) + '</span></div>' : '') + '</button>' +
+      return '<div class="pcard s' + p.slot + (open ? ' open' : '') + '"><button class="pc-h" data-act="expand" data-id="' + p.id + '" aria-expanded="' + !!open + '"><div class="pc-top">' + av(p, 'md') + '<div class="pc-name"><b>' + esc(p.name) + '</b><span class="t-foot">' + X.line(fmt(r.items), fmt(r.tax), svc ? fmt(r.service) : '', fmt(r.tip)) + '</span>' +
+        (adj ? '<span class="pc-adj">' + X.rounding(adj) + '</span>' : '') + '</div>' + amt('pt' + p.id, r.total, 't-total') + ic('chevd').replace('class="ico"', 'class="ico chev"') + '</div></button>' +
         (open ? '<div class="pc-body">' + r.lines.map(function (l) { return '<div class="ln"><span>' + esc(l.item.name) + (l.of > 1 ? ' <i class="t-cap">1/' + l.of + '</i>' : '') + '</span><span class="num">' + fmt(l.cents) + '</span></div>'; }).join('') + '</div>' : '') + '</div>';
     }).join('');
 
@@ -317,31 +329,31 @@
     if (tx.length) notes.push(X.roundPool(X.poolTax, tx.length, tx));
     if (sv.length) notes.push(X.roundPool(X.poolSvc, sv.length, sv));
     if (tp.length) notes.push(X.roundPool(X.poolTip, tp.length, tp));
-    var round = notes.length ? '<div class="card round"><div class="rc-wrap">' + R.svg('thinking', 76, { coin: 1, label: X.roundCoin }) + '</div><div><b class="t-head" style="display:block">' + X.roundTitle + '</b><ul class="t-foot" style="margin:4px 0 0;padding-left:16px">' + notes.map(function (n) { return '<li>' + n + '</li>'; }).join('') + '</ul><div class="t-foot" style="margin-top:6px">' + X.roundRule + '</div></div></div>' : '';
+    var round = notes.length ? '<div class="round"><div class="rc-wrap">' + R.svg('thinking', 76, { coin: 1, label: X.roundCoin }) + '</div><div><b class="t-head" style="display:block">' + X.roundTitle + '</b><ul class="t-foot" style="margin:4px 0 0;padding-left:16px">' + notes.map(function (n) { return '<li>' + n + '</li>'; }).join('') + '</ul><div class="t-foot" style="margin-top:6px">' + X.roundRule + '</div></div></div>' : '';
 
     return '<div class="view">' + nav(X.back, 'assign', 5) + '<div class="head" style="padding-bottom:8px"><h1 class="t-title">' + X.title + '</h1></div>' +
       '<div class="scroll" data-scroll="totals" style="padding-bottom:12px">' + banner +
       '<div class="group-label">' + X.tipLabel(fmt(S.receipt.subtotal)) + '</div><div class="segm" role="group" aria-label="' + X.tipAria + '">' + seg + '</div>' + custom + svcHint +
-      '<div class="card sum"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px"><div><div class="t-cap">' + X.billTotal + '</div>' + amt('bt', conf, 't-display') + '</div></div>' +
+      '<div class="sum"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px"><div><div class="t-cap">' + X.billTotal + '</div>' + amt('bt', conf, 't-display') + '</div></div>' +
       '<div class="sum3" style="grid-template-columns:repeat(' + (svc ? 4 : 3) + ',1fr)"><div><span class="t-cap">' + X.subtotal + '</span>' + amt('ss', S.receipt.subtotal) + '</div><div><span class="t-cap">' + X.tax + '</span>' + amt('stx', S.receipt.tax) + '</div>' + (svc ? '<div><span class="t-cap">' + X.service + '</span>' + amt('ssv', svc) + '</div>' : '') + '<div><span class="t-cap">' + X.tip + '</span>' + amt('stp', tip) + '</div></div></div>' +
-      '<div class="group-label">' + X.whoOwes + '</div>' + bar + '<div class="cards">' + cards + '</div>' + round + '</div>' +
+      '<div class="group-label divlabel">' + DIV + X.whoOwes + '</div>' + bar + '<div class="cards">' + cards + '</div>' + round + '</div>' +
       '<div class="footer bar"><button class="btn btn-primary' + (ok ? '' : ' is-disabled') + '" data-act="share">' + ic('share') + X.share + '</button>' +
       (ok ? '' : '<div class="t-foot" style="text-align:center;color:var(--warn)">' + X.blocked + '</div>') +
       '<div style="display:flex;gap:8px"><button class="btn-quiet" style="flex:1" data-act="go" data-to="assign">' + X.editAsg + '</button><button class="btn-quiet" style="flex:1" data-act="go" data-to="review">' + X.editReceipt + '</button></div></div></div>' +
       (S.sheet && S.sheet.type === 'share' ? shareSheet(b) : '') + (S.sheet && S.sheet.type === 'success' ? successView(b) : '');
   };
   function shareSheet(b) {
-    var Sh = T.share, t = [['Messages', '#34C759', 'M5 6h14v9H10l-4 3.5V15H5z'], ['Mail', '#3B82F6', 'M4 7h16v10H4zM4 8l8 6 8-6'], ['Notes', '#F5C451', 'M6 4h12v16H6zM9 9h6M9 13h6'], ['Copy', '#8C96A1', 'M8 8h10v11H8zM6 16V5h10']];
-    return '<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-label="' + esc(Sh.docTitle(T.merchant)) + '"><div class="grab"></div>' +
-      '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><span class="doc">' + ic('doc') + '</span><div><b class="t-head" style="display:block">' + esc(Sh.docTitle(T.merchant)) + '</b><span class="t-foot">' + Sh.docSub(S.people.length) + '</span></div></div>' +
+    var Sh = T.share, t = [['Messages', 1, 'M5 6h14v9H10l-4 3.5V15H5z'], ['Mail', 2, 'M4 7h16v10H4zM4 8l8 6 8-6'], ['Notes', 3, 'M6 4h12v16H6zM9 9h6M9 13h6'], ['Copy', 4, 'M8 8h10v11H8zM6 16V5h10']];
+    return '<div class="scrim" data-act="close"></div><div class="sheet share" role="dialog" aria-label="' + esc(Sh.docTitle(T.merchant)) + '"><div class="grab"></div>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><span class="doc">' + ic('doc') + '</span><div style="min-width:0;flex:1"><b class="t-head" style="display:block">' + esc(Sh.docTitle(T.merchant)) + '</b><span class="t-foot">' + Sh.docSub(S.people.length) + '</span></div><span class="av-stack sh-people">' + S.people.map(function (p) { return av(p, 'sm'); }).join('') + '</span></div>' +
       '<pre class="sumtxt">' + esc(summaryText(b)) + '</pre>' +
-      '<div class="apps">' + t.map(function (a) { return '<button data-act="shared" data-app="' + a[0] + '"><span style="background:' + a[1] + '"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + a[2] + '"/></svg></span>' + Sh.apps[a[0]] + '</button>'; }).join('') + '</div>' +
+      '<div class="apps">' + t.map(function (a) { return '<button data-act="shared" data-app="' + a[0] + '"><span style="background:var(--sh-app' + a[1] + '-bg);color:var(--sh-app' + a[1] + '-fg)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + a[2] + '"/></svg></span>' + Sh.apps[a[0]] + '</button>'; }).join('') + '</div>' +
       '<div class="t-foot" style="text-align:center;margin:10px 0 2px">' + Sh.native + '</div><button class="btn-quiet" style="width:100%" data-act="close">' + Sh.cancel + '</button></div>';
   }
   function successView(b) {
     var O = T.ok;
     return '<div class="success fadein"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:0 24px">' + R.scenes.success(290) +
-      '<h1 class="t-title" style="margin:6px 0 0">' + O.title + '</h1><p class="t-sub" style="margin:0 0 18px">' + O.body(S.people.length, fmt(b.total)) + '</p>' +
+      '<h1 class="t-title" style="margin:6px 0 0">' + O.title + '</h1><span class="av-stack sh-people sent" aria-hidden="true">' + S.people.map(function (p) { return av(p, 'md'); }).join('') + '</span><p class="t-sub" style="margin:0 0 18px">' + O.body(S.people.length, fmt(b.total)) + '</p>' +
       '<button class="btn btn-primary" data-act="new-bill">' + O.again + '</button><button class="btn-quiet" data-act="close">' + O.back + '</button></div></div>';
   }
 
@@ -374,13 +386,13 @@
     }
     if (s.type === 'remove') {
       var q = person(s.id), had = S.items.filter(function (i) { return i.who.indexOf(q.id) >= 0; }), orphan = had.filter(function (i) { return i.who.length === 1; });
-      return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><h3>' + esc(T.ppl.removeTitle(q.name)) + '</h3>' +
+      return '<div class="scrim" data-act="close"></div><div class="sheet warnish"><div class="grab"></div><h3>' + esc(T.ppl.removeTitle(q.name)) + '</h3>' +
         '<p class="t-sub" style="margin:8px 0 16px;color:var(--ink)">' + esc(T.ppl.removeBody(q.name, had.length, orphan.map(function (i) { return i.name; }), had.length - orphan.length > 0)) + '</p>' +
         '<div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:2" data-act="close">' + esc(T.ppl.keep(q.name)) + '</button><button class="btn btn-warn" style="flex:1" data-act="confirm-remove" data-id="' + q.id + '">' + T.ppl.remove + '</button></div></div>';
     }
     if (s.type === 'continue-bad') {
       var i0 = issues()[0];
-      return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><div style="display:flex;gap:10px;align-items:center">' + R.svg('worried', 64) + '<h3>' + T.rev.badTitle + '</h3></div>' +
+      return '<div class="scrim" data-act="close"></div><div class="sheet warnish"><div class="grab"></div><div style="display:flex;gap:10px;align-items:center">' + R.svg('worried', 64) + '<h3>' + T.rev.badTitle + '</h3></div>' +
         '<p class="t-sub" style="margin:10px 0 16px;color:var(--ink)">' + T.rev.badBody(fmt(Math.abs(i0.diff))) + '</p>' +
         '<div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:2" data-act="close">' + T.rev.fixIt + '</button><button class="btn btn-secondary" style="flex:1" data-act="continue-anyway">' + T.rev.keepGoing + '</button></div></div>';
     }
@@ -399,6 +411,17 @@
     document.querySelector('.screen').classList.toggle('dark-chrome', S.screen === 'capture' && S.cap !== 'denied');
     appEl.querySelectorAll('[data-scroll]').forEach(function (e) { var s = scrolls[e.dataset.scroll]; if (s) { e.scrollTop = s[0]; e.scrollLeft = s[1]; } });
     tweenAmts();
+    // the unassigned -> assigned moment: a pink rail and check badge on the row that just got its first person
+    var asg = {}; S.items.forEach(function (i) { if (i.who.length) asg[i.id] = 1; });
+    if (S.screen === 'assign' && LAST.screen === 'assign' && LAST.asg) {
+      var k = 0; S.items.forEach(function (i) {
+        if (!asg[i.id] || LAST.asg[i.id]) return;
+        var row = appEl.querySelector('.irow[data-id="' + i.id + '"]'); if (!row) return;
+        row.classList.add('just'); row.style.setProperty('--d', (k++ * 0.09) + 's');
+        row.insertAdjacentHTML('beforeend', '<span class="just-badge" aria-hidden="true">' + ic('check') + '</span>');
+      });
+    }
+    LAST.asg = asg;
     LAST.sheetOpen = S.sheet && S.sheet.type;
     LAST.screen = S.screen;
     schedule();
@@ -558,22 +581,26 @@
     var stored = null; try { stored = localStorage.getItem('esp-theme'); } catch (e) {}
     var t = qs.get('theme') || stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     setTheme(t);
+    root.dataset.people = qs.get('people') === 'old' ? 'old' : 'new';
+    root.dataset.share = qs.get('share') ? (qs.get('share') === 'old' ? 'old' : 'new') : root.dataset.people;
     if (qs.get('reduce') === '1') root.dataset.reduce = '1';
-    window.addEventListener('message', function (e) { var m = e.data; if (m && m.esp === 'theme') setTheme(m.v); if (m && m.esp === 'reduce') root.dataset.reduce = m.v ? '1' : '0'; });
+    window.addEventListener('message', function (e) { var m = e.data; if (m && m.esp === 'theme') setTheme(m.v); if (m && m.esp === 'people') { root.dataset.people = m.v === 'old' ? 'old' : 'new'; root.dataset.share = root.dataset.people; } if (m && m.esp === 'reduce') root.dataset.reduce = m.v ? '1' : '0'; });
     var tb = document.getElementById('toolbar');
     if (EMBED) { document.body.classList.add('embed'); if (tb) tb.remove(); return; }
     var q = location.search.replace(/^\?/, '');
     var Tb = T.tb, here = decodeURIComponent((location.pathname.split('/').pop() || 'index.html'));
     tb.innerHTML = '<a href="index.html" id="back-index">' + Tb.all + '</a><span class="ttl" id="ttl"></span>' +
       '<span><span class="tb-label">' + Tb.mode + '</span><span class="seg"><button data-theme-btn="light">' + Tb.light + '</button><button data-theme-btn="dark">' + Tb.dark + '</button></span></span>' +
+      '<span><span class="tb-label">' + Tb.people + '</span><span class="seg"><button data-people-btn="new" title="' + esc(Tb.peopleNewTip) + '">' + Tb.peopleNew + '</button><button data-people-btn="old" title="' + esc(Tb.peopleOldTip) + '">' + Tb.peopleOld + '</button></span></span>' +
       '<span><span class="tb-label">' + Tb.demo + '</span><span class="seg"><button data-data-btn="scanned" title="' + esc(Tb.scanTip) + '">' + Tb.scan + '</button><button data-data-btn="midway" title="' + esc(Tb.midTip) + '">' + Tb.mid + '</button><button data-data-btn="complete" title="' + esc(Tb.completeTip) + '">' + Tb.complete + '</button><button data-data-btn="service" title="' + esc(Tb.serviceTip) + '">' + Tb.service + '</button></span></span>' +
       '<label style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="rm"> ' + Tb.reduce + '</label><span class="haptic" id="haptic"></span>' +
       '<span><span class="tb-label">' + Tb.lang + '</span><span class="seg"><button aria-pressed="true" disabled>' + T.thisLabel + '</button><a class="langsw" id="lang-sw" href="../' + T.other + '/' + here + '">' + T.otherLabel + '</a></span></span>';
     tb.querySelectorAll('[data-theme-btn]').forEach(function (b) { b.onclick = function () { setTheme(b.dataset.themeBtn); }; b.setAttribute('aria-pressed', b.dataset.themeBtn === root.dataset.theme); });
+    tb.querySelectorAll('[data-people-btn]').forEach(function (b) { b.onclick = function () { setPeople(b.dataset.peopleBtn); }; b.setAttribute('aria-pressed', b.dataset.peopleBtn === root.dataset.people); });
     tb.querySelectorAll('[data-data-btn]').forEach(function (b) { b.onclick = function () { applyData(b.dataset.dataBtn); }; b.setAttribute('aria-pressed', b.dataset.dataBtn === S.data); });
     document.getElementById('rm').onchange = function (e) { root.dataset.reduce = e.target.checked ? '1' : '0'; };
-    document.getElementById('back-index').addEventListener('click', function (e) { e.currentTarget.href = 'index.html?theme=' + root.dataset.theme; });
-    document.getElementById('lang-sw').addEventListener('click', function (e) { e.currentTarget.href = '../' + T.other + '/' + here + '?theme=' + root.dataset.theme; });
+    document.getElementById('back-index').addEventListener('click', function (e) { e.currentTarget.href = 'index.html?' + keepQ(); });
+    document.getElementById('lang-sw').addEventListener('click', function (e) { e.currentTarget.href = '../' + T.other + '/' + here + '?' + keepQ(); });
     var tt = document.getElementById('ttl'); tt.textContent = TITLES[S.screen] || '';
     fit();
     window.addEventListener('resize', fit);

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es-PR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Esplitéalo · Español / English</title>
+<link rel="icon" href="data:,">
+<style>
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,__UNKEMPT_REG_B64__) format("woff2")}
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:700;font-display:swap;src:url(data:font/woff2;base64,__UNKEMPT_B64__) format("woff2")}
+__TOKENS__
+:root{--bg:var(--page);--card:var(--page-card);--lip:var(--primary-lip);--on:var(--on-primary)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 56px}
+h1,.card h2{font-family:"Unkempt","Marker Felt","Chalkboard SE",ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;font-weight:400;letter-spacing:.02em}
+__WORDMARK_CSS__
+h1 .wm{font-size:30px}
+h1{font-size:30px;line-height:1.15;margin:0 0 6px}
+p{margin:0 0 20px;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.card h2{margin:0 0 4px;font-size:22px}
+.card h2::before{content:"";display:inline-block;width:.62em;height:.62em;margin-right:.34em;background:var(--pink);-webkit-mask:var(--div-mask) center/contain no-repeat;mask:var(--div-mask) center/contain no-repeat}
+.card p{margin:0 0 14px;font-size:15px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:14px;background:var(--primary);color:var(--on);font-weight:600;text-decoration:none;border-bottom:3px solid var(--lip)}
+.btn.alt{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+small{display:block;margin-top:22px;color:var(--ink2);font-size:13px}
+</style>
+</head>
+<body>
+<script>document.documentElement.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) { document.documentElement.dataset.theme = e.matches ? "dark" : "light"; });</script>
+<main>
+  <h1>__WORDMARK__ · maquetas HTML / HTML mockups</h1>
+  <p>Chavito, el mapache, cuadra la cuenta. / Chavito the raccoon does the math.</p>
+  <div class="grid">
+    <section class="card">
+      <h2>Español (Puerto Rico)</h2>
+      <p>__NSCREENS__ pantallas y estados con el vocabulario boricua que escogió el dueño del proyecto, un recibo de ejemplo de un restaurante de Puerto Rico y un prototipo completo.</p>
+      <div class="row"><a class="btn" href="es/index.html">Ver todas las pantallas</a><a class="btn alt" href="es/prototype.html">Prototipo</a></div>
+    </section>
+    <section class="card">
+      <h2>English</h2>
+      <p>The same __NSCREENS__ screens and states in English, with the same Puerto Rico restaurant sample receipt and Chavito speaking in the first person.</p>
+      <div class="row"><a class="btn" href="en/index.html">See all screens</a><a class="btn alt" href="en/prototype.html">Prototype</a></div>
+    </section>
+  </div>
+  <div class="grid" style="margin-top:16px"><section class="card"><h2>Colores / Colors</h2><p>Paleta de marca (crema, verde, rosa), colores propuestos para las personas y para la hoja de compartir, y cómo compararlos con los anteriores (en inglés). / Brand palette (cream, green, pink), proposed person and share-sheet colors, and how to compare them with the previous ones.</p><div class="row"><a class="btn alt" href="colors.html">Plan de colores / Color plan</a></div></section></div>
+  <small>Cada versión funciona sin conexión: haz doble clic en el archivo. / Each version works offline: just double-click the file. Dentro de cada maqueta hay un cambio de idioma. / Each mockup has a language switch.</small>
+</main>
+</body>
+</html>

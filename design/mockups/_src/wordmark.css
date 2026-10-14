@@ -1,0 +1,14 @@
+/* ESPLITÉALO wordmark: the outlined logo wordmark (wordmark.svg), inline, so the acute on the É can be pink.
+   build.py injects the markup (window.ESP_WM in the app pages, __WORDMARK__ in the landing and plan pages).
+   Letters follow --wm-ink, the acute follows --wm-accent (both in tokens.css), so light and dark both work.
+   The size is the font-size of .wm (default 24px): 1em = the old text size, same width (5.83em vs 5.79em) and cap height. */
+.wm{--wm-w:5.8255em;--wm-h:.9465em;display:inline-block;position:relative;box-sizing:content-box;width:var(--wm-w);height:var(--wm-h);font-size:24px;line-height:0;vertical-align:-.0285em;flex:none;color:var(--wm-ink)}
+.brand .wm,.wm.flexed{position:relative;top:-.083em}   /* in a centred flex row the logo's baseline sits a hair low next to the old text's line box; this puts the letters where the text was */
+.wm-svg{display:block;width:100%;height:100%;overflow:visible}
+.wm-l{fill:var(--wm-ink)}
+.wm-a{fill:var(--wm-accent)}
+/* the real text stays in the page for selecting, copying and search; it is invisible and sized like the drawing */
+.wm-txt{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;white-space:nowrap;color:transparent;font:700 1em/.9465 var(--f-title,"Unkempt",sans-serif);letter-spacing:.02em;text-transform:uppercase;font-synthesis:none;cursor:text}
+.wm-txt::selection{background:var(--pink-soft);color:transparent}
+/* the ÷ from the logo as a mask, so any element can wear it in a token colour: background:var(--pink); mask:var(--div-mask) center/contain no-repeat */
+:root{--div-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='4.6' r='2.5'/%3E%3Crect x='3' y='10.4' width='18' height='3.2' rx='1.6'/%3E%3Ccircle cx='12' cy='19.4' r='2.5'/%3E%3C/svg%3E")}

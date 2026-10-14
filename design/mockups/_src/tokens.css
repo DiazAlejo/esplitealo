@@ -1,0 +1,177 @@
+/* =====================================================================
+   ESPLITÉALO COLOUR TOKENS: the only file that defines colours.
+   Everything else (style.css, app.js, mascot.js, the plan page, the
+   landing page) reads these variables. After editing, run
+       python3 _src/build.py .
+   from the v4 folder to regenerate es/, en/ and the landing + plan pages.
+
+   1. BRAND INPUTS      the three logo colours (+ basil). Change the logo palette HERE.
+   2. NEUTRALS + STATUS cream paper, surfaces, ink, warn, ok. Light and dark.
+   3. PINK ROLES        one pink token, a text-safe variant, a tint. Dark value is its own line.
+   3b. PINK USES (v4)   every place the pink shows, one token each (wordmark accent, step dot, meter, ...).
+   4. PERSON COLOURS    proposed (default) + previous (?people=old)
+   5. SHARE SHEET       proposed (default) + previous (?share=old, follows ?people=old)
+   6. ILLUSTRATION      Chavito, confetti, receipt art
+   7. PAGE CHROME       toolbar and the area around the phone
+   8. DEVICE + CAMERA   the simulated phone, the viewfinder, the printed receipt (not app palette)
+
+   Rules that keep the roles apart (also in report.md):
+   - pink is only ever a SHAPE, an icon accent, decoration, the acute of the wordmark or a LARGE soft disc
+     (never row/banner fill, never small text, never next to the warn glyph); text-safe pink is --pink-ink.
+     Shapes that carry a state (current step, selected chip) also need 3:1 on their ground (see 3b) and a second signal.
+   - warn (red-orange) only appears with an icon or the words and never as a big fill.
+   - green is the action/selection colour; person colours only appear on avatars/dots/bars.
+   ===================================================================== */
+
+/* ---------- 1. BRAND INPUTS ---------- */
+:root{
+  --brand-cream:#FBF7EF;     /* paper */
+  --brand-green:#1F7A5A;     /* primary */
+  --brand-basil:#145A42;     /* deeper green: the lip under the primary button */
+  --brand-pink:#EA5A78;      /* accent: coral pink (logo round 3) */
+}
+:root[data-theme="dark"]{
+  --brand-cream:#111915;     /* dark paper: deep basil-black (the cream's night counterpart) */
+  --brand-green:#4CC59A;     /* dark primary */
+  --brand-basil:#2E9C77;
+  --brand-pink:#EA5A78;      /* DARK PINK: same as light because it keeps 5.3:1 on the dark paper.
+                                If the logo round wants a lighter dark pink, change only this line (suggested: #FF8DA4). */
+}
+
+/* ---------- 2. NEUTRALS + STATUS ---------- */
+:root{
+  --paper:var(--brand-cream); --surface:#FFFDF8; --well:#F1EADB;
+  --ink:#1F2A24; --ink2:#5C665F; --line:#DDD3BE;
+  --primary:var(--brand-green); --primary-lip:var(--brand-basil); --on-primary:#FFFFFF;
+  --warn:#C23A1D; --warn-bg:#FCEBDD; --warn-soft:#FDEEE2;   /* tints lean orange so they never read as the pink tint */
+  --ok-bg:color-mix(in srgb,var(--primary) 9%,var(--surface)); --ok-soft:color-mix(in srgb,var(--primary) 8%,var(--surface));
+  --hair:rgba(31,42,36,.11); --sel:rgba(31,42,36,.055);
+  --scrim:rgba(17,25,21,.46); --shadow:0 1px 2px rgba(31,42,36,.08),0 6px 18px rgba(31,42,36,.07);
+}
+:root[data-theme="dark"]{
+  --paper:var(--brand-cream); --surface:#1A2420; --well:#232F29;
+  --ink:#F4EFE4; --ink2:#A8B3AA; --line:#33423A;
+  --primary:var(--brand-green); --primary-lip:var(--brand-basil); --on-primary:#0E1F18;
+  --warn:#FF8466; --warn-bg:#3C2718; --warn-soft:#30231A;
+  --ok-bg:color-mix(in srgb,var(--primary) 17%,var(--surface)); --ok-soft:color-mix(in srgb,var(--primary) 11%,var(--surface));
+  --hair:rgba(255,255,255,.10); --sel:rgba(255,255,255,.07);
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.28);
+}
+
+/* ---------- 3. PINK ROLES ---------- */
+:root{
+  --pink:var(--brand-pink);                                   /* shapes: ÷ mark, tip underline, caret, confetti, coin, cheeks */
+  --pink-ink:color-mix(in srgb,var(--brand-pink) 75%,#000);   /* the only pink allowed for text (>= 4.5:1 on paper and surface) */
+  --pink-soft:color-mix(in srgb,var(--brand-pink) 14%,#fff);  /* big soft discs behind Chavito (never a row or banner fill) */
+  --pink-mid:color-mix(in srgb,var(--brand-pink) 55%,#fff);   /* lighter confetti pieces */
+  --on-pink:#2B0F17;                                          /* ink on a pink fill (coin label); no text sits on pink otherwise */
+  --accent:var(--pink);                                       /* old name, kept so nothing breaks */
+}
+:root[data-theme="dark"]{
+  --pink-ink:var(--brand-pink);                               /* on the dark paper the pink itself passes 4.5:1 */
+  --pink-soft:color-mix(in srgb,var(--brand-pink) 24%,#1B1519);   /* rose-maroon (mixing with the green surface looked muddy brown) */
+  --pink-mid:color-mix(in srgb,var(--brand-pink) 60%,var(--paper));
+}
+
+/* ---------- 3b. PINK USES (v4) ----------
+   The owner could hardly see the pink in v3, so v4 spends it on small, bold brand shapes. Each use is one token that
+   points at --pink (or --pink-ink); to retire a use, point it at another colour. Contrast is on the plan page. */
+:root{
+  --wm-ink:var(--ink);                  /* wordmark letters: the normal title colour (the logo lockup draws them in green: use var(--primary) to match) */
+  --wm-accent:var(--pink);              /* the acute of the E-acute in ESPLITEALO (the logo's accent) */
+  --step-now:var(--pink);               /* current step in the progress dots (shape, text "Paso 2 de 5" is the second signal) */
+  --step-done:var(--primary);           /* finished steps */
+  --step-todo:color-mix(in srgb,var(--ink2) 38%,transparent);   /* steps to come */
+  --meter-fill:var(--pink);             /* Assign progress bar and the processing bar */
+  --pick:var(--pink);                   /* selected state: tip segment underline, selected chip underline, selected row rail */
+  --coin-bg:var(--on-primary);          /* round chip on a primary button (white / dark ink) ... */
+  --coin-mark:var(--pink);              /* ... and the pink division mark inside it (3.4:1 on white, 5.9:1 on dark ink) */
+  --focus-ring:var(--pink);             /* focus ring, text caret */
+  --focus-halo:color-mix(in srgb,var(--pink) 26%,transparent);
+  --total-mark:var(--pink);             /* underline of the bill total */
+  --split-rule:var(--pink);             /* rule under the share bar (the whole bill, split) */
+  --quote-bar:var(--pink);              /* left bar of the message preview */
+  --cam-accent:var(--pink);             /* camera: scan corners, shutter ring, receipt-edge guide */
+  --m-nose:var(--pink);                 /* Chavito's nose */
+  --pop-ring:var(--pink);               /* the "item just assigned" moment (badge, rail) */
+}
+
+/* ---------- 4. PERSON COLOURS ----------
+   PROPOSED (default). Eight natural, muted tones. Light = fill with --on-p (white) letter;
+   dark = lighter tint with --on-p (dark) letter. Slot order is by distinguishability: the first
+   four (Denim, Ochre, Plum, Umber) are the most different pairs, which is what 2 to 4 people use.
+   Nothing here is green, pink/coral or red-orange.                                              */
+:root{
+  --p1:#5070B2; --p2:#72650F; --p3:#572F5F; --p4:#634521;
+  --p5:#146579; --p6:#5E5A54; --p7:#77618F; --p8:#363D4B;
+  --on-p:#FFFFFF;
+}
+:root[data-theme="dark"]{
+  --p1:#9BBAF7; --p2:#D9CE8D; --p3:#AF89B6; --p4:#BCA07F;
+  --p5:#7CB9CA; --p6:#CDC9C2; --p7:#D6C2EE; --p8:#979EAC;
+  --on-p:#111915;
+}
+/* PREVIOUS (v2 / docs/DESIGN_GUIDE.md): Blue, Clay, Violet, Teal, Rose, Olive, Mustard, Slate */
+:root[data-people="old"][data-theme="light"]{
+  --p1:#2F6FA8; --p2:#A85A14; --p3:#7A4FB5; --p4:#1B7F72; --p5:#C23D7B; --p6:#58781C; --p7:#8A6D00; --p8:#5B6B80;
+  --on-p:#FFFFFF;
+}
+:root[data-people="old"][data-theme="dark"]{
+  --p1:#6FA8DC; --p2:#E39B52; --p3:#B79AE0; --p4:#55C2B2; --p5:#E67FB0; --p6:#A5C55A; --p7:#E8C85A; --p8:#9AA8BA;
+  --on-p:#14181C;
+}
+
+/* ---------- 5. SHARE SHEET ----------
+   PROPOSED: cream surface, green primary action (Messages), neutral well tiles for the other
+   apps, a green-tint header tile, person colours only on the avatars, pink only in the success state. */
+:root{
+  --sh-surface:var(--surface);
+  --sh-doc-bg:var(--ok-bg);   --sh-doc-fg:var(--primary);
+  --sh-prev-bg:var(--well);   --sh-prev-ink:var(--ink);
+  --sh-app1-bg:var(--primary); --sh-app1-fg:var(--on-primary);
+  --sh-app2-bg:var(--well);    --sh-app2-fg:var(--ink);
+  --sh-app3-bg:var(--well);    --sh-app3-fg:var(--ink);
+  --sh-app4-bg:var(--well);    --sh-app4-fg:var(--ink);
+  --sh-ok-disc:var(--pink-soft);
+  --cf1:var(--pink); --cf2:var(--primary); --cf3:var(--pink-mid); --cf4:var(--primary-lip); --cf5:#CDBB92;
+  --cf6:var(--pink); --cf7:var(--primary); --cf8:var(--pink-mid); --cf9:#CDBB92;
+}
+:root[data-theme="dark"]{ --cf5:#8C7F5E; --cf9:#8C7F5E; }
+/* PREVIOUS (v2): iOS-style coloured tiles, well header tile, green success disc, person-coloured confetti */
+:root[data-share="old"]{
+  --sh-doc-bg:var(--well);
+  --sh-app1-bg:#34C759; --sh-app1-fg:#FFFFFF;
+  --sh-app2-bg:#3B82F6; --sh-app2-fg:#FFFFFF;
+  --sh-app3-bg:#F5C451; --sh-app3-fg:#FFFFFF;
+  --sh-app4-bg:#8C96A1; --sh-app4-fg:#FFFFFF;
+  --sh-ok-disc:var(--ok-bg);
+  --cf1:#2F6FA8; --cf2:#C23D7B; --cf3:#F2B84B; --cf4:#1B7F72; --cf5:#7A4FB5; --cf6:#F2B84B; --cf7:#A85A14; --cf8:#58781C; --cf9:#2F6FA8;
+}
+
+/* ---------- 6. ILLUSTRATION (Chavito, receipts) ---------- */
+:root{
+  --m-fur:#9AA5B1; --m-furd:#5A6470; --m-mask:#2B333D; --m-cream:#F5EEDF;
+  --m-cheek:var(--pink);                 /* blush */
+  --m-coin:var(--pink); --m-coin-edge:#B83A58; --m-coin-ink:var(--on-pink);
+  --m-receipt:#FFFDF7; --m-receipt-edge:#D9D0BC; --m-receipt-bar:var(--primary);
+  --m-warn:#C23A1D; --m-tear:#7FC4E8; --m-white:#FFFFFF; --m-glass:rgba(255,255,255,.55);
+  --disc-hero:var(--pink-soft);          /* disc behind Chavito on Home and in empty states */
+}
+
+/* ---------- 7. PAGE CHROME (outside the phone) ---------- */
+:root{
+  --page:#E8E2D4; --page-ink:var(--ink); --page-ink2:var(--ink2); --page-card:#F6F2E8;
+}
+:root[data-theme="dark"]{
+  --page:#0B100D; --page-card:#161F1B;
+}
+
+/* ---------- 8. DEVICE, CAMERA, RECEIPT (simulation of physical things; not app palette) ---------- */
+:root{
+  --dev-frame:#0B0C0E; --dev-ring:#2B2E33; --dev-island:#000; --dev-shadow:rgba(0,0,0,.35);
+  --cam-bg:#15110E; --cam-table-a:#3A312A; --cam-table-b:#1B1612; --cam-grain:rgba(255,255,255,.035);
+  --cam-ink:#FFFFFF; --cam-chip:rgba(0,0,0,.45); --cam-chip2:rgba(255,255,255,.18); --cam-edge:rgba(255,255,255,.6);
+  --cam-fade:rgba(0,0,0,.85); --cam-pill:rgba(255,255,255,.86); --cam-pill-ink:#1F2A24; --cam-ghost:rgba(255,255,255,.12);
+  --rcpt-ink:#2A2A2A; --rcpt-rule:rgba(0,0,0,.4); --rcpt-shadow:rgba(0,0,0,.35); --rcpt-shadow2:rgba(0,0,0,.2);
+  --shadow-soft:rgba(0,0,0,.04); --shadow-seg:rgba(0,0,0,.14); --shadow-sheet:rgba(0,0,0,.25);
+}
