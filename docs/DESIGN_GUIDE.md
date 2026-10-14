@@ -8,7 +8,7 @@ This guide is an input to design, not a product decision. It does not change sco
 
 Study Bunny is a game-feel app that rewards time spent. Esplitéalo is a trust-feel utility that should save time and be correct. The guide keeps the warmth and the mechanisms of the first, and leaves behind its density, low contrast, tiny type, and economy.
 
-- **Warm, not childish.** Rounded forms, friendly spacing, and at most one mild moment of delight. No mascot is needed.
+- **Warm, not childish.** Rounded forms, friendly spacing, and at most one mild moment of delight. Marketing mockups use **Chavito**; the product does not depend on a mascot.
 - **Numbers first.** Money is always large, tabular, and high contrast. It is never outlined and never auto-shrunk.
 - **One person, one color, one initial, one name.** Color reinforces identity but is never the only signal.
 - **Native and accessible by default.** SwiftUI, Dynamic Type, VoiceOver, light and dark appearance, Reduce Motion, and 44 pt tap targets.
@@ -33,59 +33,88 @@ Several of its mechanisms transfer well to a bill-splitting app. Its weaknesses 
 | A dim scrim behind a rounded card sheet that dismisses on tap outside | Tiny hit targets (30 pt controls, a 16 pt help button) |
 | A one-time tutorial that can be replayed | A multi-step modal tutorial before first use, which [Screens](SCREENS.md) rules out for Home |
 
+## Logo and wordmark
+
+The shipped mark is **Dos paredes** (hand-drawn e, pink division bar touching both walls, cream ground). File-level guidance, icon builds, and colour notes live in [design/brand/README.md](../design/brand/README.md).
+
+Use the **horizontal lockup** in settings-style headers and the **stacked lockup** on splash-sized layouts. The **wordmark** SVG is for cases that need type without the symbol. In UI chrome, match mockups: letters in `primary` or `ink`, with pink only on the É acute and the ÷ in the lockup artwork (not as arbitrary body text colour).
+
 ## Starter palette
 
-These values are Esplitéalo's own original starter palette. They are not Study Bunny's values. The idea is warm "receipt paper and ink" neutrals with a basil-green primary, so money feels calm and the person colors carry the identity.
+Canonical hex values are in `design/mockups/_src/tokens.css` (the mockups and this guide should match that file exactly). The palette is warm cream paper and ink, **basil-green** primary, and **coral pink** `#EA5A78` as a brand accent. Person colours carry identity on chips and bars; they are never green, pink, or warn red-orange.
 
-The contrast ratios are WCAG ratios computed for the key pairs. They are starting points: verify every pair in the running app with the Accessibility Inspector before relying on them.
+Verify every pair in the running app with the Accessibility Inspector, including Dynamic Type sizes.
 
-### Light
+### Brand inputs
+
+| Token | Light | Dark | Notes |
+| --- | --- | --- | --- |
+| `brandCream` | #FBF7EF | #111915 | Logo ground / dark “paper” base |
+| `brandGreen` | #1F7A5A | #4CC59A | Logo e and primary actions |
+| `brandBasil` | #145A42 | #2E9C77 | Deeper green (button lip, confetti) |
+| `brandPink` | #EA5A78 | #EA5A78 | Accent; **same hex in dark** |
+
+### Neutrals and status (light)
 
 | Token | Hex | Notes |
 | --- | --- | --- |
-| `paper` | #FBF7EF | Screen background, warm off-white |
-| `surface` | #FFFFFF | Cards |
+| `paper` | #FBF7EF | Screen background |
+| `surface` | #FFFDF8 | Cards |
 | `well` | #F1EADB | Inset fields and rows |
-| `ink` | #1E2933 | 13.8:1 on `paper` |
-| `inkSecondary` | #5B6670 | 5.5:1 on `paper` |
-| `line` | #DDD3BE | Hairlines, 1.4:1, decorative only |
-| `primary` | #1F7A5A | Basil green. White on it is 5.3:1, and on `paper` 4.9:1 |
-| `onPrimary` | #FFFFFF | |
-| `accent` | #F2B84B | Highlights only, never text |
-| `warn` | #C23A1D | Unassigned or mismatch, 5.0:1 on `paper` |
+| `ink` | #1F2A24 | Primary text |
+| `inkSecondary` | #5C665F | Secondary text |
+| `line` | #DDD3BE | Hairlines, decorative |
+| `primary` | #1F7A5A | Actions, selection, processing bar (default) |
+| `primaryLip` | #145A42 | Raised primary button edge |
+| `onPrimary` | #FFFFFF | Text on primary buttons |
+| `warn` | #C23A1D | Unassigned or mismatch (unchanged red-orange) |
+| `warnBg` / `warnSoft` | #FCEBDD / #FDEEE2 | Warn surfaces (orange-tinted, not pink) |
 
-### Dark
+### Neutrals and status (dark)
 
 | Token | Hex | Notes |
 | --- | --- | --- |
-| `paper` | #14181C | |
-| `surface` | #1E252B | |
-| `well` | #28313A | |
-| `ink` | #F2EEE6 | 15.4:1 on `paper` |
-| `inkSecondary` | #A5AEB6 | 7.9:1 on `paper` |
-| `line` | #36414B | |
-| `primary` | #4CC59A | 8.3:1 on `paper`. Dark text on it is 8.0:1 |
-| `accent` | #F5C766 | |
-| `warn` | #FF8466 | 7.4:1 on `paper` |
+| `paper` | #111915 | Deep basil-black base |
+| `surface` | #1A2420 | Cards |
+| `well` | #232F29 | Insets |
+| `ink` | #F4EFE4 | Primary text |
+| `inkSecondary` | #A8B3AA | Secondary text |
+| `line` | #33423A | Hairlines |
+| `primary` | #4CC59A | Actions and selection |
+| `primaryLip` | #2E9C77 | Button lip |
+| `onPrimary` | #0E1F18 | Text on primary |
+| `warn` | #FF8466 | Unassigned or mismatch |
+
+### Coral pink roles
+
+Pink is **never** a substitute for `warn`, never small body text, and never a large row or banner fill. Use it for **shapes**, icon accents, decoration, the wordmark acute, and large soft discs.
+
+| Token | Role |
+| --- | --- |
+| `pink` | Shapes: ÷ mark, meter fill, selection rails, camera accents, confetti, Chavito blush |
+| `pinkInk` | The only pink allowed on **text** (light: mixed for 4.5:1; dark: full `#EA5A78` on dark paper) |
+| `pinkSoft` / `pinkMid` | Hero discs and confetti tints |
+
+**Where pink appears on screens** (see mockups): current step dot (`stepNow`), assign progress meter, selected chip underline and row rail, focus ring, bill total underline, share split rule, message preview quote bar, camera shutter ring and corners, success-state soft disc on the share sheet, and Chavito’s nose and cheeks in illustrations.
 
 ### Person colors
 
-There are eight slots. In light mode a chip uses the fill with white text. In dark mode it uses the lighter tinted fill with dark text (`paper`, 6.8 to 10.9:1). Every chip also shows an initial and the name.
+Eight slots, ordered for distinguishability when only two to four people are on a bill. Light mode: fill with white initials (`onP` #FFFFFF). Dark mode: lighter fill with dark initials (`onP` #111915). Every chip also shows an initial and the name. None of these hues are green, coral pink, or warn red-orange.
 
-| Slot | Light fill | White-text contrast | Dark-mode fill |
+**Rose is dropped.** The old v2 slot 5 (Rose) sat too close to the coral pink accent and to error-adjacent hues; the set was rebuilt around muted natural tones without a pink person colour.
+
+| Slot | Name | Light fill | Dark fill |
 | --- | --- | --- | --- |
-| 1 Blue | #2F6FA8 | 5.3 | #6FA8DC |
-| 2 Clay | #A85A14 | 5.1 | #E39B52 |
-| 3 Violet | #7A4FB5 | 5.8 | #B79AE0 |
-| 4 Teal | #1B7F72 | 4.9 | #55C2B2 |
-| 5 Rose | #C23D7B | 4.9 | #E67FB0 |
-| 6 Olive | #58781C | 5.1 | #A5C55A |
-| 7 Mustard | #8A6D00 | 4.9 | #E8C85A |
-| 8 Slate | #5B6B80 | 5.4 | #9AA8BA |
+| 1 | Denim | #5070B2 | #9BBAF7 |
+| 2 | Ochre | #72650F | #D9CE8D |
+| 3 | Plum | #572F5F | #AF89B6 |
+| 4 | Umber | #634521 | #BCA07F |
+| 5 | Lagoon | #146579 | #7CB9CA |
+| 6 | Stone | #5E5A54 | #CDC9C2 |
+| 7 | Heather | #77618F | #D6C2EE |
+| 8 | Slate | #363D4B | #979EAC |
 
-If any slot changes, re-run the contrast checks.
-
-`warn` and Clay are close in hue. So an unassigned item always uses a dashed outline plus an icon, never color alone.
+Re-run contrast checks if any slot changes. Unassigned items always use a dashed outline plus an icon and the word “Unassigned”, never colour alone.
 
 ## Type scale
 
@@ -132,7 +161,11 @@ Study Bunny uses a single weight with text as small as 7 pt and shrink-to-fit la
 - a success haptic when the totals reconcile
 - a warning haptic when an item is still unassigned at **Review split**
 
-**Illustration.** Use at most one friendly spot illustration on Home and in empty states, drawn in Esplitéalo's own style. Nothing depends on a mascot.
+**Illustration.** Use at most one friendly spot illustration on Home and in empty states. Mockups use **Chavito** (see `tokens.css` illustration tokens); the app does not require a mascot.
+
+### Share sheet
+
+Follow `tokens.css` share tokens: cream `surface`, **green** primary action tile (Messages), neutral `well` tiles for other apps, green-tint document header, person colours only on avatars, and **pink only in the success state** (`shOkDisc` uses `pinkSoft`). Confetti mixes pink and primary, not person-slot colours.
 
 ## Screen mapping
 
@@ -140,7 +173,7 @@ Each entry applies the principles above to a screen in [Screens](SCREENS.md). It
 
 ### 1. Home
 
-A calm paper-colored screen with the wordmark and one large **Scan receipt** button, 48 to 56 pt tall. It is the single lip-style button. **Choose photo** is a plain bordered button. There are only two actions, so there is no icon grid.
+A calm paper-colored screen with the brand wordmark or stacked lockup (see [design/brand](../design/brand/README.md)) and one large **Scan receipt** button, 48 to 56 pt tall. It is the single lip-style button. **Choose photo** is a plain bordered button. There are only two actions, so there is no icon grid.
 
 Recent bills, if present, are a simple list. There is no tutorial carousel. A one-line "how it works" sits under the buttons, or behind a small "?" that opens a replayable sheet.
 
@@ -152,7 +185,7 @@ If permission is denied, show an explanatory card with an **Open Settings** butt
 
 ### 3. Processing
 
-Show a thin primary-green indeterminate bar, status text at body size ("Reading receipt"), and no sparkles. Offer **Enter items manually** as a secondary button after about 8 seconds or on failure. VoiceOver announces progress changes sparingly.
+Show a thin progress bar using `meterFill` (pink) or primary green per mockups, status text at body size ("Reading receipt"), and no sparkles. Offer **Enter items manually** as a secondary button after about 8 seconds or on failure. VoiceOver announces progress changes sparingly.
 
 ### 4. Review receipt
 
@@ -189,7 +222,7 @@ This is the most important screen. The layout follows [Screens](SCREENS.md): chi
 ```
 
 - **Chips.** Person chips carry a live pre-tax subtotal.
-- **Meter.** A three-layer "items assigned" meter, 16 to 20 pt tall with a 4 pt inset.
+- **Meter.** A three-layer "items assigned" meter (`meterFill`, coral pink), 16 to 20 pt tall with a 4 pt inset.
 - **Row states.** An assigned row has a person-colored leading bar. A shared row shows the stacked person chips and "equal split". An unassigned row has a dashed `warn` outline and the word "Unassigned". Rows are at least 56 pt tall, and long names wrap to two lines.
 - **Press feedback.** Rows use the press tint.
 - **Assigning.** The chip's subtotal does a quick count change, plus a small flying amount only when Reduce Motion is off.
