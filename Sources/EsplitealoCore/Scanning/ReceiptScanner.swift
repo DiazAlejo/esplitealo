@@ -2,6 +2,15 @@ import CoreGraphics
 import Foundation
 import ImageIO
 
+extension CGImagePropertyOrientation {
+    func orientedSize(width: Int, height: Int) -> (width: Int, height: Int) {
+        switch self {
+        case .left, .leftMirrored, .right, .rightMirrored: return (height, width)
+        default: return (width, height)
+        }
+    }
+}
+
 public struct ReceiptScanner: Sendable {
     /// Spanish (Puerto Rico receipts) first, English second. Vision supports `es-ES` (not `es-MX`) on the iOS 17 floor.
     public static let defaultRecognitionLanguages = ["es-ES", "en-US"]
@@ -21,9 +30,10 @@ public struct ReceiptScanner: Sendable {
         image: CGImage,
         orientation: CGImagePropertyOrientation = .up
     ) async throws -> RecognizedText {
+        let size = orientation.orientedSize(width: image.width, height: image.height)
         try ReceiptImageValidator.validateDimensions(
-            width: image.width,
-            height: image.height,
+            width: size.width,
+            height: size.height,
             maximumSinglePhotoAspectRatio: maximumSinglePhotoAspectRatio
         )
         let recognized = try await recognizer.recognize(image: image, orientation: orientation)
@@ -36,7 +46,7 @@ public struct ReceiptScanner: Sendable {
 public struct VisionTextRecognizer: TextRecognizing, Sendable {
     public init() {}
     public func recognize(image: CGImage, orientation: CGImagePropertyOrientation) async throws -> RecognizedText {
-        throw ReceiptScanError.noTextFound
+        throw ReceiptScanError.recognitionUnavailable
     }
 }
 #endif

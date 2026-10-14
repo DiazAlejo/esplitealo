@@ -41,7 +41,7 @@ Inject `TextRecognizing` stubs in unit tests for error paths.
 
 | Piece | Role |
 | ----- | ---- |
-| `DocumentCameraBridge` | `VNDocumentCameraViewController` wrapper; first page only; cancel / failure as `DocumentCameraError` |
+| `DocumentCameraBridge` | `VNDocumentCameraViewController` wrapper; multi-page scans rejected with `DocumentCameraError.tooManyPages`; cancel / failure as `DocumentCameraError` |
 | `PhotoImportBridge` | `PhotosPicker` + EXIF-upright `CGImage` via ImageIO thumbnail transform |
 | `CameraPermission` | Maps `AVCaptureDevice` video authorization without prompting until `requestAccessIfNeeded()` |
 

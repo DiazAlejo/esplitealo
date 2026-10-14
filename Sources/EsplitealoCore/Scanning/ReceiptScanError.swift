@@ -7,4 +7,6 @@ public enum ReceiptScanError: Error, Equatable, Sendable {
     case imageTooSmallOrUnreadable(minWordHeight: Double?)
     /// One-photo MVP: aspect ratio (height ÷ width) exceeds the supported limit for a single capture.
     case receiptTooLongForSinglePhoto(aspectRatio: Double, maximumAspectRatio: Double)
+    /// Text recognition is not available on this platform.
+    case recognitionUnavailable
 }
