@@ -1,0 +1,46 @@
+{
+  "imageSize": { "width": 420, "height": 120 },
+  "lines": [
+    {
+      "text": "Burger 12.00",
+      "confidence": 1,
+      "rect": { "x": 12, "y": 8, "width": 200, "height": 18 },
+      "baselineAngle": 0,
+      "words": [
+        { "text": "Burger", "rect": { "x": 12, "y": 8, "width": 54, "height": 18 } },
+        { "text": "12.00", "rect": { "x": 300, "y": 8, "width": 45, "height": 18 } }
+      ]
+    },
+    {
+      "text": "Fries 4.00",
+      "confidence": 1,
+      "rect": { "x": 12, "y": 30, "width": 200, "height": 18 },
+      "baselineAngle": 0,
+      "words": [
+        { "text": "Fries", "rect": { "x": 12, "y": 30, "width": 45, "height": 18 } },
+        { "text": "4.00", "rect": { "x": 300, "y": 30, "width": 36, "height": 18 } }
+      ]
+    },
+    {
+      "text": "Subtotal 20.00",
+      "confidence": 1,
+      "rect": { "x": 12, "y": 52, "width": 200, "height": 18 },
+      "baselineAngle": 0,
+      "words": [
+        { "text": "Subtotal", "rect": { "x": 12, "y": 52, "width": 72, "height": 18 } },
+        { "text": "20.00", "rect": { "x": 300, "y": 52, "width": 45, "height": 18 } }
+      ]
+    },
+    {
+      "text": "Total 20.00",
+      "confidence": 1,
+      "rect": { "x": 12, "y": 74, "width": 200, "height": 18 },
+      "baselineAngle": 0,
+      "words": [
+        { "text": "Total", "rect": { "x": 12, "y": 74, "width": 45, "height": 18 } },
+        { "text": "20.00", "rect": { "x": 300, "y": 74, "width": 45, "height": 18 } }
+      ]
+    }
+  ],
+  "engine": "hand-written"
+}
