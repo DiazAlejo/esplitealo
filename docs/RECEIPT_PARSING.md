@@ -4,7 +4,7 @@ Pure Foundation logic in `EsplitealoCore` that turns on-device OCR output into a
 
 ## Input: `RecognizedText`
 
-`ReceiptScanner` in `EsplitealoCore/Scanning` wraps `VNRecognizeTextRequest` and produces a `RecognizedText` value (see `docs/SCANNING.md`):
+`ReceiptScanner` in `EsplitealoScanning` wraps Vision’s `RecognizeTextRequest` and produces a `RecognizedText` value (see `docs/SCANNING.md`):
 
 - `imageSize` in pixels
 - `lines` with full-line text, confidence, baseline angle, and per-word boxes
@@ -37,4 +37,4 @@ Regenerate Vision fixtures locally with the throwaway script in firstmate task d
 
 ## Accuracy benchmark
 
-Scoring helpers live in `Sources/EsplitealoCore/OCRBenchmark/`. CI runs **metric unit tests only**; full Vision benchmarks use the `EsplitealoOCRBenchmark` executable (see [OCR_BENCHMARK.md](OCR_BENCHMARK.md)). Payment and footer lines (`change due`, card slip `No:`, `(Qty …)`) are classified out of the item list so totals are not double-counted.
+Scoring helpers live in `Sources/OCRBenchmarkKit/`. CI runs **metric unit tests only**; full Vision benchmarks use the `EsplitealoOCRBenchmark` executable (see [OCR_BENCHMARK.md](OCR_BENCHMARK.md)). Payment and footer lines (`change due`, card slip `No:`, `(Qty …)`) are classified out of the item list so totals are not double-counted.

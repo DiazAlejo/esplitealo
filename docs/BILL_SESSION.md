@@ -25,7 +25,7 @@ Holds:
 | `tip` | Session tip (`TipConfiguration`) |
 | `serviceChargeCents` | Gratuity printed on the receipt (allocated like the HTML mockup, outside `BillCalculator`) |
 | `mismatchAcknowledged` | User chose to continue past a receipt mismatch |
-| `merchantName`, `dateLabel`, `dateLabelEnglish` | Share header metadata |
+| `merchantName`, `date` | Share header metadata. `date` is a `Date?`; `ShareSummaryBuilder` formats it per language ("13 oct" / "Oct 13") with a caller-supplied `Calendar` |
 
 ### Participants
 
@@ -63,6 +63,16 @@ After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it
 
 `ReceiptDraft.adjustments` (for example parser discount lines) are included in `netItemsSubtotalCents`, the session tip basis, and `derivedBillTotalCents`, matching `ReceiptReconciliationEngine`. v1 does **not** allocate discounts across people ([R-29](REQUIREMENTS.md), [calculation rules](CALCULATION_RULES.md), [roadmap](ROADMAP.md)). While any adjustment rows remain, `hasUnallocatedAdjustments` is true, `canShare` is false, and `shareBlockReason` is `discountNeedsManualAdjustment` even when the receipt reconciles. The user must net discounts into item prices or remove adjustment rows; sharing unblocks automatically once adjustments are empty and totals still reconcile. Proportional discount allocation is a future product decision.
 
+## Saving the bill in progress
+
+iOS can end a backgrounded app without warning (for example while someone checks WhatsApp or ATH Móvil at the table), so the bill in progress is autosaved as a draft and deleted when the bill is finished. This layer is in `EsplitealoCore` and has no UI.
+
+- `BillSession` is `Codable`. `BillSessionCoding.encoder()` / `decoder()` are the one JSON dialect (ISO 8601 dates, sorted keys).
+- The JSON carries `schemaVersion` (`BillSession.currentSchemaVersion`, currently 1). Decoding throws `BillSessionDecodingError.unsupportedSchemaVersion` for a newer or missing version. A restored bill equals the one that was saved: the draft is not re-reconciled on decode.
+- The stored shape is a contract once drafts exist on phones. Changing it means bumping the version, adding a migration, and committing a fixture such as `Tests/Fixtures/BillSessions/v1-in-progress.json` that proves the old file still decodes.
+- `BillDraftStore` is the protocol (`load`, `save`, `delete`; at most one draft). `FileBillDraftStore(directory:)` writes one `draft.json` atomically (no temporary files left behind) and creates the directory if needed. `load()` returns `nil` when there is no draft and throws when the file is unreadable, so the app decides whether to delete it.
+- Still the app's job: debounce saves (about 0.5 s) and save on `scenePhase == .background`; choose the directory (`Application Support/Draft`) and mark it excluded from backup; offer to continue a recent draft and delete it when the bill is shared or abandoned; store any receipt image next to the draft file, never in the photo library.
+
 ## Share text
 
-`ShareSummaryBuilder.build(for:language:)` produces per-person text for `es` or `en`. Wording follows the bilingual HTML mockups (`share` strings): neutral Spanish, Puerto Rican closing line in Spanish, “total” not “monto”, no IVU label, no payment copy. Strings live in `ShareSummaryStrings` for a future localization catalog.
+`ShareSummaryBuilder.build(for:language:calendar:)` produces per-person text for `es` or `en`. Wording follows the bilingual HTML mockups (`share` strings): neutral Spanish, Puerto Rican closing line in Spanish, “total” not “monto”, no IVU label, no payment copy. Strings live in `ShareSummaryStrings` for a future localization catalog.

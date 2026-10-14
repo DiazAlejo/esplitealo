@@ -4,7 +4,7 @@ Developer-only iOS utility to exercise Esplitealo’s on-device receipt OCR and 
 
 ## Open and run on your iPhone
 
-1. Open `Tools/ScannerLab/ScannerLab.xcodeproj` in Xcode 16.4 or newer.
+1. Open `Tools/ScannerLab/ScannerLab.xcodeproj` in Xcode 26.3 or newer.
 2. Select the **ScannerLab** scheme and your connected iPhone (or a simulator).
 3. In the **ScannerLab** target → **Signing & Capabilities**:
    - Choose your **Team** (leave the repository without a team ID).

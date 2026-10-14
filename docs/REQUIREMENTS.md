@@ -59,11 +59,11 @@ The core question the first release must answer: can a group turn a receipt into
 ### Flow
 
 - **R-31.** The flow is linear, but the user can go back to edit the receipt, assignments, or tip without losing work.
-- **R-32.** An active bill is kept in memory. Saved bills (SwiftData) are optional and only added if the schedule allows.
+- **R-32.** The active bill is autosaved on the device as a JSON draft (`BillDraftStore`), so it survives iOS ending the app in the background. The draft is deleted when the bill is finished. Saved "recent bills" are optional and, if added, are plain JSON files rather than a database.
 
 ## Non-functional requirements
 
-- **N-1.** Platform: iOS, built with SwiftUI.
+- **N-1.** Platform: iOS 18 or later, built with SwiftUI. (iOS 18 runs on the same iPhones as iOS 17.)
 - **N-2.** Privacy: no backend, no accounts, no analytics that transmit receipt data, no AI services.
 - **N-3.** All monetary calculations use integer cents, never floating point.
 - **N-4.** The calculation engine is pure logic, independent of the UI, and fully unit-tested.
