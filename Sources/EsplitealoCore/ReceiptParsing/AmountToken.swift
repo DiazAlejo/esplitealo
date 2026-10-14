@@ -18,7 +18,7 @@ struct AmountToken: Equatable {
 
     static func parse(_ token: String) -> AmountToken? {
         var s = token.trimmingCharacters(in: .whitespaces)
-        guard !s.isEmpty else { return nil }
+        guard !s.isEmpty, !s.hasSuffix("%") else { return nil }
 
         var negative = false
         if s.hasPrefix("(") && s.hasSuffix(")") {

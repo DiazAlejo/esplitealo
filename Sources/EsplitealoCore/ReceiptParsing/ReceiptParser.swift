@@ -178,7 +178,8 @@ public struct ReceiptParser: Sendable {
                 if let a = amount(from: line.amounts, rect: rect) { total = a }
 
             case .discount:
-                if let a = amount(from: line.amounts, rect: rect) {
+                if var a = amount(from: line.amounts, rect: rect) {
+                    a.minorUnits = -abs(a.minorUnits)
                     adjustments.append(DraftAdjustment(label: line.label.isEmpty ? "Descuento" : line.label, amount: a))
                 }
 
