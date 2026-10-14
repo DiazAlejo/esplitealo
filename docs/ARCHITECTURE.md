@@ -20,8 +20,14 @@ EsplitealoCore/                    # Swift package root (Package.swift)
 │   │   ├── RowBuilder.swift
 │   │   ├── AmountToken.swift
 │   │   └── ReceiptParser.swift
+│   ├── Scanning/
+│   │   ├── ReceiptScanner.swift
+│   │   ├── VisionTextRecognizer.swift
+│   │   └── ReceiptScanPipeline.swift
 │   └── Services/
 │       └── BillCalculator.swift
+├── Sources/EsplitealoCapture/       # iOS capture bridge (VisionKit, PhotosUI)
+│   └── Capture/
 └── Tests/EsplitealoCoreTests/
     ├── BillCalculatorTests.swift
     ├── ReceiptParsing/
