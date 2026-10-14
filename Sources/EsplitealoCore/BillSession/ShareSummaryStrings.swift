@@ -9,6 +9,21 @@ enum ShareSummaryStrings {
         let close: (String) -> String
     }
 
+    private static let shortMonthsEs = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+    private static let shortMonthsEn = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    /// "13 oct" / "Oct 13". Fixed tables instead of `DateFormatter`, so the share text never
+    /// depends on the device locale or on ICU details (and stays portable).
+    static func dateLabel(_ date: Date?, language: ShareLanguage, calendar: Calendar) -> String {
+        guard let date else { return "" }
+        let parts = calendar.dateComponents([.month, .day], from: date)
+        guard let month = parts.month, let day = parts.day, (1 ... 12).contains(month) else { return "" }
+        switch language {
+        case .es: return "\(day) \(shortMonthsEs[month - 1])"
+        case .en: return "\(shortMonthsEn[month - 1]) \(day)"
+        }
+    }
+
     static func bundle(for language: ShareLanguage) -> Bundle {
         switch language {
         case .es:

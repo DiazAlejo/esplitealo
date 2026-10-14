@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ReceiptItem: Equatable, Sendable, Identifiable {
+public struct ReceiptItem: Equatable, Sendable, Identifiable, Codable {
     public let id: UUID
     public let description: String
     public let quantity: Int

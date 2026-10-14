@@ -1,7 +1,7 @@
 import Foundation
 
 /// Assignment for one unit of a quantity line. Empty `participantIDs` means unclaimed.
-public struct ItemAssignment: Equatable, Sendable {
+public struct ItemAssignment: Equatable, Sendable, Codable {
     public let itemID: UUID
     public let unitIndex: Int
     public let participantIDs: [UUID]
