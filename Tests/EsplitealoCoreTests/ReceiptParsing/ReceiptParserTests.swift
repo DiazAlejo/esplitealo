@@ -189,6 +189,41 @@ final class ReceiptParserTests: XCTestCase {
         XCTAssertTrue(draft.reconciles)
     }
 
+    func testCashAndChangeAfterTotalAreNotItems() {
+        let text = RecognizedTextTestBuilder.fromRowTexts([
+            "Cinnamon Latte 5.50",
+            "Subtotal 5.50",
+            "Grand Total 5.50",
+            "CASH 20.00",
+            "CHANGE DUE 14.50",
+        ])
+        let draft = parser.parse(text)
+        XCTAssertEqual(draft.items.count, 1)
+        XCTAssertEqual(draft.total?.minorUnits, 550)
+    }
+
+    func testCardSlipLineIsNotAnItem() {
+        let text = RecognizedTextTestBuilder.fromRowTexts([
+            "Tea 4.00",
+            "Subtotal 4.00",
+            "Total 4.00",
+            "EDC CIMB NIAGA No: xx7730 4.00",
+        ])
+        let draft = parser.parse(text)
+        XCTAssertEqual(draft.items.count, 1)
+    }
+
+    func testQtyFooterLineIsNotAnItem() {
+        let text = RecognizedTextTestBuilder.fromRowTexts([
+            "Soup 6.00",
+            "Subtotal 6.00",
+            "Total 6.00",
+            "(Qty 2.00) 2.00",
+        ])
+        let draft = parser.parse(text)
+        XCTAssertEqual(draft.items.count, 1)
+    }
+
     func testSharedAppetizerStyle() {
         let text = RecognizedTextTestBuilder.fromRowTexts([
             "Mesa 7",
