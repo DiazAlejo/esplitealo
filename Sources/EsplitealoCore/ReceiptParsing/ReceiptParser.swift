@@ -402,6 +402,9 @@ private func dropCurrencyWords(_ words: inout [String]) {
 
 private func classify(_ line: LineFields) -> RowKind {
     let lower = canonicalKeywords(line.label)
+    if lower.contains("(qty") || lower.hasPrefix("qty ") { return .other }
+    if lower.contains("change due") { return .payment }
+    if lower.contains("no:") && !line.amounts.isEmpty { return .payment }
     if matchesTipTable(lower) { return .tipTable }
     if fuzzySubtotalLine(lower) { return .subtotal }
     if matches(subtotalKeywords, lower) { return .subtotal }
@@ -515,7 +518,8 @@ private let tipKeywords = ["tip", "propina", "gratuity", "service", "servicio"]
 private let totalKeywords = ["total", "importe", "amount due", "grandtotal", "grand total"]
 private let discountKeywords = ["discount", "descuento", "off"]
 private let paymentKeywords = [
-    "cash", "change", "visa", "mastercard", "amex", "tarjeta", "efectivo", "card", "mesa", "approved"
+    "cash", "change", "change due", "visa", "mastercard", "amex", "tarjeta", "efectivo", "card", "mesa",
+    "approved", "edc", "cimb", "creditcard", "debit"
 ]
 
 private func canonicalKeywords(_ label: String) -> String {
