@@ -12,6 +12,7 @@ let package = Package(
         .library(name: "EsplitealoCapture", targets: ["EsplitealoCapture"]),
         .executable(name: "EsplitealoOCRBenchmark", targets: ["EsplitealoOCRBenchmark"]),
         .library(name: "ScannerLabKit", targets: ["ScannerLabKit"]),
+        .library(name: "EsplitealoDesign", targets: ["EsplitealoDesign"]),
     ],
     targets: [
         .target(name: "EsplitealoCore"),
@@ -21,6 +22,7 @@ let package = Package(
             dependencies: ["EsplitealoCore"]
         ),
         .target(name: "ScannerLabKit", dependencies: ["EsplitealoCore"]),
+        .target(name: "EsplitealoDesign"),
         .testTarget(name: "EsplitealoCoreTests", dependencies: ["EsplitealoCore"]),
         .testTarget(
             name: "EsplitealoCaptureTests",
@@ -29,6 +31,10 @@ let package = Package(
         .testTarget(
             name: "ScannerLabKitTests",
             dependencies: ["ScannerLabKit"]
+        ),
+        .testTarget(
+            name: "EsplitealoDesignTests",
+            dependencies: ["EsplitealoDesign"]
         ),
     ]
 )
