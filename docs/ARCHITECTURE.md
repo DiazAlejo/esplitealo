@@ -28,6 +28,8 @@ EsplitealoCore/                    # Swift package root (Package.swift)
 │       └── BillCalculator.swift
 ├── Sources/EsplitealoCapture/       # iOS capture bridge (VisionKit, PhotosUI)
 │   └── Capture/
+├── Sources/ScannerLabKit/           # Scanner Lab logic (developer utility, not the app)
+├── Tools/ScannerLab/                # Scanner Lab Xcode project; see its README
 └── Tests/EsplitealoCoreTests/
     ├── BillCalculatorTests.swift
     ├── ReceiptParsing/
