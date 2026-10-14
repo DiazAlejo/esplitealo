@@ -1,0 +1,1395 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Share sheet · Esplitéalo mockup</title>
+<link rel="icon" href="data:,">
+<style>
+/* Esplitéalo HTML mockups — tokens from docs/DESIGN_GUIDE.md */
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:400;font-display:swap;src:url(../_src/fonts/Unkempt-Regular-latin.woff2) format("woff2")}
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:700;font-display:swap;src:url(../_src/fonts/Unkempt-Bold-latin.woff2) format("woff2")}
+:root{
+  --paper:#FBF7EF; --surface:#FFFFFF; --well:#F1EADB; --ink:#1E2933; --ink2:#5B6670;
+  --line:#DDD3BE; --primary:#1F7A5A; --primary-lip:#145A42; --on-primary:#FFFFFF;
+  --accent:#F2B84B; --warn:#C23A1D; --warn-bg:#FBEAE4; --ok-bg:#E3F1EA;
+  --scrim:rgba(20,24,28,.46); --shadow:0 1px 2px rgba(30,41,51,.08),0 6px 18px rgba(30,41,51,.07);
+  --p1:#2F6FA8; --p2:#A85A14; --p3:#7A4FB5; --p4:#1B7F72; --p5:#C23D7B; --p6:#58781C; --p7:#8A6D00; --p8:#5B6B80;
+  --on-p:#FFFFFF;
+  --page:#E8E2D4; --page-ink:#1E2933; --page-ink2:#5B6670; --page-card:#F6F2E8;
+  --f-text:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro",system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-round:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,sans-serif;
+  --f-title:"Unkempt","Marker Felt","Chalkboard SE",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,sans-serif;
+  --f-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#14181C; --surface:#1E252B; --well:#28313A; --ink:#F2EEE6; --ink2:#A5AEB6;
+  --line:#36414B; --primary:#4CC59A; --primary-lip:#2E9C77; --on-primary:#0E1F18;
+  --accent:#F5C766; --warn:#FF8466; --warn-bg:#3A2420; --ok-bg:#1B3029;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.28);
+  --p1:#6FA8DC; --p2:#E39B52; --p3:#B79AE0; --p4:#55C2B2; --p5:#E67FB0; --p6:#A5C55A; --p7:#E8C85A; --p8:#9AA8BA;
+  --on-p:#14181C;
+  --page:#0B0D10; --page-ink:#F2EEE6; --page-ink2:#A5AEB6; --page-card:#171C21;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--page);color:var(--page-ink);font-family:var(--f-text);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+input{font:inherit;color:inherit}
+
+/* ---------- page chrome (outside the phone) ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:center;padding:12px 16px;font-size:14px;color:var(--page-ink2)}
+.toolbar a{color:var(--page-ink);text-decoration:none;font-weight:600}
+.toolbar a:hover{text-decoration:underline}
+.toolbar .ttl{color:var(--page-ink);font-weight:600}
+.seg{display:inline-flex;background:var(--page-card);border:1px solid var(--line);border-radius:10px;padding:2px}
+.seg button{padding:5px 11px;border-radius:8px;font-size:13px;font-weight:600;color:var(--page-ink2)}
+.seg button[aria-pressed="true"]{background:var(--page-ink);color:var(--page)}
+.tb-label{font-size:12px;margin-right:6px}
+.haptic{min-width:170px;font-family:var(--f-mono);font-size:12px;opacity:0;transition:opacity .2s;color:var(--page-ink)}
+.haptic.on{opacity:1}
+.stage{display:flex;justify-content:center;padding:4px 0 28px}
+.fit{transform-origin:top center}
+
+/* ---------- device ---------- */
+.device{width:414px;height:868px;padding:12px;border-radius:66px;background:#0B0C0E;box-shadow:0 0 0 2px #2b2e33,0 24px 60px rgba(0,0,0,.35);position:relative}
+.screen{width:390px;height:844px;border-radius:54px;overflow:hidden;position:relative;background:var(--paper);color:var(--ink);font-size:17px;line-height:1.3;isolation:isolate}
+.island{position:absolute;top:11px;left:50%;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000;z-index:60}
+.status{position:absolute;top:0;left:0;right:0;height:54px;padding:18px 34px 0 40px;display:flex;justify-content:space-between;align-items:flex-start;font-weight:600;font-size:16px;z-index:50;pointer-events:none;font-family:var(--f-text)}
+.status svg{display:block;fill:currentColor}
+.status .ic{display:flex;gap:6px;align-items:center;margin-top:3px}
+.home-ind{position:absolute;bottom:8px;left:50%;width:138px;height:5px;margin-left:-69px;border-radius:3px;background:var(--ink);opacity:.85;z-index:55;pointer-events:none}
+.dark-chrome .status,.dark-chrome .home-ind{color:#fff}
+.dark-chrome .home-ind{background:#fff}
+
+.view{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:54px}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 16px 24px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.footer{padding:12px 16px 34px;background:linear-gradient(to top,var(--paper) 78%,transparent);position:relative;z-index:3;display:flex;flex-direction:column;gap:8px}
+.footer.bar{background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -6px 16px rgba(0,0,0,.04)}
+
+/* ---------- type ---------- */
+.t-display{font:600 40px/1.05 var(--f-round);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.t-title{font:400 26px/1.2 var(--f-title);letter-spacing:.01em}
+.wordmark{font:700 24px/1 var(--f-title);letter-spacing:.02em;text-transform:uppercase;font-synthesis:none}
+.t-amount{font:500 22px/1.15 var(--f-round);font-variant-numeric:tabular-nums}
+.t-head{font-weight:600;font-size:17px}
+.t-body{font-size:17px}
+.t-sub{font-size:15px;color:var(--ink2)}
+.t-foot{font-size:13px;color:var(--ink2);line-height:1.35}
+.t-cap{font-size:12px;font-weight:500;color:var(--ink2)}
+.num{font-variant-numeric:tabular-nums}
+.warn-t{color:var(--warn)}
+.ok-t{color:var(--primary)}
+
+/* ---------- nav ---------- */
+.nav{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 6px 0 4px;flex:none}
+.back{display:flex;align-items:center;gap:2px;min-height:44px;min-width:44px;padding:0 8px;color:var(--primary);font-size:17px}
+.back svg{width:12px;height:20px}
+.step{font-size:13px;color:var(--ink2);padding-right:10px}
+.head{padding:2px 16px 12px;flex:none}
+.head .t-title{margin:0}
+.head .t-sub{margin-top:4px}
+
+/* ---------- buttons ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border-radius:16px;font-size:17px;font-weight:600;text-align:center;transition:transform .1s,filter .1s}
+.btn:active{transform:scale(.97);filter:brightness(.8)}
+.btn-primary{background:var(--primary);color:var(--on-primary);border-bottom:3px solid var(--primary-lip);box-shadow:0 2px 0 rgba(0,0,0,.06)}
+.btn-secondary{background:var(--surface);color:var(--primary);border:1.5px solid var(--primary);min-height:52px}
+.btn-quiet{min-height:44px;color:var(--primary);font-weight:600;font-size:17px}
+.btn-warn{background:var(--surface);color:var(--warn);border:1.5px solid var(--warn);min-height:52px}
+.btn[disabled],.btn.is-disabled{background:var(--well);color:var(--ink2);border:1.5px dashed var(--line);box-shadow:none;cursor:not-allowed}
+.btn.is-disabled:active{transform:none;filter:none}
+.btn svg{width:22px;height:22px;flex:none}
+.btn.sm{min-height:44px;font-size:15px;border-radius:12px}
+.link{color:var(--primary);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
+
+/* ---------- cards, chips, avatars ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.well{background:var(--well);border-radius:16px}
+.av{width:28px;height:28px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;font:600 14px/1 var(--f-text);color:var(--on-p);background:var(--pc,var(--p8))}
+.av.lg{width:40px;height:40px;font-size:18px}
+.av.xl{width:48px;height:48px;font-size:20px}
+.av.ring{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--pc);background-clip:padding-box}
+.av.dotted{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--pc);outline:2px dotted var(--pc);outline-offset:3px}
+.s1{--pc:var(--p1)}.s2{--pc:var(--p2)}.s3{--pc:var(--p3)}.s4{--pc:var(--p4)}.s5{--pc:var(--p5)}.s6{--pc:var(--p6)}.s7{--pc:var(--p7)}.s8{--pc:var(--p8)}
+.av-stack{display:inline-flex}
+.av-stack .av{margin-left:-6px;box-shadow:0 0 0 2px var(--surface)}
+.av-stack .av:first-child{margin-left:0}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;line-height:1.3}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.ok{background:var(--ok-bg);color:var(--primary)}
+.pill.neutral{background:var(--well);color:var(--ink2)}
+.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- banners ---------- */
+.banner{display:flex;gap:12px;align-items:flex-start;border-radius:16px;padding:12px 14px;border:1.5px solid}
+.banner.warn{background:var(--warn-bg);border-color:var(--warn);color:var(--ink)}
+.banner.ok{background:var(--ok-bg);border-color:var(--primary);color:var(--ink)}
+.banner .b-ico{flex:none;width:24px;height:24px;margin-top:1px}
+.banner.warn .b-ico{color:var(--warn)} .banner.ok .b-ico{color:var(--primary)}
+.banner>div>b:first-child,.banner b.hd{display:block;font-size:17px;font-weight:600}
+.banner .t-foot{color:var(--ink2);margin-top:2px}
+.banner .rc-wrap{flex:none;margin:-6px -4px -6px 0}
+
+/* ---------- meter ---------- */
+.meter{height:22px;border-radius:11px;background:var(--well);border:1.5px solid var(--line);padding:4px;display:block}
+.meter i{display:block;height:100%;border-radius:7px;background:var(--primary);min-width:0;transition:width .35s cubic-bezier(.3,1.4,.5,1)}
+.meter.done{border-color:var(--primary)}
+
+/* ---------- sheet ---------- */
+.scrim{position:absolute;inset:0;background:var(--scrim);z-index:20;animation:fadein .2s ease both}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-radius:24px 24px 0 0;padding:8px 16px 34px;box-shadow:0 -10px 40px rgba(0,0,0,.25);animation:sheetup .3s cubic-bezier(.2,.9,.3,1) both;max-height:92%;overflow-y:auto;scrollbar-width:none}
+.sheet.still{animation:none}
+.sheet::-webkit-scrollbar{display:none}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sheet h3{margin:0;font:600 22px/1.2 var(--f-round)}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes sheetup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------- forms ---------- */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;color:var(--ink2);font-weight:500}
+.input{height:52px;border-radius:12px;background:var(--well);border:1.5px solid transparent;padding:0 14px;font-size:17px;width:100%;outline:none}
+.input:focus{border-color:var(--primary);background:var(--surface)}
+.input.err{border-color:var(--warn)}
+.input.amt{font:500 22px var(--f-round);font-variant-numeric:tabular-nums;text-align:right}
+
+/* ---------- generic list rows ---------- */
+.group-label{font-size:13px;font-weight:600;color:var(--ink2);margin:18px 4px 8px}
+
+/* ---------- toast ---------- */
+.toast{position:absolute;left:16px;right:16px;bottom:120px;z-index:40;background:var(--ink);color:var(--paper);border-radius:14px;padding:12px 14px;font-size:15px;box-shadow:var(--shadow);animation:sheetup .25s ease both}
+
+/* ---------- reduced motion ---------- */
+:root[data-reduce="1"] *,:root[data-reduce="1"] *::before,:root[data-reduce="1"] *::after{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important}
+}
+
+/* ---------- mascot motion ---------- */
+.rc,.scene{display:block;overflow:visible}
+.rc .pupil,.scene .pupil{transition:transform .3s}
+@keyframes lookaround{0%,100%{transform:translateX(0)}30%{transform:translateX(5px)}65%{transform:translateX(-5px)}}
+.look-around .pupil{animation:lookaround 2.6s ease-in-out infinite}
+@keyframes glass{0%,100%{transform:translate(110px,176px)}50%{transform:translate(190px,176px)}}
+.scene .glass{animation:glass 2.6s ease-in-out infinite;transform:translate(110px,176px)}
+@keyframes scan{0%,100%{transform:translateY(0)}50%{transform:translateY(54px)}}
+.scene .scanline{animation:scan 2.6s ease-in-out infinite}
+@keyframes wag{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}
+.tail-wag{transform-origin:262px 150px;animation:wag 3s ease-in-out infinite}
+@keyframes conf{0%{transform-box:fill-box;opacity:0;translate:0 -14px}20%{opacity:1}100%{opacity:1;translate:0 10px}}
+.conf{animation:conf 1.1s ease-out both;transform-box:fill-box}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.rc-neutral .eyes,.rc-thinking .eyes{transform-box:fill-box;transform-origin:center;animation:blink 5s infinite}
+
+/* ======================= screens ======================= */
+body.embed{background:transparent}
+body.embed .stage{padding:0}
+.fadein{animation:fadein .3s ease both}
+.rc-wrap{flex:none}
+.rbill{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:62px;padding:8px 16px}
+.rbill:active{background:var(--well)}
+
+/* capture */
+.vf{position:absolute;inset:0;background:#15110e;overflow:hidden}
+.vf .table{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 40%,#3a312a 0%,#1b1612 70%);}
+.vf .table::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(95deg,rgba(255,255,255,.035) 0 2px,transparent 2px 38px)}
+.vf.frozen{filter:saturate(.92) brightness(.9)}
+.brk{position:absolute;width:34px;height:34px;border:4px solid #fff;border-right:0;border-bottom:0;border-radius:10px 0 0 0;opacity:.95}
+.brk.r{border:4px solid #fff;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.brk.b{border:4px solid #fff;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.brk.br{border:4px solid #fff;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.cam-top{position:absolute;top:58px;left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;z-index:5}
+.cam-btn{min-width:44px;min-height:44px;padding:0 14px;border-radius:22px;background:rgba(0,0,0,.45);color:#fff;font-weight:600;font-size:17px;display:flex;align-items:center;justify-content:center}
+.guide-pill{position:absolute;top:116px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:8px;align-items:center;width:max-content;max-width:344px;padding:9px 16px;border-radius:22px;text-align:left;line-height:1.25;background:rgba(255,255,255,.86);color:#1E2933;font-size:15px;font-weight:500;backdrop-filter:blur(8px)}
+.guide-pill .ico{width:18px;height:18px}
+.cam-bottom{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 34px;background:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));z-index:5;display:flex;flex-direction:column}
+.cam-bottom.row{flex-direction:row;align-items:center;justify-content:space-between;padding:20px 22px 40px}
+.shutter{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+.shutter i{width:60px;height:60px;border-radius:50%;background:#fff;display:block}
+.shutter:active{transform:scale(.94)}
+.lib{width:76px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:12px;font-weight:500;min-height:44px}
+.lib-th{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.6)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9}
+.flash.go{animation:flashgo .22s ease-out}
+@keyframes flashgo{0%{opacity:.9}100%{opacity:0}}
+
+/* receipt paper */
+.paper{background:#FFFDF7;color:#2a2a2a;font-family:var(--f-mono);line-height:1.5;padding:1.1em 1.2em 1.7em;border-radius:3px;box-shadow:0 8px 26px rgba(0,0,0,.35);-webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/1.4em 100%;mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/1.4em 100%;margin-bottom:0;position:relative}
+.paper .pc{text-align:center;opacity:.82;font-size:.86em}.paper .pc.big{font-weight:700;font-size:1.1em;opacity:1;letter-spacing:.05em}
+.paper .pd{border-top:1px dashed rgba(0,0,0,.4);margin:.55em 0}
+.paper .pl{display:flex;justify-content:space-between;gap:.6em;white-space:nowrap}.paper .pl.b{font-weight:700}
+.paper .pl.hl{background:rgba(194,58,29,.14);outline:1.5px solid #C23A1D;outline-offset:1px;border-radius:2px}
+
+/* processing */
+.ibar{width:220px;height:6px;border-radius:3px;background:var(--well);overflow:hidden;position:relative}
+.ibar i{position:absolute;top:0;bottom:0;width:40%;border-radius:3px;background:var(--primary);animation:slide 1.4s ease-in-out infinite}
+@keyframes slide{0%{left:-40%}100%{left:100%}}
+
+/* review */
+.rrow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:60px;padding:8px 16px;border-top:1px solid var(--line)}
+.rrow:first-child{border-top:0}
+.rrow:active{background:var(--well)}
+.rrow.flag{background:var(--warn-bg);box-shadow:inset 4px 0 0 var(--warn)}
+.rr-l{display:flex;flex-direction:column;min-width:0}
+.frow{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:56px;padding:8px 16px;border-top:1px solid var(--line)}
+.frow:first-child{border-top:0}
+.frow.bad{background:var(--warn-bg);box-shadow:inset 4px 0 0 var(--warn)}
+.thumb{overflow:hidden}
+.thumb-h{display:flex;align-items:center;gap:12px;width:100%;padding:8px 14px 8px 8px;min-height:64px}
+.th-mini{width:48px;height:48px;overflow:hidden;border-radius:8px;background:var(--well);display:block;position:relative;flex:none}
+.th-mini .paper{position:absolute;left:-12px;top:2px;box-shadow:none}
+.th-body{padding:4px 12px 14px;background:var(--well)}
+.th-body .paper{box-shadow:0 4px 14px rgba(0,0,0,.2);margin-top:10px}
+
+/* people */
+.prow2{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 8px 8px 14px;border-top:1px solid var(--line)}
+.prow2:first-child{border-top:0}
+.mini{min-height:44px;padding:0 10px;font-size:15px;font-weight:600;color:var(--primary);border-radius:10px}
+.mini:active{background:var(--well)}
+.mini.warn-t{color:var(--warn)}
+
+/* assign */
+.chips-wrap{position:relative;z-index:25;background:var(--paper);flex:none;padding-bottom:6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 16px 4px;scroll-snap-type:x proximity;scroll-padding-left:16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;width:124px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--pc);border-radius:14px;padding:8px 10px 8px;display:flex;flex-direction:column;gap:2px;text-align:left;transition:transform .15s,box-shadow .15s}
+.chip-top{display:flex;align-items:center;gap:8px}.chip-top b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip .t-amount{display:block}
+.chip:active{transform:scale(.97)}
+.chip.on{box-shadow:0 0 0 2.5px var(--pc);background:var(--surface)}
+.pop{animation:pop .38s ease}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.1)}100%{transform:scale(1)}}
+.paintbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 16px 0;padding:2px 4px 2px 12px;border-radius:12px;background:var(--well);border-left:5px solid var(--pc);font-size:14px;position:relative;z-index:2}
+.ilist{display:flex;flex-direction:column;gap:8px}
+.irow{position:relative;display:flex;min-height:68px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .1s,filter .1s;outline-offset:2px}
+.irow:active{transform:scale(.985);filter:brightness(.92)}
+.irow .bar{display:flex;flex-direction:column;width:7px;flex:none}
+.irow .bar s{flex:1;background:var(--pc);display:block}
+.ir-main{flex:1;min-width:0;padding:9px 14px 9px 12px;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.ir-1{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.ir-name{min-width:0;overflow-wrap:anywhere}
+.ir-2{display:flex;align-items:center;gap:8px;min-height:28px}
+.ir-2 .t-foot{white-space:nowrap}
+.irow.un{background:var(--warn-bg);border:2px dashed var(--warn)}
+.irow.un .ir-main{padding-left:14px}
+.irow.pulse{animation:pulsew .9s ease 2}
+@keyframes pulsew{0%,100%{transform:none}30%{transform:translateX(-5px)}60%{transform:translateX(5px)}}
+.prows{display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:12px;min-height:60px;padding:6px 14px 6px 10px;border-radius:14px;background:var(--well);border:2px solid transparent;transition:background .15s,border-color .15s}
+.prow.on{border-color:var(--pc);background:var(--surface);box-shadow:0 0 0 1px var(--line) inset}
+.prow:active{filter:brightness(.92)}
+.ck{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink2);display:flex;align-items:center;justify-content:center;flex:none;color:var(--on-primary)}
+.prow.on .ck{background:var(--primary);border-color:var(--primary)}
+.ck .ico{width:16px;height:16px;stroke-width:3}
+.fly{position:absolute;z-index:70;pointer-events:none;background:var(--primary);color:var(--on-primary);font:600 15px var(--f-round);padding:3px 10px;border-radius:999px;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+/* totals */
+.segm{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--well);border-radius:14px;padding:4px}
+.segm button{min-height:44px;border-radius:11px;font-weight:600;font-size:16px;color:var(--ink2);text-align:center}
+.segm button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.18),0 0 0 1.5px var(--primary)}
+.sum{padding:12px 16px;margin-top:10px}
+.sum3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;padding-top:10px;border-top:1px solid var(--line)}
+.sum3 div{display:flex;flex-direction:column;gap:2px}
+.sbar{display:flex;height:34px;border-radius:10px;overflow:hidden;gap:2px;background:var(--paper)}
+.sbar span{background:var(--pc);color:var(--on-p);font:600 15px/34px var(--f-text);text-align:center;transition:width .35s}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 2px 12px;font-size:13px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:50%;background:var(--pc);display:block}
+.cards{display:flex;flex-direction:column;gap:10px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--pc);border-radius:16px;overflow:hidden}
+.pc-h{display:block;width:100%;padding:12px 14px 12px 12px;min-height:44px}
+.pc-top{display:flex;align-items:center;gap:10px}
+.pc-line{margin-top:6px}
+.pc-body{padding:2px 14px 12px 14px;border-top:1px dashed var(--line);margin:0 0}
+.ln{display:flex;justify-content:space-between;font-size:15px;padding:6px 0}
+.round{display:flex;gap:10px;align-items:flex-start;padding:12px 14px 12px 8px;margin-top:12px;background:var(--well);border-style:dashed}
+.round li{margin:2px 0}
+.doc{width:44px;height:44px;border-radius:10px;background:var(--well);display:flex;align-items:center;justify-content:center;color:var(--primary)}
+.sumtxt{margin:0 0 12px;padding:12px;background:var(--well);border-radius:12px;font:13px/1.45 var(--f-mono);white-space:pre-wrap;max-height:196px;overflow:auto;color:var(--ink)}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.apps button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--ink2);min-height:44px}
+.apps span{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.apps svg{width:28px;height:28px}
+.success{position:absolute;inset:0;z-index:35;background:var(--paper);display:flex;align-items:center;justify-content:center;padding-top:54px}
+.how{list-style:none;padding:0;margin:12px 0 16px;counter-reset:s;display:flex;flex-direction:column;gap:10px}
+.how li{counter-increment:s;display:flex;gap:12px;align-items:center;min-height:44px}
+.how li::before{content:counter(s);width:32px;height:32px;border-radius:50%;background:var(--ok-bg);color:var(--primary);font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.how b{display:block;font-size:17px}.how span{font-size:15px;color:var(--ink2)}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:70}
+
+/* bilingual additions */
+.say{position:relative;display:inline-block;max-width:300px;padding:7px 14px;border-radius:16px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);font:600 14px/1.25 var(--f-round);text-align:center;box-shadow:var(--shadow)}
+.say::before{content:"";position:absolute;left:50%;top:-7px;width:12px;height:12px;background:var(--surface);border-left:1.5px solid var(--line);border-top:1.5px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+.seg a.langsw{display:inline-flex;align-items:center;padding:5px 11px;border-radius:8px;font-size:13px;font-weight:600;color:var(--page-ink);text-decoration:none}
+.seg a.langsw:hover{text-decoration:underline}
+.seg button[disabled]{cursor:default}
+
+</style>
+</head>
+<body>
+<div class="toolbar" id="toolbar"></div>
+<div class="stage"><div class="fit" id="fit">
+  <div class="device"><div class="screen" aria-label="iPhone screen">
+    <div class="island"></div>
+    <div class="status" aria-hidden="true"><span>9:41</span><span class="ic">
+      <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1-1.1A10.6 10.6 0 0 0 8 .7C5.2.7 2.7 1.7 1 3.5l1 1.1A8.7 8.7 0 0 1 8 2.2zm0 3.4c1.4 0 2.6.5 3.6 1.4l1-1.1A7 7 0 0 0 8 4.1c-1.8 0-3.4.7-4.6 1.8l1 1.1c1-.9 2.2-1.4 3.6-1.4zM8 9a2 2 0 0 0-1.4.6L8 11.5l1.4-1.9A2 2 0 0 0 8 9z"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="19" height="9" rx="2.2"/><path d="M24.2 4.5v4c.8-.3 1.5-1.1 1.5-2s-.7-1.7-1.5-2z" opacity=".5"/></svg>
+    </span></div>
+    <div id="app"></div>
+    <div id="fx"></div>
+    <div class="home-ind"></div>
+  </div></div>
+</div></div>
+<script>
+window.ESP_LANG = 'en';
+/* Esplitéalo — all user-facing strings, Spanish (Puerto Rico) and English.
+   Voice: the raccoon, Chavito, speaks in the first person ("yo" / "I").
+   Slang dial (see data/esplitealo-copy-slang/report.md): amounts, warnings, errors, confirms and permission text stay plain. */
+(function (root) {
+  'use strict';
+  function joinEs(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1]; }
+  function joinEn(a) { return a.length < 2 ? a.join('') : a.length === 2 ? a.join(' and ') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
+
+  var es = {
+    lang: 'es', htmlLang: 'es-PR', other: 'en', otherLabel: 'English', thisLabel: 'Español',
+    titleSuffix: ' · maqueta de Esplitéalo', brand: 'Esplitéalo',
+    /* sample data */
+    merchant: 'Fonda Doña Lola',
+    itemNames: ['Jugo de parcha', 'Medalla', 'Surtido de frituras', 'Mofongo de camarones', 'Pernil con gandules', 'Ensalada de pulpo', 'Bistec encebollado', 'Flan para compartir'],
+    recent: [['Pinchos en Piñones', '4 oct', 6210, 3], ['Brunch en Santurce', '28 sep', 8740, 5]],
+    dateShort: '13 oct',
+    paper: { addr: 'Calle Loíza 214 · Mesa 12', when: '10/13/26 · 7:42 PM · Mesera: Neidy', sub: 'Subtotal', tax: 'Impuesto 11.5%', service: 'Cargo por servicio 15%', total: 'TOTAL', thanks: '¡Gracias por su visita!' },
+    /* chrome */
+    tb: { all: '← Todas las pantallas', mode: 'Modo', light: 'Claro', dark: 'Oscuro', demo: 'Datos de ejemplo', scan: 'Escaneo', mid: 'A medias', complete: 'Completo', service: 'Con servicio', reduce: 'Reducir movimiento',
+      scanTip: 'Escaneo nuevo con un error de lectura', midTip: 'Cuatro amigos, 6 de 8 artículos marcados', completeTip: 'Todos los artículos marcados', serviceTip: 'El recibo trae cargo por servicio: la propina empieza en $0',
+      lang: 'Idioma' },
+    titles: { home: '1 · Inicio', capture: '2 · Cámara', processing: '3 · Procesando el escaneo', review: '4 · Chequear el recibo', people: '5 · Añadir personas', assign: '6 · Marcar artículos', totals: '7 · Totales y compartir' },
+    haptic: { 'selection tick': 'toque de selección', warning: 'aviso', success: 'éxito' }, hapticWord: 'háptico',
+    step: function (n) { return 'Paso ' + n + ' de 5'; },
+    /* home */
+    home: { how: 'Cómo funciona', bubble: 'Soy Chavito. Yo cuadro la cuenta.', title: 'Divide la cuenta.<br>Con la matemática bregamos nosotros.',
+      sub: 'Toma una foto del recibo, marca quién pidió qué y comparte lo que le toca a cada cual.',
+      scan: 'Escanear recibo', photo: 'Elegir foto', privacy: 'Lee el recibo en tu celular. Sin registrarte.', recent: 'Cuentas recientes',
+      people: function (n) { return n + ' personas'; }, placeholder: 'Las cuentas guardadas son opcionales en la v1; esta fila es solo un ejemplo.' },
+    how: { title: 'Cómo funciona', steps: [['Escanea', 'Toma la foto del recibo. Yo lo leo en tu celular.'], ['Chequea', 'Corrige cualquier precio que leí mal.'], ['Marca', 'Toca cada artículo y escoge quién lo pidió.'], ['Comparte', 'Mándale a cada cual lo suyo, al centavo.']], ok: 'Entendido' },
+    /* capture */
+    cap: { cancel: 'Cancelar', flash: 'Flash', flashToast: 'El flash es un control nativo de la cámara.', guide: 'Encuadra todo el recibo: artículos, impuesto y total',
+      looks: '¿Se ve bien? Revisa los bordes', use: 'Usar foto', retake: 'Tomar otra', choose: 'Elegir foto', shutter: 'Tomar foto',
+      deniedTitle: 'La cámara está desactivada', deniedBody: 'Para escanear, activa la cámara para Esplitéalo en Ajustes › Esplitéalo. O elige una foto que ya tengas.', openSettings: 'Abrir Ajustes', settingsToast: 'Abriría los Ajustes de iOS.' },
+    /* processing */
+    proc: { back: 'Atrás', cancel: 'Cancelar', msgs: ['Leyendo el recibo', 'Buscando los precios', 'Cuadrando el total'], bar: 'Leyendo el recibo',
+      foot: 'Se lee en tu celular. Tu recibo nunca sale de ahí.', manual: 'Añadir los artículos a mano',
+      failTitle: 'Ay bendito, no pude leer ese recibo', failBody: 'Puede que la foto esté borrosa o cortada. Trátalo otra vez o añade los artículos a mano. No se perdió nada.',
+      retry: 'Tratar otra vez', another: 'Elegir otra foto' },
+    /* review */
+    rev: { back: 'Tomar otra', title: 'Chequea el recibo', sub: 'Corrige lo que leí mal. Yo nunca cambio tus totales por mi cuenta.',
+      origTitle: 'Recibo original', origOpen: 'Toca para cerrar', origClosed: 'Toca para comparar mientras editas',
+      origNote: function (printed, read) { return 'Precio impreso del flan: ' + printed + '. Leí ' + read + '.'; },
+      warnTitle: 'Los números como quiera no cuadran',
+      warnSub: function (items, sub) { return 'Tus artículos suman <b class="num" style="display:inline">' + items + '</b>, pero el subtotal del recibo dice <b class="num" style="display:inline">' + sub + '</b>.'; },
+      warnTot: function (calc, tot) { return 'El subtotal más el impuesto es <b class="num" style="display:inline">' + calc + '</b>, pero el total del recibo dice <b class="num" style="display:inline">' + tot + '</b>.'; },
+      warnTotSvc: function (calc, tot) { return 'El subtotal más impuesto y servicio es <b class="num" style="display:inline">' + calc + '</b>, pero el total del recibo dice <b class="num" style="display:inline">' + tot + '</b>.'; },
+      diff: function (d) { return ' Diferencia: ' + d + '. '; }, checkRow: 'Chequea la fila señalada.', checkAmts: 'Chequea las cantidades de abajo.',
+      okTitle: 'Todo quedó nítido', okBody: 'Los artículos, el impuesto y el total coinciden con el recibo.',
+      flag: 'Chequear · el precio parece alto', check: 'Chequear', needsLook: 'Para chequear', items: 'Artículos', add: 'Añadir artículo', amounts: 'Totales del recibo',
+      subtotal: 'Subtotal', tax: 'Impuesto', service: 'Cargo por servicio', total: 'Total', itemsAddUp: function (v) { return 'Los artículos suman ' + v; }, subPlusTax: function (v) { return 'Subtotal + impuesto es ' + v; }, subPlusTaxSvc: function (v) { return 'Subtotal + impuesto + servicio es ' + v; },
+      empty: 'Todavía no hay artículos', emptyBody: 'Añade cada línea del recibo para comenzar.', cont: 'Seguir con el corillo', needOne: 'Añade al menos un artículo primero.',
+      badTitle: 'Los números como quiera no cuadran', badBody: function (d) { return 'Diferencia: ' + d + '. Puedes seguir, pero no podrás compartir hasta que cuadre.'; }, fixIt: 'Arreglarlo', keepGoing: 'Continuar' },
+    sheet: { newItem: 'Artículo nuevo', editItem: 'Editar artículo', flagNote: function (v) { return 'Leí <b class="num">' + v + '</b>. Compáralo con el recibo original y corrígelo si hace falta.'; },
+      desc: 'Descripción', price: 'Precio', descPh: 'ej. Mofongo de camarones', save: 'Guardar', del: 'Eliminar artículo', cancel: 'Cancelar',
+      errName: 'Añade una descripción.', errPrice: 'Escribe un precio como 12.50.', receiptTotal: 'Total del recibo', typeIt: 'Escribe lo que dice el recibo.', amount: 'Cantidad',
+      errAmt: 'Escribe una cantidad como 11.62.', rename: 'Renombrar', name: 'Nombre' },
+    /* people */
+    ppl: { back: 'Recibo', title: '¿Quiénes están en el corillo?', sub: 'Escribe los nombres y ya. Sin usuarios ni contactos.', placeholder: 'Nombre', add: 'Añadir persona',
+      assigned: function (n) { return n + (n === 1 ? ' artículo marcado' : ' artículos marcados'); }, none: 'Sin artículos todavía', rename: 'Renombrar', remove: 'Quitar',
+      atTable: function (n) { return n + ' en la mesa'; }, emptyTitle: 'La mesa está vacía, añade a alguien.', emptyBody: 'Escribe un nombre arriba y toca “Añadir persona”. Necesitas al menos una.',
+      next: 'Marcar artículos', errName: 'Escribe un nombre primero.', errDup: function (v) { return v + ' ya está en la mesa. Prueba con la inicial del apellido.'; }, needOne: 'Añade al menos una persona primero.',
+      removeTitle: function (n) { return '¿Quitar a ' + n + '?'; },
+      removeBody: function (n, had, orphanNames, shared) { return n + ' tiene ' + had + (had === 1 ? ' artículo marcado. ' : ' artículos marcados. ') + (orphanNames.length ? joinEs(orphanNames) + (orphanNames.length > 1 ? ' volverán' : ' volverá') + ' a quedar sin marcar. ' : '') + (shared ? 'Los artículos compartidos se quedan con las demás personas.' : ''); },
+      keep: function (n) { return 'Dejar a ' + n; } },
+    /* assign */
+    asg: { back: 'Personas', title: 'Marcar artículos', progress: function (d, n) { return d + ' de ' + n; }, meter: 'Artículos marcados', chips: 'Subtotales antes del impuesto',
+      unassigned: 'Sin marcar', tapChoose: 'Toca para escoger quién', equal: function (v) { return 'Partes iguales · ' + v + ' cada uno'; }, equalMix: function (v) { return 'Partes iguales · ' + v; },
+      aria: function (name, price, who) { return name + ', ' + price + ', ' + (who ? 'marcado para ' + who : 'sin marcar'); },
+      warnTitle: function (n) { return n === 1 ? 'Falta 1 artículo por marcar' : 'Faltan ' + n + ' artículos por marcar'; },
+      warnBody: function (n) { return (n === 1 ? 'Márcalo' : 'Márcalos') + ' para continuar. No se divide nada hasta que cada artículo tenga una persona.'; },
+      restEven: 'Dividir el resto en partes iguales', paintBar: function (n) { return 'Pintando para <b>' + n + '</b>. Toca los artículos para añadir o quitar.'; }, done: 'Listo',
+      allDone: function (n) { return '¡Los ' + n + ' artículos tienen dueño!'; }, left: function (v, n) { return 'Sin marcar: <b class="num" style="color:var(--warn)">' + v + '</b> en ' + n + (n === 1 ? ' artículo' : ' artículos'); },
+      btn: function (left) { return 'Chequear el espliteo' + (left ? ' · faltan ' + left : ''); }, foot: 'Toca un artículo para escoger quién lo pidió, o toca un nombre arriba para pintar artículos uno tras otro.',
+      who: '¿Quién pidió esto?', everyone: 'Todos', clear: 'Ninguno', pickOne: 'Escoge al menos a una persona para este artículo.', all: 'Le toca todo.', splitN: function (n) { return 'Dividido en ' + n + ' partes iguales.'; },
+      extra: function (n, c, names) { return 'Dividido en ' + n + '. Sobran ' + c + '¢; van a ' + joinEs(names) + ' (orden de la lista).'; }, sheetLabel: function (n) { return '¿Quién pidió ' + n + '?'; },
+      none: 'Ninguno' },
+    /* totals */
+    tot: { back: 'Marcar', title: 'Totales', notSettled: 'Aún no está completo', notSettledBody: function (n, v) { return 'Hay ' + n + (n === 1 ? ' artículo sin marcar (' : ' artículos sin marcar (') + v + '). ' + (n === 1 ? 'Márcalo' : 'Márcalos') + ' para compartir.'; },
+      offTitle: function (d) { return 'Diferencia de ' + d + '. Todavía no se puede compartir'; },
+      offBody: function (shortItems, sub) { return shortItems !== null ? 'Los artículos suman ' + shortItems + ', pero el subtotal del recibo dice ' + sub + '.' : 'Tu espliteo y el total del recibo no coinciden.'; }, offFix: ' Arregla el recibo y este aviso desaparece.',
+      okTitle: function (v) { return 'Suma ' + v; }, okSub: 'Machea con el recibo y la propina, hasta el último chavito',
+      tipLabel: function (v) { return 'Propina · sobre ' + v + ' antes del impuesto'; }, custom: 'Otra', tipDec: 'Bajar propina', tipInc: 'Subir propina', tipCustomAria: 'Propina personalizada en dólares', tipAria: 'Propina',
+      tipSvc: function (v) { return 'El recibo ya trae cargo por servicio (' + v + '), así que dejé la propina en $0.00. Súbela si quieres dar más.'; },
+      tipSvcMore: function (v) { return 'El recibo ya trae cargo por servicio (' + v + '). Chequea que no estés dando propina doble.'; },
+      billTotal: 'Total de la cuenta con propina', subtotal: 'Subtotal', tax: 'Impuesto', service: 'Servicio', tip: 'Propina', whoOwes: 'Cuánto le toca a cada cual', barAria: 'Parte de la cuenta por persona',
+      line: function (i, t, s, p) { return 'artículos ' + i + ' · impuesto ' + t + (s ? ' · servicio ' + s : '') + ' · propina ' + p; },
+      rounding: function (n) { return 'Incluye ' + n + '¢ de redondeo'; },
+      roundTitle: 'Dónde cayeron los chavitos sueltos', roundCoin: 'Chavito sostiene una moneda de un centavo',
+      roundItem: function (name, price, n, left, names) { return name + ' ' + price + ' ÷ ' + n + ' deja ' + left + '¢ sobrante' + (left === 1 ? '' : 's') + '. ' + joinEs(names) + (names.length === 1 ? ' paga' : ' pagan') + ' 1¢ más.'; },
+      roundPool: function (label, n, names) { return label + ': ' + n + '¢ sobrante' + (n === 1 ? ' va' : 's van') + ' a ' + joinEs(names) + '.'; }, poolTax: 'Impuesto', poolSvc: 'Servicio', poolTip: 'Propina',
+      roundRule: 'Los centavos que sobran van primero a quien estuvo más cerca de completar el siguiente centavo; si hay empate, se sigue el orden de la lista. Mismos datos, mismo resultado.',
+      share: 'Compartir espliteo', blocked: 'No se puede compartir hasta que los números cuadren.', blockedToast: 'Arregla la diferencia primero y entonces puedes compartir.', editAsg: 'Editar marcado', editReceipt: 'Editar recibo' },
+    /* share + success */
+    share: { docTitle: function (m) { return 'Espliteo de ' + m; }, docSub: function (n) { return 'Resumen en texto · ' + n + ' personas'; }, native: 'Aquí se abrirá la hoja de compartir de iOS.', cancel: 'Cancelar', apps: { Messages: 'Mensajes', Mail: 'Correo', Notes: 'Notas', Copy: 'Copiar' },
+      head: function (m, d, bill, tipLabel, tip, conf, svc) { return m + ' · ' + d + '\nCuenta ' + bill + (svc ? ' (incluye servicio ' + svc + ')' : '') + ' + ' + tipLabel + ' ' + tip + ' = ' + conf + '\n'; },
+      tipPct: function (p) { return 'propina ' + p + '%'; }, tipFlat: 'propina',
+      person: function (n, tot, i, t, s, p) { return '\n' + n + ' debe ' + tot + '\n  artículos ' + i + ' · impuesto ' + t + (s ? ' · servicio ' + s : '') + ' · propina ' + p + '\n'; },
+      close: function (v) { return '\nTodo cuadra en ' + v + '. Esplitéalo y listo 🦝'; } },
+    ok: { title: '¡Wepa! Cuentas claras.', body: function (n, v) { return 'Se enviaron ' + n + ' totales que suman <b class="num" style="color:var(--ink)">' + v + '</b>. Nadie tuvo que bregar con la matemática; yo me encargué.'; }, again: 'Comenzar otra cuenta', back: 'Regresar a los totales' },
+    mascot: { expr: { neutral: 'Chavito, el mapache', happy: 'Chavito, el mapache, contento', thinking: 'Chavito, el mapache, pensando', worried: 'Chavito, el mapache, preocupado' },
+      home: 'Chavito, el mapache, con un recibo largo', processing: 'Chavito leyendo un recibo con una lupa', failed: 'Chavito, preocupado, con un recibo borroso', empty: 'Chavito esperando junto a cuatro sillas vacías', success: 'Chavito celebrando' },
+    /* gallery */
+    idx: { title: 'Esplitéalo · diseños de pantallas', h1: '<span class="wordmark">Esplitéalo</span> · diseños de pantallas',
+      intro: 'Siete pantallas dibujadas como HTML clicable dentro de un iPhone. Todos los teléfonos de abajo funcionan: toca filas, abre hojas, edita precios. Abre cualquier pantalla a tamaño completo o recorre todo el flujo en un solo teléfono.',
+      mode: 'Modo', light: 'Claro', dark: 'Oscuro', reduce: 'Reducir movimiento', proto: 'Abrir el prototipo completo →', flow: 'Flujo de pantallas', state: ' estado', states: ' estados', open: 'Abrir a tamaño completo ↗' }
+  };
+
+  var en = {
+    lang: 'en', htmlLang: 'en', other: 'es', otherLabel: 'Español', thisLabel: 'English',
+    titleSuffix: ' · Esplitéalo mockup', brand: 'Esplitéalo',
+    merchant: 'Fonda Doña Lola',
+    itemNames: ['Passion fruit juice', 'Medalla beer', 'Fritters sampler', 'Shrimp mofongo', 'Roast pork & rice', 'Octopus salad', 'Steak & onions', 'Flan to share'],
+    recent: [['Pinchos in Piñones', 'Oct 4', 6210, 3], ['Brunch in Santurce', 'Sep 28', 8740, 5]],
+    dateShort: 'Oct 13',
+    paper: { addr: 'Calle Loíza 214 · Table 12', when: '10/13/26 · 7:42 PM · Server: Neidy', sub: 'Subtotal', tax: 'Tax 11.5%', service: 'Service charge 15%', total: 'TOTAL', thanks: 'Thank you!' },
+    tb: { all: '← All screens', mode: 'Mode', light: 'Light', dark: 'Dark', demo: 'Demo data', scan: 'Scan', mid: 'Mid-way', complete: 'Complete', service: 'With service', reduce: 'Reduce motion',
+      scanTip: 'Fresh scan with an OCR mistake', midTip: 'Four friends, 6 of 8 items assigned', completeTip: 'All items assigned', serviceTip: 'The receipt has a service charge: tip starts at $0', lang: 'Language' },
+    titles: { home: '1 · Home', capture: '2 · Capture', processing: '3 · Scan processing', review: '4 · Review receipt', people: '5 · Add people', assign: '6 · Assign items', totals: '7 · Totals and share' },
+    haptic: { 'selection tick': 'selection tick', warning: 'warning', success: 'success' }, hapticWord: 'haptic',
+    step: function (n) { return 'Step ' + n + ' of 5'; },
+    home: { how: 'How it works', bubble: 'I’m Chavito. I do the math.', title: 'Split the check,<br>skip the math', sub: 'Snap the receipt, tap who had what, and share what everyone owes.',
+      scan: 'Scan receipt', photo: 'Choose photo', privacy: 'Reads receipts on your phone. No account.', recent: 'Recent bills',
+      people: function (n) { return n + ' people'; }, placeholder: 'Saved bills are optional for v1, so this row is a placeholder.' },
+    how: { title: 'How it works', steps: [['Scan', 'Photograph the receipt. I read it on your phone.'], ['Check', 'Fix any price I misread.'], ['Tap', 'Tap each item and pick who had it.'], ['Share', 'Send everyone their exact amount.']], ok: 'Got it' },
+    cap: { cancel: 'Cancel', flash: 'Flash', flashToast: 'Flash is a native camera control.', guide: 'Fit the whole receipt: items, tax, total', looks: 'Looks good? Check the edges', use: 'Use photo', retake: 'Retake', choose: 'Choose photo', shutter: 'Take photo',
+      deniedTitle: 'Camera access is off', deniedBody: 'To scan, turn on Camera for Esplitéalo in Settings › Esplitéalo. Or pick a photo you already took.', openSettings: 'Open Settings', settingsToast: 'Would open iOS Settings.' },
+    proc: { back: 'Back', cancel: 'Cancel', msgs: ['Reading receipt', 'Finding prices', 'Checking the total'], bar: 'Reading receipt', foot: 'Read on your phone. Your receipt never leaves it.', manual: 'Enter items manually',
+      failTitle: 'I couldn’t read that one', failBody: 'The photo may be blurry or cut off. Try again, or type the items in yourself. Nothing is lost.', retry: 'Try again', another: 'Choose another photo' },
+    rev: { back: 'Retake', title: 'Check the receipt', sub: 'Fix anything I misread. I never change your totals for you.',
+      origTitle: 'Original receipt', origOpen: 'Tap to collapse', origClosed: 'Tap to compare while you edit',
+      origNote: function (printed, read) { return 'Printed flan price: ' + printed + '. I read ' + read + '.'; },
+      warnTitle: 'Numbers don’t add up yet',
+      warnSub: function (items, sub) { return 'Your items add up to <b class="num" style="display:inline">' + items + '</b>, but the receipt subtotal says <b class="num" style="display:inline">' + sub + '</b>.'; },
+      warnTot: function (calc, tot) { return 'Subtotal plus tax is <b class="num" style="display:inline">' + calc + '</b>, but the receipt total says <b class="num" style="display:inline">' + tot + '</b>.'; },
+      warnTotSvc: function (calc, tot) { return 'Subtotal plus tax and service is <b class="num" style="display:inline">' + calc + '</b>, but the receipt total says <b class="num" style="display:inline">' + tot + '</b>.'; },
+      diff: function (d) { return ' Off by ' + d + '. '; }, checkRow: 'Check the flagged row.', checkAmts: 'Check the amounts below.',
+      okTitle: 'Everything adds up', okBody: 'Items, tax and total match the receipt.',
+      flag: 'Check · price looks high', check: 'Check', needsLook: 'Needs a look', items: 'Items', add: 'Add item', amounts: 'Receipt amounts',
+      subtotal: 'Subtotal', tax: 'Tax', service: 'Service charge', total: 'Total', itemsAddUp: function (v) { return 'Items add up to ' + v; }, subPlusTax: function (v) { return 'Subtotal + tax is ' + v; }, subPlusTaxSvc: function (v) { return 'Subtotal + tax + service is ' + v; },
+      empty: 'No items yet', emptyBody: 'Add each line from the receipt to get started.', cont: 'Continue to people', needOne: 'Add at least one item first.',
+      badTitle: 'The numbers still don’t match', badBody: function (d) { return 'Off by ' + d + '. You can keep going, but you won’t be able to share until it adds up.'; }, fixIt: 'Fix it', keepGoing: 'Continue' },
+    sheet: { newItem: 'New item', editItem: 'Edit item', flagNote: function (v) { return 'I read <b class="num">' + v + '</b>. Compare it with the original receipt, then correct it if needed.'; },
+      desc: 'Description', price: 'Price', descPh: 'e.g. Shrimp mofongo', save: 'Save', del: 'Delete item', cancel: 'Cancel',
+      errName: 'Add a description.', errPrice: 'Enter a price like 12.50.', receiptTotal: 'Receipt total', typeIt: 'Type what is printed on the receipt.', amount: 'Amount', errAmt: 'Enter an amount like 11.62.', rename: 'Rename', name: 'Name' },
+    ppl: { back: 'Receipt', title: 'Who’s splitting?', sub: 'Just type names. No accounts, no contacts.', placeholder: 'Name', add: 'Add person',
+      assigned: function (n) { return n + (n === 1 ? ' item' : ' items') + ' assigned'; }, none: 'No items yet', rename: 'Rename', remove: 'Remove',
+      atTable: function (n) { return n + (n === 1 ? ' person' : ' people') + ' at the table'; }, emptyTitle: 'No one’s at the table yet', emptyBody: 'Type a name above and tap Add person. You need at least one.',
+      next: 'Assign items', errName: 'Type a name first.', errDup: function (v) { return v + ' is already at the table. Try a last initial.'; }, needOne: 'Add at least one person first.',
+      removeTitle: function (n) { return 'Remove ' + n + '?'; },
+      removeBody: function (n, had, orphanNames, shared) { return n + ' has ' + had + (had === 1 ? ' item' : ' items') + ' assigned. ' + (orphanNames.length ? joinEn(orphanNames) + ' will go back to Unassigned. ' : '') + (shared ? 'Shared items keep their other people.' : ''); },
+      keep: function (n) { return 'Keep ' + n; } },
+    asg: { back: 'People', title: 'Assign items', progress: function (d, n) { return d + ' of ' + n; }, meter: 'Items assigned', chips: 'Pre-tax subtotals',
+      unassigned: 'Unassigned', tapChoose: 'Tap to choose who', equal: function (v) { return 'Equal split · ' + v + ' each'; }, equalMix: function (v) { return 'Equal split · ' + v; },
+      aria: function (name, price, who) { return name + ', ' + price + ', ' + (who ? 'assigned to ' + who : 'unassigned'); },
+      warnTitle: function (n) { return n + (n === 1 ? ' item still needs' : ' items still need') + ' someone'; },
+      warnBody: function (n) { return 'Assign ' + (n === 1 ? 'it' : 'them') + ' to move on. Nothing is split until every item has a person.'; },
+      restEven: 'Split the rest evenly', paintBar: function (n) { return 'Painting for <b>' + n + '</b>. Tap items to add or remove.'; }, done: 'Done',
+      allDone: function (n) { return 'All ' + n + ' items assigned'; }, left: function (v, n) { return 'Unassigned: <b class="num" style="color:var(--warn)">' + v + '</b> across ' + n + (n === 1 ? ' item' : ' items'); },
+      btn: function (left) { return 'Review split' + (left ? ' · ' + left + ' left' : ''); }, foot: 'Tap an item to choose who had it. Or tap a name above to paint items one after another.',
+      who: 'Who had this?', everyone: 'Everyone', clear: 'Clear', pickOne: 'Pick at least one person to settle this item.', all: 'Gets all of it.', splitN: function (n) { return 'Split ' + n + ' ways, equal shares.'; },
+      extra: function (n, c, names) { return 'Split ' + n + ' ways. ' + c + '¢ left over goes to ' + joinEn(names) + ' (list order).'; }, sheetLabel: function (n) { return 'Who had ' + n + '?'; } },
+    tot: { back: 'Assign', title: 'Totals', notSettled: 'Not settled yet', notSettledBody: function (n, v) { return n + ' unassigned ' + (n === 1 ? 'item' : 'items') + ' (' + v + '). Assign them to share.'; },
+      offTitle: function (d) { return 'Off by ' + d + '. Can’t share yet'; },
+      offBody: function (shortItems, sub) { return shortItems !== null ? 'Items add up to ' + shortItems + ' but the receipt subtotal says ' + sub + '.' : 'Your split and the receipt total differ.'; }, offFix: ' Fix the receipt and this clears.',
+      okTitle: function (v) { return 'Adds up to ' + v; }, okSub: 'Matches the receipt + tip, to the cent',
+      tipLabel: function (v) { return 'Tip · on ' + v + ' before tax'; }, custom: 'Custom', tipDec: 'Decrease tip', tipInc: 'Increase tip', tipCustomAria: 'Custom tip in dollars', tipAria: 'Tip',
+      tipSvc: function (v) { return 'The receipt already has a service charge (' + v + '), so I set the tip to $0.00. Raise it if you want to give more.'; },
+      tipSvcMore: function (v) { return 'The receipt already has a service charge (' + v + '). Check that you’re not tipping twice.'; },
+      billTotal: 'Bill total with tip', subtotal: 'Subtotal', tax: 'Tax', service: 'Service', tip: 'Tip', whoOwes: 'Who owes what', barAria: 'Share of the bill by person',
+      line: function (i, t, s, p) { return 'items ' + i + ' · tax ' + t + (s ? ' · service ' + s : '') + ' · tip ' + p; },
+      rounding: function (n) { return 'Includes ' + n + '¢ rounding'; },
+      roundTitle: 'Where the stray cents went', roundCoin: 'Chavito holding a one-cent coin',
+      roundItem: function (name, price, n, left, names) { return name + ' ' + price + ' ÷ ' + n + ' leaves ' + left + '¢. ' + joinEn(names) + (names.length === 1 ? ' pays' : ' pay') + ' 1¢ more.'; },
+      roundPool: function (label, n, names) { return label + ': ' + n + (n === 1 ? '¢ of leftovers goes to ' : '¢ of leftovers go to ') + joinEn(names) + '.'; }, poolTax: 'Tax', poolSvc: 'Service', poolTip: 'Tip',
+      roundRule: 'Leftover cents go to the largest remainder, ties by list order. Same inputs, same result.',
+      share: 'Share breakdown', blocked: 'Sharing is blocked until the numbers match.', blockedToast: 'Fix the difference first, then you can share.', editAsg: 'Edit assignments', editReceipt: 'Edit receipt' },
+    share: { docTitle: function (m) { return m + ' split'; }, docSub: function (n) { return 'Text summary · ' + n + ' people'; }, native: 'The native iOS share sheet will open here.', cancel: 'Cancel', apps: { Messages: 'Messages', Mail: 'Mail', Notes: 'Notes', Copy: 'Copy' },
+      head: function (m, d, bill, tipLabel, tip, conf, svc) { return m + ' · ' + d + '\nBill ' + bill + (svc ? ' (includes service ' + svc + ')' : '') + ' + ' + tipLabel + ' ' + tip + ' = ' + conf + '\n'; },
+      tipPct: function (p) { return p + '% tip'; }, tipFlat: 'tip',
+      person: function (n, tot, i, t, s, p) { return '\n' + n + ' owes ' + tot + '\n  items ' + i + ' · tax ' + t + (s ? ' · service ' + s : '') + ' · tip ' + p + '\n'; },
+      close: function (v) { return '\nAdds up to ' + v + '. Split with Esplitéalo'; } },
+    ok: { title: 'All settled up!', body: function (n, v) { return n + ' amounts sent, adding up to <b class="num" style="color:var(--ink)">' + v + '</b>. Nobody had to do math. I took care of it.'; }, again: 'Start a new bill', back: 'Back to totals' },
+    mascot: { expr: { neutral: 'Chavito the raccoon', happy: 'Chavito the raccoon, happy', thinking: 'Chavito the raccoon, thinking', worried: 'Chavito the raccoon, worried' },
+      home: 'Chavito the raccoon holding a long receipt', processing: 'Chavito reading a receipt with a magnifying glass', failed: 'Chavito, worried, holding a blurry receipt', empty: 'Chavito waiting beside four empty seats', success: 'Chavito celebrating' },
+    idx: { title: 'Esplitéalo · screen designs', h1: '<span class="wordmark">Esplitéalo</span> · screen designs',
+      intro: 'Seven screens, drawn as clickable HTML in an iPhone frame. Every phone below is live: tap rows, open sheets, edit prices. Open any screen full size, or click through the whole flow in one phone.',
+      mode: 'Mode', light: 'Light', dark: 'Dark', reduce: 'Reduce motion', proto: 'Open full prototype →', flow: 'Screen flow', state: ' state', states: ' states', open: 'Open full size ↗' }
+  };
+
+  root.ESP_I18N = { es: es, en: en };
+  root.ESP_T = root.ESP_I18N[root.ESP_LANG || 'es'];
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* Esplitéalo bill math — integer cents only (mirrors docs/CALCULATION_RULES.md).
+   Leftover cents: largest remainder, ties broken by participant order. */
+(function (root) {
+  'use strict';
+
+  // Split `cents` equally among ids; the first (cents mod n) ids in order get +1¢.
+  function splitEqual(cents, ids) {
+    var n = ids.length, out = {};
+    if (!n) return out;
+    var base = Math.floor(cents / n), rem = cents - base * n;
+    ids.forEach(function (id, i) { out[id] = base + (i < rem ? 1 : 0); });
+    return out;
+  }
+
+  // Allocate `total` cents proportionally to integer `weights` (largest remainder).
+  // Returns shares and the indexes that received a leftover cent.
+  function allocate(total, weights) {
+    var sumW = weights.reduce(function (a, b) { return a + b; }, 0);
+    var shares = weights.map(function () { return 0; });
+    if (!sumW || !total) return { shares: shares, bumps: [] };
+    var rems = [], used = 0;
+    weights.forEach(function (w, i) {
+      var num = total * w;
+      shares[i] = Math.floor(num / sumW);
+      rems.push({ i: i, r: num % sumW });
+      used += shares[i];
+    });
+    var left = total - used;
+    rems.sort(function (a, b) { return b.r - a.r || a.i - b.i; });
+    var bumps = [];
+    for (var k = 0; k < left; k++) { shares[rems[k].i] += 1; bumps.push(rems[k].i); }
+    return { shares: shares, bumps: bumps.sort(function (a, b) { return a - b; }) };
+  }
+
+  // Tip as a percentage of the pre-tax subtotal, rounded half-up to whole cents.
+  function tipFromPct(subtotal, pct) {
+    return Math.floor((subtotal * pct * 2 + 100) / 200);
+  }
+
+  // items: [{id, price, who:[personId...]}], people: [{id}]
+  function computeBill(o) {
+    var people = o.people, items = o.items;
+    var rows = people.map(function (p) {
+      return { id: p.id, items: 0, tax: 0, service: 0, tip: 0, total: 0, itemAdj: [], taxAdj: 0, serviceAdj: 0, tipAdj: 0, lines: [] };
+    });
+    var byId = {};
+    rows.forEach(function (r) { byId[r.id] = r; });
+    var unassigned = [];
+    items.forEach(function (it) {
+      var who = people.map(function (p) { return p.id; }).filter(function (id) { return it.who.indexOf(id) >= 0; });
+      if (!who.length) { unassigned.push(it); return; }
+      var parts = splitEqual(it.price, who);
+      var base = Math.floor(it.price / who.length);
+      who.forEach(function (id) {
+        byId[id].items += parts[id];
+        byId[id].lines.push({ item: it, cents: parts[id], of: who.length });
+        if (parts[id] > base) byId[id].itemAdj.push({ item: it, cents: parts[id] - base });
+      });
+    });
+    var w = rows.map(function (r) { return r.items; });
+    var t = allocate(o.tax, w), g = allocate(o.tip, w), v = allocate(o.service || 0, w);
+    rows.forEach(function (r, i) {
+      r.tax = t.shares[i]; r.tip = g.shares[i]; r.service = v.shares[i];
+      r.serviceAdj = v.bumps.indexOf(i) >= 0 ? 1 : 0;
+      r.taxAdj = t.bumps.indexOf(i) >= 0 ? 1 : 0;
+      r.tipAdj = g.bumps.indexOf(i) >= 0 ? 1 : 0;
+      r.total = r.items + r.tax + r.service + r.tip;
+    });
+    var sum = function (f) { return rows.reduce(function (a, r) { return a + f(r); }, 0); };
+    return {
+      rows: rows, unassigned: unassigned,
+      items: sum(function (r) { return r.items; }),
+      tax: sum(function (r) { return r.tax; }),
+      service: sum(function (r) { return r.service; }),
+      tip: sum(function (r) { return r.tip; }),
+      total: sum(function (r) { return r.total; })
+    };
+  }
+
+  var api = { splitEqual: splitEqual, allocate: allocate, tipFromPct: tipFromPct, computeBill: computeBill };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.Calc = api;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* Original raccoon mascot ("Chavito", formerly the working name "Rocco"), drawn as inline SVG. Flat style, four expressions.
+   Head is drawn in a 200x200 box; scenes compose it with paws, tail, receipts, confetti. */
+(function (root) {
+  'use strict';
+  var FUR = '#9AA5B1', FURD = '#5A6470', MASK = '#2B333D', CREAM = '#F5EEDF', PINK = '#F0A9A3', GOLD = '#F2B84B';
+  var uid = 0;
+
+  function eyeAt(cx, look) {
+    return '<circle cx="' + cx + '" cy="108" r="10.5" fill="#fff"/>' +
+      '<g class="pupil" style="transform:translate(' + look[0] + 'px,' + look[1] + 'px)">' +
+      '<circle cx="' + cx + '" cy="108" r="5.6" fill="' + MASK + '"/><circle cx="' + (cx + 1.8) + '" cy="105.6" r="1.9" fill="#fff"/></g>';
+  }
+
+  // Returns the head as SVG group markup (200x200 coordinate space).
+  function head(expr, o) {
+    o = o || {};
+    var look = o.look || (expr === 'thinking' ? [3, -4] : expr === 'worried' ? [-2, 2] : [0, 0]);
+    var eyes, brows = '', mouth, extra = '', cheeks = '';
+    if (expr === 'happy') {
+      eyes = '<g class="eyes-shut" fill="none" stroke="' + CREAM + '" stroke-width="4.6" stroke-linecap="round">' +
+        '<path d="M61 113 Q72 98 83 113"/><path d="M117 113 Q128 98 139 113"/></g>';
+      mouth = '<path d="M86 147 Q100 172 114 147 Z" fill="' + MASK + '"/><path d="M93 160 Q100 152 107 160 Q100 168 93 160Z" fill="' + PINK + '"/>';
+      cheeks = '<ellipse cx="55" cy="139" rx="11" ry="7" fill="' + PINK + '" opacity=".55"/><ellipse cx="145" cy="139" rx="11" ry="7" fill="' + PINK + '" opacity=".55"/>';
+    } else {
+      eyes = '<g class="eyes">' + eyeAt(72, look) + eyeAt(128, look) + '</g>';
+      if (expr === 'worried') {
+        brows = '<path d="M59 92 L85 81" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/><path d="M115 81 L141 92" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/>';
+        mouth = '<path d="M87 157 Q100 145 113 157" fill="none" stroke="' + MASK + '" stroke-width="4" stroke-linecap="round"/>';
+        extra = '<path d="M164 62 C171 73 173 80 164 85 C155 80 157 73 164 62Z" fill="#7FC4E8"/><ellipse cx="162" cy="78" rx="2" ry="3" fill="#fff" opacity=".7"/>';
+      } else if (expr === 'thinking') {
+        brows = '<path d="M62 87 L83 87" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/><path d="M117 82 Q130 74 143 81" fill="none" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/>';
+        mouth = '<path d="M90 153 Q103 148 113 154" fill="none" stroke="' + MASK + '" stroke-width="4" stroke-linecap="round"/>';
+        extra = '<circle cx="162" cy="46" r="4" fill="' + CREAM + '" stroke="' + FURD + '" stroke-width="1.5"/><circle cx="173" cy="32" r="6" fill="' + CREAM + '" stroke="' + FURD + '" stroke-width="1.5"/>';
+      } else {
+        mouth = '<path d="M88 150 Q100 160 112 150" fill="none" stroke="' + MASK + '" stroke-width="4" stroke-linecap="round"/>';
+        cheeks = '<ellipse cx="56" cy="140" rx="10" ry="6" fill="' + PINK + '" opacity=".45"/><ellipse cx="144" cy="140" rx="10" ry="6" fill="' + PINK + '" opacity=".45"/>';
+      }
+    }
+    return '' +
+      // ears
+      '<circle cx="52" cy="62" r="23" fill="' + FUR + '"/><circle cx="54" cy="65" r="12" fill="' + FURD + '"/>' +
+      '<circle cx="148" cy="62" r="23" fill="' + FUR + '"/><circle cx="146" cy="65" r="12" fill="' + FURD + '"/>' +
+      // cheek tufts + head
+      '<path d="M34 112 L12 130 L38 142Z" fill="' + FUR + '"/><path d="M166 112 L188 130 L162 142Z" fill="' + FUR + '"/>' +
+      '<path d="M28 116 C28 72 62 48 100 48 C138 48 172 72 172 116 C172 152 142 174 100 174 C58 174 28 152 28 116Z" fill="' + FUR + '"/>' +
+      // forehead stripe
+      '<path d="M91 50 L109 50 L106 84 L94 84Z" fill="' + FURD + '"/>' +
+      // brow patches, muzzle, mask
+      '<ellipse cx="72" cy="87" rx="15" ry="8" fill="' + CREAM + '"/><ellipse cx="128" cy="87" rx="15" ry="8" fill="' + CREAM + '"/>' +
+      '<ellipse cx="100" cy="143" rx="35" ry="27" fill="' + CREAM + '"/>' +
+      '<path d="M36 106 C48 88 80 86 100 99 C120 86 152 88 164 106 C162 130 134 136 117 124 C108 119 92 119 83 124 C66 136 38 130 36 106Z" fill="' + MASK + '"/>' +
+      eyes + brows + cheeks +
+      // nose + philtrum + mouth
+      '<path d="M89 127 C89 121 111 121 111 127 C111 133 105 137 100 138 C95 137 89 133 89 127Z" fill="' + MASK + '"/>' +
+      '<path d="M100 138 L100 148" stroke="' + MASK + '" stroke-width="3.2" stroke-linecap="round"/>' +
+      mouth + extra +
+      (o.coin ? '<g class="coin"><ellipse cx="146" cy="176" rx="17" ry="11" fill="' + FUR + '"/><circle cx="160" cy="162" r="19" fill="' + GOLD + '" stroke="#C99A2E" stroke-width="3"/><text x="160" y="168" text-anchor="middle" font-family="-apple-system,system-ui,sans-serif" font-weight="700" font-size="16" fill="#6B4D0A">1¢</text></g>' : '');
+  }
+
+  function svg(expr, size, o) {
+    o = o || {};
+    var M = (root.ESP_T && root.ESP_T.mascot) || { expr: {} };
+    var label = o.label || M.expr[expr] || ('Raccoon mascot, ' + expr);
+    var h = o.coin ? 200 : 190;
+    return '<svg class="rc rc-' + expr + '" viewBox="0 6 200 ' + (h) + '" width="' + size + '" height="' + Math.round(size * h / 200) + '" role="img" aria-label="' + label + '">' + head(expr, o) + '</svg>';
+  }
+
+  function ML_() { return (root.ESP_T && root.ESP_T.mascot) || {}; }
+  var ML = new Proxy({}, { get: function (_, k) { return ML_()[k] || ''; } });
+
+  function paw(x, y, rot) {
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + (rot || 0) + ')"><ellipse rx="19" ry="13" fill="' + FUR + '"/>' +
+      '<path d="M-7 -4 v6 M0 -5 v7 M7 -4 v6" stroke="' + FURD + '" stroke-width="2.6" stroke-linecap="round"/></g>';
+  }
+
+  function tail(x, y, rot, id) {
+    // striped tail: rounded bar clipped, with dark rings
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + rot + ')"><clipPath id="' + id + '"><rect x="-70" y="-24" width="140" height="48" rx="24"/></clipPath>' +
+      '<g clip-path="url(#' + id + ')"><rect x="-70" y="-24" width="140" height="48" fill="' + FUR + '"/>' +
+      [-48, -18, 12, 42].map(function (px) { return '<rect x="' + px + '" y="-24" width="14" height="48" fill="' + FURD + '"/>'; }).join('') +
+      '<rect x="46" y="-24" width="24" height="48" fill="' + MASK + '"/></g></g>';
+  }
+
+  var lines = function (x, y, w, n, gap, col) {
+    var s = '';
+    for (var i = 0; i < n; i++) {
+      var ww = i % 3 === 2 ? w * 0.6 : w;
+      s += '<rect x="' + x + '" y="' + (y + i * gap) + '" width="' + ww + '" height="4" rx="2" fill="' + col + '"/>';
+    }
+    return s;
+  };
+
+  /* ---------- scenes ---------- */
+  // Home hero: raccoon peeks over a long receipt it is holding; tail curls out the side.
+  function sceneHome(w) {
+    var id = 'tl' + (++uid);
+    return '<svg class="scene" viewBox="0 0 320 232" width="' + w + '" height="' + Math.round(w * 232 / 320) + '" role="img" aria-label="' + ML.home + '">' +
+      '<circle cx="160" cy="120" r="104" fill="var(--ok-bg)"/>' +
+      '<g class="tail-wag">' + tail(262, 150, -28, id) + '</g>' +
+      '<g transform="translate(60 6)">' + head('happy', {}) + '</g>' +
+      '<g transform="translate(94 150)"><path d="M0 0 H132 V92 L121 84 L110 92 L99 84 L88 92 L77 84 L66 92 L55 84 L44 92 L33 84 L22 92 L11 84 L0 92Z" fill="#FFFDF7" stroke="#D9D0BC" stroke-width="1.5"/>' +
+      '<rect x="14" y="16" width="52" height="5" rx="2.5" fill="#2B333D" opacity=".75"/><rect x="92" y="16" width="26" height="5" rx="2.5" fill="#2B333D" opacity=".75"/>' +
+      '<rect x="14" y="30" width="64" height="4" rx="2" fill="#2B333D" opacity=".28"/><rect x="92" y="30" width="26" height="4" rx="2" fill="#2B333D" opacity=".28"/>' +
+      '<rect x="14" y="43" width="44" height="4" rx="2" fill="#2B333D" opacity=".28"/><rect x="92" y="43" width="26" height="4" rx="2" fill="#2B333D" opacity=".28"/>' +
+      '<rect x="14" y="62" width="104" height="14" rx="4" fill="#1F7A5A"/></g>' +
+      paw(106, 156, -8) + paw(214, 156, 8) +
+      '</svg>';
+  }
+
+  // Processing: raccoon reads a receipt through a magnifier that slides along the lines.
+  function sceneProcessing(w) {
+    var id = 'pr' + (++uid);
+    return '<svg class="scene" viewBox="0 0 280 240" width="' + w + '" height="' + Math.round(w * 240 / 280) + '" role="img" aria-label="' + ML.processing + '">' +
+      '<circle cx="140" cy="122" r="108" fill="var(--ok-bg)"/>' +
+      '<g transform="translate(40 0) scale(1)"><g class="look-around">' + head('thinking', {}) + '</g></g>' +
+      '<g transform="translate(70 148)"><path d="M0 0 H140 V84 L128 76 L116 84 L104 76 L92 84 L80 76 L68 84 L56 76 L44 84 L32 76 L20 84 L10 76 L0 84Z" fill="#FFFDF7" stroke="#D9D0BC" stroke-width="1.5"/>' +
+      lines(14, 14, 78, 5, 12, 'rgba(43,51,61,.28)') +
+      '<g fill="rgba(43,51,61,.4)"><rect x="104" y="14" width="22" height="4" rx="2"/><rect x="104" y="26" width="22" height="4" rx="2"/><rect x="104" y="38" width="22" height="4" rx="2"/><rect x="104" y="50" width="22" height="4" rx="2"/></g>' +
+      '<rect class="scanline" x="4" y="10" width="132" height="10" rx="3" fill="var(--primary)" opacity=".28"/></g>' +
+      '<g class="glass"><circle cx="0" cy="0" r="25" fill="rgba(255,255,255,.55)" stroke="' + FURD + '" stroke-width="6"/><path d="M18 18 L40 40" stroke="' + FURD + '" stroke-width="8" stroke-linecap="round"/>' +
+      '<path d="M-14 -8 A16 16 0 0 1 -4 -16" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>' +
+      paw(88, 168, 12) +
+      '</svg>';
+  }
+
+  // Failed scan: worried raccoon, receipt with a question mark.
+  function sceneFailed(w) {
+    return '<svg class="scene" viewBox="0 0 280 240" width="' + w + '" height="' + Math.round(w * 240 / 280) + '" role="img" aria-label="' + ML.failed + '">' +
+      '<circle cx="140" cy="122" r="108" fill="var(--warn-bg)"/>' +
+      '<g transform="translate(40 0)">' + head('worried', {}) + '</g>' +
+      '<g transform="translate(78 150) rotate(-4 60 40)"><path d="M0 0 H124 V80 L113 72 L102 80 L91 72 L80 80 L69 72 L58 80 L47 72 L36 80 L25 72 L14 80 L0 72Z" fill="#FFFDF7" stroke="#D9D0BC" stroke-width="1.5"/>' +
+      lines(14, 14, 60, 3, 12, 'rgba(43,51,61,.18)') +
+      '<text x="96" y="52" font-family="-apple-system,system-ui,sans-serif" font-weight="700" font-size="34" fill="#C23A1D" text-anchor="middle">?</text></g>' +
+      paw(92, 160, 10) + paw(202, 160, -10) +
+      '</svg>';
+  }
+
+  // Empty state: raccoon waiting at a table with empty seats.
+  function sceneEmpty(w) {
+    return '<svg class="scene" viewBox="0 0 300 200" width="' + w + '" height="' + Math.round(w * 200 / 300) + '" role="img" aria-label="' + ML.empty + '">' +
+      '<ellipse cx="150" cy="168" rx="124" ry="22" fill="var(--well)"/>' +
+      '<g transform="translate(75 0) scale(.75)"><g class="look-around">' + head('neutral', { look: [-4, 1] }) + '</g></g>' +
+      [0, 1, 2, 3].map(function (i) {
+        var x = 60 + i * 60;
+        return '<g><circle cx="' + x + '" cy="168" r="19" fill="none" stroke="var(--ink2)" stroke-width="2.5" stroke-dasharray="4 5" opacity=".7"/>' +
+          '<path d="M' + (x - 6) + ' 168 H' + (x + 6) + ' M' + x + ' 162 V174" stroke="var(--ink2)" stroke-width="2.5" stroke-linecap="round" opacity=".7"/></g>';
+      }).join('') +
+      '</svg>';
+  }
+
+  // Success: happy raccoon with paws up and a little confetti (skippable, respects Reduce Motion).
+  function sceneSuccess(w) {
+    var conf = [[40, 40, '#2F6FA8', 8], [248, 52, '#C23D7B', 7], [70, 96, '#F2B84B', 9], [226, 104, '#1B7F72', 8], [24, 150, '#7A4FB5', 7], [262, 158, '#F2B84B', 8], [150, 14, '#A85A14', 7], [108, 36, '#58781C', 6], [196, 30, '#2F6FA8', 6]];
+    return '<svg class="scene" viewBox="0 0 290 250" width="' + w + '" height="' + Math.round(w * 250 / 290) + '" role="img" aria-label="' + ML.success + '">' +
+      '<circle cx="145" cy="132" r="104" fill="var(--ok-bg)"/>' +
+      conf.map(function (c, i) {
+        return '<rect class="conf" style="animation-delay:' + (i * 0.12) + 's" x="' + c[0] + '" y="' + c[1] + '" width="' + c[3] + '" height="' + (c[3] * 1.6) + '" rx="2" fill="' + c[2] + '" transform="rotate(' + (i * 37 % 90 - 30) + ' ' + c[0] + ' ' + c[1] + ')"/>';
+      }).join('') +
+      '<g transform="translate(45 20)">' + head('happy', {}) + '</g>' +
+      paw(62, 128, -50) + paw(228, 128, 50) +
+      '<g transform="translate(206 196)"><circle r="26" fill="var(--primary)" stroke="var(--surface)" stroke-width="4"/><path d="M-11 0 L-3 9 L12 -9" fill="none" stroke="var(--on-primary)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></g>' +
+      '</svg>';
+  }
+
+  // Favicon-sized mark used for the wordmark.
+  function mark(size) {
+    return '<svg viewBox="0 0 200 200" width="' + size + '" height="' + size + '" aria-hidden="true">' + head('neutral', {}) + '</svg>';
+  }
+
+  root.Raccoon = { svg: svg, head: head, mark: mark, scenes: { home: sceneHome, processing: sceneProcessing, failed: sceneFailed, empty: sceneEmpty, success: sceneSuccess } };
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+window.ESP_START = {"screen": "totals", "data": "complete", "sheet": {"type": "share"}};
+</script>
+<script>
+/* Esplitéalo — clickable HTML mockup engine. One app, started on any screen via window.ESP_START. */
+(function () {
+  'use strict';
+  var Calc = window.Calc, R = window.Raccoon, T = window.ESP_T, LANG = T.lang;
+  var START = window.ESP_START || { screen: 'home' };
+  var root = document.documentElement;
+  var qs = new URLSearchParams(location.search);
+  var EMBED = qs.get('embed') === '1';
+
+  /* ------------------------------------------------------------ helpers */
+  function fmt(c) { var n = c < 0; c = Math.abs(c); return (n ? '−' : '') + '$' + Math.floor(c / 100) + '.' + ('0' + (c % 100)).slice(-2); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function parseCents(s) {
+    var m = String(s).replace(/[$,\s]/g, '').match(/^(\d*)(?:\.(\d{0,2}))?$/);
+    if (!m || (m[1] === '' && !m[2])) return null;
+    return parseInt(m[1] || '0', 10) * 100 + parseInt(((m[2] || '') + '00').slice(0, 2), 10);
+  }
+  function reduced() { return root.dataset.reduce === '1' || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  function sum(a, f) { return a.reduce(function (x, y) { return x + f(y); }, 0); }
+  function ic(n) {
+    var P = {
+      back: '<path d="M15 5 L8 12 L15 19"/>', next: '<path d="M9 5 L16 12 L9 19"/>',
+      camera: '<path d="M3.5 8.5h3.2l1.8-2.8h7l1.8 2.8h3.2v10.5h-17z"/><circle cx="12" cy="13.6" r="3.6"/>',
+      photo: '<rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M4 17.5l4.8-4.6 3.6 3.4 2.6-2.4 5 4.2"/>',
+      check: '<path d="M5 12.5l4.6 4.6L19 7.4"/>', plus: '<path d="M12 5v14M5 12h14"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+      warn: '<path d="M12 4.2L21 19.5H3z"/><path d="M12 10v4.2M12 16.9v.2"/>',
+      share: '<path d="M12 3.5v11M8 7.2l4-3.7 4 3.7M6 11.5H5.2v8.3h13.6v-8.3H18"/>',
+      help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 1 1 3.6 2.4c-.7.4-1.1.9-1.1 1.8M12 16.8v.2"/>',
+      bolt: '<path d="M13 3L5.5 13.5H11L10 21l7.5-10.5H12z"/>',
+      info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.2"/>',
+      doc: '<path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4"/>',
+      chevd: '<path d="M6 9l6 6 6-6"/>', chevu: '<path d="M6 15l6-6 6 6"/>',
+      lock: '<rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>'
+    };
+    return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + (P[n] || '') + '</svg>';
+  }
+
+  /* ------------------------------------------------------------ sample data */
+  var PRICES = [400, 500, 1400, 2200, 1800, 1400, 1500, 900]; // the receipt exactly as printed (juice, beer, starter, mains, dessert)
+  var PRINTED = PRICES.map(function (c, i) { return [T.itemNames[i], c]; });
+  var WHO_MID = { 2: ['b'], 3: ['a', 'b', 'c'], 4: ['a'], 5: ['b'], 6: ['c'], 7: ['d'] };
+  var WHO_ALL = { 1: ['d'], 2: ['b'], 3: ['a', 'b', 'c'], 4: ['a'], 5: ['b'], 6: ['c'], 7: ['d'], 8: ['a', 'b', 'c', 'd'] };
+  var NAMES = [['a', 'Marisol', 1], ['b', 'Héctor', 2], ['c', 'Keishla', 3], ['d', 'Yadiel', 4]];
+  var RECEIPT = { subtotal: 10100, tax: 1162, total: 11262 };
+  var RECEIPT_SVC = { subtotal: 10100, tax: 1162, service: 1515, total: 12777 };
+
+  function makeItems(opts) {
+    return PRINTED.map(function (p, i) {
+      var id = i + 1, bad = opts.bad && id === 8;
+      return { id: id, name: p[0], price: bad ? 1900 : p[1], flag: bad ? 'price' : null, who: (opts.who && opts.who[id] || []).slice() };
+    });
+  }
+  function dataset(name) {
+    var bad = name === 'scanned' || name === 'complete-bad';
+    var full = name === 'complete' || name === 'complete-bad' || name === 'service';
+    var who = name === 'midway' ? WHO_MID : full ? WHO_ALL : null;
+    var people = (name === 'midway' || full) ? NAMES.map(function (n) { return { id: n[0], name: n[1], slot: n[2] }; }) : [];
+    var svc = name === 'service';
+    // when the receipt already shows a service charge the tip starts at $0 (design decision)
+    return { items: makeItems({ bad: bad, who: who }), people: people, receipt: Object.assign({}, svc ? RECEIPT_SVC : RECEIPT), tip: svc ? { mode: 'custom', cents: 0 } : { mode: 'pct', pct: 18 } };
+  }
+
+  /* ------------------------------------------------------------ state */
+  var S = {
+    screen: START.screen || 'home', data: START.data || 'scanned',
+    tip: START.tip || null,
+    cap: START.cap || 'live', proc: { failed: !!START.failed, manual: false, showManual: false },
+    thumb: !!START.thumb, paint: START.paint || null, warn: !!START.warn,
+    sheet: START.sheet || null, draft: {}, expanded: {}, toast: null, fromFlow: false, nextId: 100, nextPerson: 10
+  };
+  (function apply(d) { S.items = d.items; S.people = d.people; S.receipt = d.receipt; if (!S.tip) S.tip = d.tip; })(dataset(S.data));
+  if (START.items) START.items(S);
+  var LAST = {};
+
+  /* ------------------------------------------------------------ derived */
+  function issues() {
+    var items = sum(S.items, function (i) { return i.price; }), r = S.receipt, out = [];
+    if (items !== r.subtotal) out.push({ kind: 'subtotal', diff: items - r.subtotal, items: items });
+    else if (r.subtotal + r.tax + (r.service || 0) !== r.total) out.push({ kind: 'total', diff: r.subtotal + r.tax + (r.service || 0) - r.total, calc: r.subtotal + r.tax + (r.service || 0) });
+    return out;
+  }
+  function tipCents() { return S.tip.mode === 'pct' ? Calc.tipFromPct(S.receipt.subtotal, S.tip.pct) : S.tip.cents; }
+  function bill() { return Calc.computeBill({ items: S.items, people: S.people, tax: S.receipt.tax, service: S.receipt.service || 0, tip: tipCents() }); }
+  function person(id) { return S.people.filter(function (p) { return p.id === id; })[0]; }
+  function av(p, cls) { return '<span class="av s' + p.slot + ' ' + (cls || '') + '" aria-hidden="true">' + esc(p.name.charAt(0).toUpperCase()) + '</span>'; }
+  function shareOf(item) { // person -> cents for an item
+    var ids = S.people.map(function (p) { return p.id; }).filter(function (id) { return item.who.indexOf(id) >= 0; });
+    return Calc.splitEqual(item.price, ids);
+  }
+  function itemById(id) { return S.items.filter(function (i) { return i.id === id; })[0]; }
+  function subtotalOf(pid) { return sum(S.items, function (it) { var s = shareOf(it); return s[pid] || 0; }); }
+  function unassigned() { return S.items.filter(function (i) { return !i.who.length; }); }
+  function amt(key, cents, cls) { return '<span class="' + (cls || 't-amount') + '" data-amt data-key="' + key + '" data-v="' + cents + '">' + fmt(cents) + '</span>'; }
+  function summaryText(b) {
+    var X = T.share, svc = S.receipt.service || 0, conf = S.receipt.total + tipCents();
+    var t = X.head(T.merchant, T.dateShort, fmt(S.receipt.total), S.tip.mode === 'pct' ? X.tipPct(S.tip.pct) : X.tipFlat, fmt(tipCents()), fmt(conf), svc ? fmt(svc) : '');
+    b.rows.forEach(function (r) { t += X.person(person(r.id).name, fmt(r.total), fmt(r.items), fmt(r.tax), svc ? fmt(r.service) : '', fmt(r.tip)); });
+    return t + X.close(fmt(b.total));
+  }
+  function stepLabel(n) { return '<span class="step">' + T.step(n) + '</span>'; }
+  function nav(label, to, step) {
+    return '<div class="nav"><button class="back" data-act="go" data-to="' + to + '">' + ic('back') + esc(label) + '</button>' + (step ? stepLabel(step) : '') + '</div>';
+  }
+
+  /* ------------------------------------------------------------ receipt paper (a "photo" of the receipt) */
+  function paper(opts) {
+    opts = opts || {};
+    var P = T.paper, svc = S.receipt && S.receipt.service;
+    var fs = opts.fs || 11, rows = PRINTED.map(function (p, i) {
+      var hl = opts.mark && i === 7;
+      return '<div class="pl' + (hl ? ' hl' : '') + '"><span>1 ' + esc(p[0]) + '</span><span>' + (p[1] / 100).toFixed(2) + '</span></div>';
+    }).join('');
+    return '<div class="paper" style="font-size:' + fs + 'px;' + (opts.style || '') + '"><div class="pc big">' + esc(T.merchant.toUpperCase()) + '</div><div class="pc">' + P.addr + '</div><div class="pc">' + P.when + '</div><div class="pd"></div>' +
+      rows + '<div class="pd"></div><div class="pl"><span>' + P.sub + '</span><span>101.00</span></div><div class="pl"><span>' + P.tax + '</span><span>11.62</span></div>' + (svc ? '<div class="pl"><span>' + P.service + '</span><span>15.15</span></div>' : '') + '<div class="pl b"><span>' + P.total + '</span><span>' + (svc ? '127.77' : '112.62') + '</span></div><div class="pc" style="margin-top:.6em">' + P.thanks + '</div></div>';
+  }
+
+  /* ------------------------------------------------------------ screens */
+  var V = {};
+
+  V.home = function () {
+    var H = T.home;
+    return '<div class="view"><div class="scroll" data-scroll="home" style="padding-top:4px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;height:48px;margin:0 -4px 0 0">' +
+        '<div style="display:flex;align-items:center;gap:8px">' + R.mark(34) + '<span class="wordmark">' + T.brand + '</span></div>' +
+        '<button class="back" style="padding:0 6px" data-act="sheet" data-type="how" aria-label="' + esc(H.how) + '">' + ic('help') + '<span style="font-size:15px;margin-left:4px">' + H.how + '</span></button></div>' +
+      '<div style="display:flex;justify-content:center;margin:2px 0 6px">' + R.scenes.home(250) + '</div>' +
+      '<div style="display:flex;justify-content:center;margin:0 0 10px"><span class="say">' + H.bubble + '</span></div>' +
+      '<div style="text-align:center;margin:2px 4px 16px"><h1 class="t-title" style="margin:0">' + H.title + '</h1>' +
+      '<p class="t-sub" style="margin:8px 0 0">' + H.sub + '</p></div>' +
+      '<button class="btn btn-primary" data-act="start-scan" style="min-height:58px">' + ic('camera') + H.scan + '</button>' +
+      '<button class="btn btn-secondary" data-act="start-photo" style="margin-top:12px">' + ic('photo') + H.photo + '</button>' +
+      '<div class="t-foot" style="display:flex;gap:6px;align-items:center;justify-content:center;margin:14px 0 0">' + ic('lock') + H.privacy + '</div>' +
+      '<div class="group-label" style="margin-top:22px">' + H.recent + '</div><div class="card" style="overflow:hidden">' +
+      T.recent.map(function (r, i) {
+        return '<button class="rbill" data-act="toast" data-msg="' + esc(H.placeholder) + '" style="' + (i ? 'border-top:1px solid var(--line)' : '') + '"><span><b class="t-head" style="display:block">' + r[0] + '</b><span class="t-foot">' + r[1] + ' · ' + H.people(r[3]) + '</span></span>' + amt('rb' + i, r[2], 't-amount') + '</button>';
+      }).join('') + '</div></div></div>';
+  };
+
+  V.capture = function () {
+    var C = T.cap;
+    if (S.cap === 'denied') {
+      return '<div class="view">' + nav(C.cancel, 'home') + '<div class="scroll" style="display:flex;flex-direction:column;justify-content:center;gap:16px;padding-bottom:60px">' +
+        '<div class="card" style="padding:24px 20px;text-align:center"><div style="display:flex;justify-content:center">' + R.svg('thinking', 110) + '</div>' +
+        '<h2 class="t-title" style="margin:6px 0 8px;font-size:24px">' + C.deniedTitle + '</h2>' +
+        '<p class="t-sub" style="margin:0 0 18px">' + C.deniedBody + '</p>' +
+        '<button class="btn btn-primary" data-act="toast" data-msg="' + esc(C.settingsToast) + '">' + C.openSettings + '</button></div>' +
+        '<button class="btn btn-secondary" data-act="start-photo">' + ic('photo') + C.choose + '</button></div></div>';
+    }
+    var shot = S.cap === 'captured';
+    return '<div class="view dark-view" style="background:#000;padding-top:0"><div class="vf' + (shot ? ' frozen' : '') + '">' +
+      '<div class="table"></div>' + paper({ fs: 11.5, style: 'position:absolute;left:50%;top:50%;width:262px;margin:-232px 0 0 -131px;transform:rotate(-2.2deg)' }) +
+      '<div class="brk" style="left:36px;top:178px"></div><div class="brk r" style="right:36px;top:178px"></div><div class="brk b" style="left:36px;bottom:208px"></div><div class="brk br" style="right:36px;bottom:208px"></div></div>' +
+      '<div class="cam-top"><button class="cam-btn" data-act="go" data-to="home">' + C.cancel + '</button>' + (shot ? '' : '<button class="cam-btn" data-act="toast" data-msg="' + esc(C.flashToast) + '" aria-label="' + C.flash + '">' + ic('bolt') + '</button>') + '</div>' +
+      '<div class="guide-pill">' + (shot ? ic('check') + C.looks : ic('info') + C.guide) + '</div>' +
+      (shot ? '<div class="cam-bottom" style="gap:10px"><button class="btn btn-primary" data-act="use-photo">' + C.use + '</button><button class="btn btn-secondary" data-act="retake" style="background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.6)">' + C.retake + '</button></div>'
+        : '<div class="cam-bottom row"><button class="lib" data-act="start-photo"><span class="lib-th">' + ic('photo') + '</span>' + C.choose + '</button><button class="shutter" data-act="shutter" aria-label="' + C.shutter + '"><i></i></button><span style="width:76px"></span></div>') +
+      '<div class="flash" id="flash"></div></div>';
+  };
+
+  V.processing = function () {
+    var P = T.proc, failed = S.proc.failed;
+    if (failed) {
+      return '<div class="view">' + nav(P.back, 'capture') + '<div class="scroll" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding-bottom:30px">' +
+        R.scenes.failed(250) + '<h1 class="t-title" style="margin:6px 0 0">' + P.failTitle + '</h1>' +
+        '<p class="t-sub" style="margin:0 12px 14px">' + P.failBody + '</p>' +
+        '<button class="btn btn-primary" data-act="retry">' + P.retry + '</button><button class="btn btn-secondary" data-act="manual">' + P.manual + '</button>' +
+        '<button class="btn-quiet" data-act="go" data-to="capture">' + P.another + '</button></div></div>';
+    }
+    return '<div class="view">' + nav(P.cancel, 'capture') + '<div class="scroll" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding-bottom:40px">' +
+      R.scenes.processing(260) + '<h1 class="t-title" style="margin:8px 0 0" id="pmsg" aria-live="polite">' + P.msgs[0] + '</h1>' +
+      '<div class="ibar" role="progressbar" aria-label="' + esc(P.bar) + '"><i></i></div>' +
+      '<p class="t-foot" style="margin:0 20px">' + P.foot + '</p>' +
+      '<div style="width:100%;min-height:56px;margin-top:10px">' + (S.proc.showManual ? '<button class="btn btn-secondary fadein" data-act="manual">' + P.manual + '</button>' : '') + '</div></div></div>';
+  };
+
+  V.review = function () {
+    var Rv = T.rev, iss = issues(), r = S.receipt, svc = r.service || 0, items = sum(S.items, function (i) { return i.price; });
+    var banner = '';
+    if (!S.items.length) banner = '';
+    else if (iss.length) {
+      var i0 = iss[0];
+      var msg = i0.kind === 'subtotal' ? Rv.warnSub(fmt(i0.items), fmt(r.subtotal)) : (svc ? Rv.warnTotSvc : Rv.warnTot)(fmt(i0.calc), fmt(r.total));
+      banner = '<div class="banner warn" role="alert"><div class="rc-wrap">' + R.svg('worried', 62) + '</div><div><b>' + Rv.warnTitle + '</b><div class="t-foot" style="color:var(--ink)">' + msg + Rv.diff(fmt(Math.abs(i0.diff))) + (i0.kind === 'subtotal' ? Rv.checkRow : Rv.checkAmts) + '</div></div></div>';
+    } else banner = '<div class="banner ok"><span class="b-ico">' + ic('check') + '</span><div><b>' + Rv.okTitle + '</b><div class="t-foot">' + Rv.okBody + '</div></div></div>';
+
+    var rowHTML = function (it) {
+      var flag = it.flag === 'price';
+      return '<button class="rrow' + (flag ? ' flag' : '') + '" data-act="sheet" data-type="edit-item" data-id="' + it.id + '"><span class="rr-l"><span class="t-body">' + esc(it.name) + '</span>' +
+        (flag ? '<span class="pill warn" style="margin-top:4px;align-self:flex-start">' + ic('warn') + Rv.flag + '</span>' : '') + '</span>' + amt('ri' + it.id, it.price, 't-amount' + (flag ? ' warn-t' : '')) + '</button>';
+    };
+    var flagged = S.items.filter(function (i) { return i.flag; }), plain = S.items.filter(function (i) { return !i.flag; });
+    var field = function (key, label, val, bad, note) {
+      return '<button class="frow' + (bad ? ' bad' : '') + '" data-act="sheet" data-type="edit-field" data-field="' + key + '"><span><span class="t-body">' + label + '</span>' + (note ? '<span class="t-foot" style="display:block;' + (bad ? 'color:var(--warn)' : '') + '">' + note + '</span>' : '') + '</span><span style="display:flex;align-items:center;gap:8px">' + (bad ? '<span class="pill warn">' + ic('warn') + Rv.check + '</span>' : '') + amt('f' + key, val, 't-amount' + (bad ? ' warn-t' : '')) + '</span></button>';
+    };
+    var sBad = iss[0] && iss[0].kind === 'subtotal', tBad = iss[0] && iss[0].kind === 'total';
+    var empty = !S.items.length;
+    return '<div class="view">' + nav(Rv.back, 'capture', 2) + '<div class="head"><h1 class="t-title">' + Rv.title + '</h1><p class="t-sub">' + Rv.sub + '</p></div>' +
+      '<div class="scroll" data-scroll="review" style="padding-bottom:16px">' +
+      '<div class="card thumb' + (S.thumb ? ' open' : '') + '"><button class="thumb-h" data-act="thumb" aria-expanded="' + S.thumb + '"><span class="th-mini">' + paper({ fs: 3.4, style: 'width:70px;pointer-events:none' }) + '</span><span><b class="t-head" style="display:block">' + Rv.origTitle + '</b><span class="t-foot">' + (S.thumb ? Rv.origOpen : Rv.origClosed) + '</span></span><span style="margin-left:auto;color:var(--ink2)">' + ic(S.thumb ? 'chevu' : 'chevd') + '</span></button>' +
+      (S.thumb ? '<div class="th-body">' + paper({ fs: 12, mark: S.data === 'scanned' || S.items.some(function (i) { return i.flag; }), style: 'width:250px;margin:0 auto' }) + (S.items.some(function (i) { return i.flag; }) ? '<div class="t-foot" style="text-align:center;margin-top:8px">' + Rv.origNote('$9.00', '$19.00') + '</div>' : '') + '</div>' : '') + '</div>' +
+      '<div style="margin:12px 0">' + banner + '</div>' +
+      (empty ? '<div class="card" style="padding:22px;text-align:center"><div style="display:flex;justify-content:center">' + R.svg('neutral', 96) + '</div><b class="t-head" style="display:block;margin-top:6px">' + Rv.empty + '</b><p class="t-sub" style="margin:4px 0 0">' + Rv.emptyBody + '</p></div>' :
+        (flagged.length ? '<div class="group-label" style="margin-top:6px;color:var(--warn)">' + Rv.needsLook + ' · ' + flagged.length + '</div><div class="card" style="overflow:hidden;border-color:var(--warn)">' + flagged.map(rowHTML).join('') + '</div>' : '') +
+        '<div class="group-label" style="margin-top:' + (flagged.length ? 16 : 6) + 'px">' + Rv.items + ' · ' + plain.length + '</div><div class="card" style="overflow:hidden">' + plain.map(rowHTML).join('') + '</div>') +
+      '<button class="btn btn-secondary sm" data-act="add-item" style="margin-top:12px">' + ic('plus') + Rv.add + '</button>' +
+      '<div class="group-label">' + Rv.amounts + '</div><div class="well" style="overflow:hidden">' +
+      field('subtotal', Rv.subtotal, r.subtotal, sBad, sBad ? Rv.itemsAddUp(fmt(items)) : '') + field('tax', Rv.tax, r.tax, false, '11.5%') +
+      (svc ? field('service', Rv.service, svc, false, '15%') : '') +
+      field('total', Rv.total, r.total, tBad, tBad ? (svc ? Rv.subPlusTaxSvc : Rv.subPlusTax)(fmt(r.subtotal + r.tax + svc)) : '') + '</div></div>' +
+      '<div class="footer bar"><button class="btn btn-primary' + (empty ? ' is-disabled' : '') + '" data-act="review-continue">' + Rv.cont + '</button></div></div>';
+  };
+
+  V.people = function () {
+    var Pp = T.ppl, n = S.people.length, d = S.draft.person || '';
+    var rows = S.people.map(function (p, i) {
+      var cnt = S.items.filter(function (it) { return it.who.indexOf(p.id) >= 0; }).length;
+      return '<div class="prow2">' + av(p, 'lg' + (i >= 8 ? ' dotted' : '')) + '<div style="flex:1;min-width:0"><b class="t-head" style="display:block">' + esc(p.name) + '</b><span class="t-foot">' + (cnt ? Pp.assigned(cnt) : Pp.none) + '</span></div>' +
+        '<button class="mini" data-act="sheet" data-type="rename" data-id="' + p.id + '">' + Pp.rename + '</button><button class="mini warn-t" data-act="remove-person" data-id="' + p.id + '">' + Pp.remove + '</button></div>';
+    }).join('');
+    return '<div class="view">' + nav(Pp.back, 'review', 3) + '<div class="head"><h1 class="t-title">' + Pp.title + '</h1><p class="t-sub">' + Pp.sub + '</p></div>' +
+      '<div class="scroll" data-scroll="people" style="padding-bottom:16px">' +
+      '<div style="display:flex;gap:8px;align-items:stretch"><input class="input" id="pname" placeholder="' + esc(Pp.placeholder) + '" value="' + esc(d) + '" autocomplete="off" maxlength="18" aria-label="' + esc(Pp.placeholder) + '"><button class="btn btn-secondary sm" style="width:auto;padding:0 14px;white-space:nowrap;flex:none" data-act="add-person">' + ic('plus') + Pp.add + '</button></div>' +
+      '<div class="t-foot" id="perr" style="margin:6px 2px 0;min-height:18px;color:var(--warn)">' + (S.draft.err || '') + '</div>' +
+      (n ? '<div class="group-label" style="margin-top:6px">' + Pp.atTable(n) + '</div><div class="card" style="overflow:hidden">' + rows + '</div>' :
+        '<div style="text-align:center;margin-top:18px"><div style="display:flex;justify-content:center">' + R.scenes.empty(290) + '</div><h2 class="t-title" style="font-size:22px;margin:10px 0 4px">' + Pp.emptyTitle + '</h2><p class="t-sub" style="margin:0 24px">' + Pp.emptyBody + '</p></div>') +
+      '</div><div class="footer bar"><button class="btn btn-primary' + (n ? '' : ' is-disabled') + '" data-act="people-continue">' + Pp.next + '</button></div></div>';
+  };
+
+  function chipsHTML() {
+    return '<div class="chips-wrap"><div class="group-label" style="margin:0 20px 6px;font-size:12px">' + T.asg.chips + '</div><div class="chips" data-scroll="chips">' + S.people.map(function (p) {
+      return '<button class="chip s' + p.slot + (S.paint === p.id ? ' on' : '') + '" data-act="paint" data-id="' + p.id + '" data-chip="' + p.id + '" aria-pressed="' + (S.paint === p.id) + '">' +
+        '<span class="chip-top">' + av(p) + '<b>' + esc(p.name) + '</b></span>' + amt('chip' + p.id, subtotalOf(p.id)) + '</button>';
+    }).join('') + '</div></div>';
+  }
+  function itemRowHTML(it) {
+    var A_ = T.asg, who = S.people.filter(function (p) { return it.who.indexOf(p.id) >= 0; });
+    var cls = 'irow', r2 = '', bar = '';
+    if (!who.length) {
+      cls += ' un' + (S.warn ? ' pulse' : '');
+      r2 = '<span class="pill warn">' + ic('warn') + A_.unassigned + '</span><span class="t-foot">' + A_.tapChoose + '</span>';
+    } else {
+      var sh = shareOf(it), vals = who.map(function (p) { return sh[p.id]; });
+      bar = '<i class="bar">' + who.map(function (p) { return '<s class="s' + p.slot + '"></s>'; }).join('') + '</i>';
+      if (who.length === 1) r2 = av(who[0]) + '<span class="t-sub" style="color:var(--ink)">' + esc(who[0].name) + '</span>';
+      else {
+        var same = vals.every(function (v) { return v === vals[0]; });
+        r2 = '<span class="av-stack">' + who.map(function (p) { return av(p); }).join('') + '</span><span class="t-foot" style="color:var(--ink2)">' + (same ? A_.equal(fmt(vals[0])) : A_.equalMix(vals.map(fmt).join(' · '))) + '</span>';
+      }
+    }
+    return '<div class="' + cls + '" role="button" tabindex="0" data-act="item" data-id="' + it.id + '" aria-label="' + esc(A_.aria(it.name, fmt(it.price), who.map(function (p) { return p.name; }).join(', '))) + '">' + bar +
+      '<div class="ir-main"><div class="ir-1"><span class="t-body ir-name">' + esc(it.name) + '</span>' + amt('it' + it.id, it.price) + '</div><div class="ir-2">' + r2 + '</div></div></div>';
+  }
+  function assignSheet(id) {
+    var A_ = T.asg, it = itemById(id); if (!it) return '';
+    var sh = shareOf(it), who = it.who.length, rows = S.people.map(function (p) {
+      var on = it.who.indexOf(p.id) >= 0;
+      return '<button class="prow' + (on ? ' on' : '') + ' s' + p.slot + '" data-act="toggle" data-id="' + it.id + '" data-pid="' + p.id + '" data-prow="' + p.id + '" role="checkbox" aria-checked="' + on + '"><span class="ck">' + (on ? ic('check') : '') + '</span>' + av(p, 'lg') + '<b class="t-head" style="flex:1">' + esc(p.name) + '</b>' + (on ? '<span class="t-amount num">' + fmt(sh[p.id]) + '</span>' : '<span class="t-foot">—</span>') + '</button>';
+    }).join('');
+    var vals = Object.keys(sh).map(function (k) { return sh[k]; }), extra = who > 1 && !vals.every(function (v) { return v === vals[0]; });
+    var note = !who ? A_.pickOne : who === 1 ? A_.all : A_.splitN(who);
+    if (extra) { var firsts = S.people.filter(function (p) { return sh[p.id] === Math.max.apply(null, vals); }).map(function (p) { return p.name; }); note = A_.extra(who, it.price % who, firsts); }
+    return '<div class="scrim" data-act="close"></div><div class="sheet' + (LAST.sheetOpen === 'assign' ? ' still' : '') + '" role="dialog" aria-label="' + esc(A_.sheetLabel(it.name)) + '"><div class="grab"></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h3>' + esc(it.name) + '</h3>' + amt('sh-price', it.price) + '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px"><span class="t-sub">' + A_.who + '</span><button class="link" style="min-height:36px;font-size:15px" data-act="everyone" data-id="' + it.id + '">' + (it.who.length === S.people.length ? A_.clear : A_.everyone) + '</button></div>' +
+      '<div class="prows">' + rows + '</div><div class="t-foot" style="margin:10px 2px 12px;min-height:34px">' + note + '</div><button class="btn btn-primary" data-act="close">' + A_.done + '</button></div>';
+  }
+  V.assign = function () {
+    var A_ = T.asg, n = S.items.length, left = unassigned(), done = n - left.length, all = !left.length;
+    var paintName = S.paint && person(S.paint) ? person(S.paint).name : null;
+    var footTxt = all ? '<span class="ok-t" style="display:flex;gap:6px;align-items:center;font-weight:600">' + ic('check') + A_.allDone(n) + '</span>' :
+      '<span style="color:var(--ink2)">' + A_.left(fmt(sum(left, function (i) { return i.price; })), left.length) + '</span>';
+    return '<div class="view">' + nav(A_.back, 'people', 4) +
+      '<div class="head" style="padding-bottom:10px"><div style="display:flex;align-items:baseline;justify-content:space-between"><h1 class="t-title">' + A_.title + '</h1><span class="t-sub num" style="color:' + (all ? 'var(--primary)' : 'var(--ink2)') + ';font-weight:600">' + A_.progress(done, n) + (all ? ' ✓' : '') + '</span></div>' +
+      '<div class="meter' + (all ? ' done' : '') + '" role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + done + '" aria-label="' + esc(A_.meter) + '" style="margin-top:10px"><i style="width:' + (n ? Math.round(done / n * 100) : 0) + '%"></i></div></div>' +
+      chipsHTML() +
+      (paintName ? '<div class="paintbar s' + person(S.paint).slot + '"><span>' + A_.paintBar(esc(paintName)) + '</span><button class="link" style="min-height:36px" data-act="paint" data-id="' + S.paint + '">' + A_.done + '</button></div>' : '') +
+      '<div class="scroll" data-scroll="assign" style="padding-top:8px;padding-bottom:12px">' +
+      (S.warn && left.length ? '<div class="banner warn" role="alert" style="margin-bottom:10px">' + '<span class="b-ico">' + ic('warn') + '</span><div><b>' + A_.warnTitle(left.length) + '</b><div class="t-foot">' + A_.warnBody(left.length) + '</div><button class="btn btn-secondary sm" data-act="split-rest" style="margin-top:10px;background:var(--surface)">' + A_.restEven + '</button></div></div>' : '') +
+      '<div class="ilist">' + S.items.map(itemRowHTML).join('') + '</div>' +
+      (S.paint ? '' : '<p class="t-foot" style="text-align:center;margin:14px 20px 0">' + A_.foot + '</p>') + '</div>' +
+      '<div class="footer bar"><div class="t-foot" style="display:flex;justify-content:center;font-size:14px">' + footTxt + '</div><button class="btn btn-primary" id="rsbtn" data-act="review-split">' + A_.btn(all ? 0 : left.length) + '</button></div></div>' +
+      (S.sheet && S.sheet.type === 'assign' ? assignSheet(S.sheet.id) : '');
+  };
+
+  V.totals = function () {
+    var X = T.tot, b = bill(), tip = tipCents(), svc = S.receipt.service || 0, conf = S.receipt.total + tip, un = unassigned(), iss = issues();
+    var ok = !un.length && b.total === conf, short = iss[0];
+    var banner;
+    if (un.length) banner = '<div class="banner warn" role="alert"><span class="b-ico">' + ic('warn') + '</span><div><b>' + X.notSettled + '</b><div class="t-foot">' + X.notSettledBody(un.length, fmt(sum(un, function (i) { return i.price; }))) + '</div></div></div>';
+    else if (!ok) banner = '<div class="banner warn" role="alert"><div class="rc-wrap">' + R.svg('worried', 64) + '</div><div><b>' + X.offTitle(fmt(Math.abs(b.total - conf))) + '</b><div class="t-foot" style="color:var(--ink)">' + X.offBody(short && short.kind === 'subtotal' ? fmt(short.items) : null, fmt(S.receipt.subtotal)) + X.offFix + '</div></div></div>';
+    else banner = '<div class="banner ok" style="align-items:center;padding:10px 14px"><span class="b-ico" style="margin:0">' + ic('check') + '</span><div style="flex:1"><b class="num">' + X.okTitle(fmt(b.total)) + '</b><div class="t-foot">' + X.okSub + '</div></div></div>';
+
+    var seg = [15, 18, 20].map(function (p) { return '<button data-act="tip" data-pct="' + p + '" aria-pressed="' + (S.tip.mode === 'pct' && S.tip.pct === p) + '">' + p + '%</button>'; }).join('') +
+      '<button data-act="tip" data-pct="custom" aria-pressed="' + (S.tip.mode === 'custom') + '">' + X.custom + '</button>';
+    var custom = S.tip.mode === 'custom' ? '<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><button class="mini" style="min-width:44px;font-size:22px" data-act="tipstep" data-d="-50" aria-label="' + X.tipDec + '">−</button><input class="input amt" id="ctip" inputmode="decimal" value="' + (tip / 100).toFixed(2) + '" aria-label="' + X.tipCustomAria + '"><button class="mini" style="min-width:44px;font-size:22px" data-act="tipstep" data-d="50" aria-label="' + X.tipInc + '">+</button></div>' : '';
+    var svcHint = svc ? '<div class="t-foot" style="margin-top:8px">' + (tip === 0 ? X.tipSvc(fmt(svc)) : X.tipSvcMore(fmt(svc))) + '</div>' : '';
+
+    var total = Math.max(1, b.total);
+    var bar = '<div class="sbar" role="img" aria-label="' + X.barAria + '">' + b.rows.map(function (r) {
+      var p = person(r.id), pc = r.total / total * 100;
+      return '<span class="s' + p.slot + '" style="width:' + pc + '%">' + (pc > 12 ? esc(p.name.charAt(0)) : '') + '</span>';
+    }).join('') + '</div><div class="legend">' + b.rows.map(function (r) { var p = person(r.id); return '<span class="s' + p.slot + '"><i></i>' + esc(p.name) + ' ' + Math.round(r.total / total * 100) + '%</span>'; }).join('') + '</div>';
+
+    var cards = b.rows.map(function (r) {
+      var p = person(r.id), open = S.expanded[p.id], adj = r.itemAdj.length + r.taxAdj + r.serviceAdj + r.tipAdj;
+      return '<div class="pcard s' + p.slot + (open ? ' open' : '') + '"><button class="pc-h" data-act="expand" data-id="' + p.id + '" aria-expanded="' + !!open + '"><div class="pc-top">' + av(p, 'lg') + '<b class="t-head" style="flex:1;font-size:19px">' + esc(p.name) + '</b>' + amt('pt' + p.id, r.total, 't-display') + '</div>' +
+        '<div class="t-foot pc-line">' + X.line(fmt(r.items), fmt(r.tax), svc ? fmt(r.service) : '', fmt(r.tip)) + '</div>' +
+        (adj ? '<div style="margin-top:6px"><span class="pill neutral">' + X.rounding(adj) + '</span></div>' : '') + '</button>' +
+        (open ? '<div class="pc-body">' + r.lines.map(function (l) { return '<div class="ln"><span>' + esc(l.item.name) + (l.of > 1 ? ' <i class="t-cap">1/' + l.of + '</i>' : '') + '</span><span class="num">' + fmt(l.cents) + '</span></div>'; }).join('') + '</div>' : '') + '</div>';
+    }).join('');
+
+    // rounding explainer
+    var notes = [];
+    S.items.forEach(function (it) { if (it.who.length > 1 && it.price % it.who.length) { var sh = shareOf(it), mx = Math.max.apply(null, Object.keys(sh).map(function (k) { return sh[k]; })); var ws = S.people.filter(function (p) { return sh[p.id] === mx; }).map(function (p) { return p.name; }); notes.push(X.roundItem(esc(it.name), fmt(it.price), it.who.length, it.price % it.who.length, ws.map(esc))); } });
+    var names = function (key) { return b.rows.filter(function (r) { return r[key]; }).map(function (r) { return esc(person(r.id).name); }); };
+    var tx = names('taxAdj'), sv = names('serviceAdj'), tp = names('tipAdj');
+    if (tx.length) notes.push(X.roundPool(X.poolTax, tx.length, tx));
+    if (sv.length) notes.push(X.roundPool(X.poolSvc, sv.length, sv));
+    if (tp.length) notes.push(X.roundPool(X.poolTip, tp.length, tp));
+    var round = notes.length ? '<div class="card round"><div class="rc-wrap">' + R.svg('thinking', 76, { coin: 1, label: X.roundCoin }) + '</div><div><b class="t-head" style="display:block">' + X.roundTitle + '</b><ul class="t-foot" style="margin:4px 0 0;padding-left:16px">' + notes.map(function (n) { return '<li>' + n + '</li>'; }).join('') + '</ul><div class="t-foot" style="margin-top:6px">' + X.roundRule + '</div></div></div>' : '';
+
+    return '<div class="view">' + nav(X.back, 'assign', 5) + '<div class="head" style="padding-bottom:8px"><h1 class="t-title">' + X.title + '</h1></div>' +
+      '<div class="scroll" data-scroll="totals" style="padding-bottom:12px">' + banner +
+      '<div class="group-label">' + X.tipLabel(fmt(S.receipt.subtotal)) + '</div><div class="segm" role="group" aria-label="' + X.tipAria + '">' + seg + '</div>' + custom + svcHint +
+      '<div class="card sum"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px"><div><div class="t-cap">' + X.billTotal + '</div>' + amt('bt', conf, 't-display') + '</div></div>' +
+      '<div class="sum3" style="grid-template-columns:repeat(' + (svc ? 4 : 3) + ',1fr)"><div><span class="t-cap">' + X.subtotal + '</span>' + amt('ss', S.receipt.subtotal) + '</div><div><span class="t-cap">' + X.tax + '</span>' + amt('stx', S.receipt.tax) + '</div>' + (svc ? '<div><span class="t-cap">' + X.service + '</span>' + amt('ssv', svc) + '</div>' : '') + '<div><span class="t-cap">' + X.tip + '</span>' + amt('stp', tip) + '</div></div></div>' +
+      '<div class="group-label">' + X.whoOwes + '</div>' + bar + '<div class="cards">' + cards + '</div>' + round + '</div>' +
+      '<div class="footer bar"><button class="btn btn-primary' + (ok ? '' : ' is-disabled') + '" data-act="share">' + ic('share') + X.share + '</button>' +
+      (ok ? '' : '<div class="t-foot" style="text-align:center;color:var(--warn)">' + X.blocked + '</div>') +
+      '<div style="display:flex;gap:8px"><button class="btn-quiet" style="flex:1" data-act="go" data-to="assign">' + X.editAsg + '</button><button class="btn-quiet" style="flex:1" data-act="go" data-to="review">' + X.editReceipt + '</button></div></div></div>' +
+      (S.sheet && S.sheet.type === 'share' ? shareSheet(b) : '') + (S.sheet && S.sheet.type === 'success' ? successView(b) : '');
+  };
+  function shareSheet(b) {
+    var Sh = T.share, t = [['Messages', '#34C759', 'M5 6h14v9H10l-4 3.5V15H5z'], ['Mail', '#3B82F6', 'M4 7h16v10H4zM4 8l8 6 8-6'], ['Notes', '#F5C451', 'M6 4h12v16H6zM9 9h6M9 13h6'], ['Copy', '#8C96A1', 'M8 8h10v11H8zM6 16V5h10']];
+    return '<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-label="' + esc(Sh.docTitle(T.merchant)) + '"><div class="grab"></div>' +
+      '<div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><span class="doc">' + ic('doc') + '</span><div><b class="t-head" style="display:block">' + esc(Sh.docTitle(T.merchant)) + '</b><span class="t-foot">' + Sh.docSub(S.people.length) + '</span></div></div>' +
+      '<pre class="sumtxt">' + esc(summaryText(b)) + '</pre>' +
+      '<div class="apps">' + t.map(function (a) { return '<button data-act="shared" data-app="' + a[0] + '"><span style="background:' + a[1] + '"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + a[2] + '"/></svg></span>' + Sh.apps[a[0]] + '</button>'; }).join('') + '</div>' +
+      '<div class="t-foot" style="text-align:center;margin:10px 0 2px">' + Sh.native + '</div><button class="btn-quiet" style="width:100%" data-act="close">' + Sh.cancel + '</button></div>';
+  }
+  function successView(b) {
+    var O = T.ok;
+    return '<div class="success fadein"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:0 24px">' + R.scenes.success(290) +
+      '<h1 class="t-title" style="margin:6px 0 0">' + O.title + '</h1><p class="t-sub" style="margin:0 0 18px">' + O.body(S.people.length, fmt(b.total)) + '</p>' +
+      '<button class="btn btn-primary" data-act="new-bill">' + O.again + '</button><button class="btn-quiet" data-act="close">' + O.back + '</button></div></div>';
+  }
+
+  /* ------------------------------------------------------------ sheets that do not belong to one screen */
+  function globalSheet() {
+    var s = S.sheet; if (!s) return '';
+    var Sh = T.sheet;
+    if (s.type === 'how') return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><h3>' + T.how.title + '</h3><ol class="how">' +
+      T.how.steps.map(function (st) { return '<li><b>' + st[0] + '</b><span>' + st[1] + '</span></li>'; }).join('') + '</ol><button class="btn btn-primary" data-act="close">' + T.how.ok + '</button></div>';
+    if (s.type === 'edit-item') {
+      var it = itemById(s.id), isNew = !!s.isNew; if (!it) return '';
+      var d = S.draft.item || (S.draft.item = { name: it.name, price: (it.price / 100).toFixed(2) });
+      return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><h3>' + (isNew ? Sh.newItem : Sh.editItem) + '</h3>' +
+        (it.flag ? '<div class="banner warn" style="margin:10px 0"><span class="b-ico">' + ic('warn') + '</span><div class="t-foot" style="color:var(--ink)">' + Sh.flagNote(fmt(it.price)) + '</div></div>' : '') +
+        '<div class="field" style="margin-top:12px"><label for="e-name">' + Sh.desc + '</label><input class="input" id="e-name" data-bind="item.name" value="' + esc(d.name) + '" placeholder="' + esc(Sh.descPh) + '" autocomplete="off"></div>' +
+        '<div class="field" style="margin-top:12px"><label for="e-price">' + Sh.price + '</label><input class="input amt" id="e-price" data-bind="item.price" inputmode="decimal" value="' + esc(d.price) + '" placeholder="0.00"></div>' +
+        '<div class="t-foot warn-t" id="e-err" style="min-height:20px;margin-top:6px"></div><button class="btn btn-primary" data-act="save-item" data-id="' + it.id + '">' + Sh.save + '</button>' +
+        '<div style="display:flex;gap:8px;margin-top:4px"><button class="btn-quiet warn-t" style="flex:1" data-act="delete-item" data-id="' + it.id + '">' + Sh.del + '</button><button class="btn-quiet" style="flex:1" data-act="close">' + Sh.cancel + '</button></div></div>';
+    }
+    if (s.type === 'edit-field') {
+      var lab = { subtotal: T.rev.subtotal, tax: T.rev.tax, service: T.rev.service, total: Sh.receiptTotal }[s.field], dd = S.draft.field || (S.draft.field = { v: (S.receipt[s.field] / 100).toFixed(2) });
+      return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><h3>' + lab + '</h3><p class="t-sub" style="margin:4px 0 12px">' + Sh.typeIt + '</p>' +
+        '<div class="field"><label for="e-field">' + Sh.amount + '</label><input class="input amt" id="e-field" data-bind="field.v" inputmode="decimal" value="' + esc(dd.v) + '"></div><div class="t-foot warn-t" id="e-err" style="min-height:20px;margin-top:6px"></div>' +
+        '<button class="btn btn-primary" data-act="save-field" data-field="' + s.field + '">' + Sh.save + '</button><button class="btn-quiet" style="width:100%" data-act="close">' + Sh.cancel + '</button></div>';
+    }
+    if (s.type === 'rename') {
+      var p = person(s.id), dr = S.draft.rename || (S.draft.rename = { v: p.name });
+      return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><h3>' + Sh.rename + '</h3><div class="field" style="margin-top:12px"><label for="e-rn">' + Sh.name + '</label><input class="input" id="e-rn" data-bind="rename.v" value="' + esc(dr.v) + '" maxlength="18"></div><div style="height:12px"></div>' +
+        '<button class="btn btn-primary" data-act="save-rename" data-id="' + p.id + '">' + Sh.save + '</button><button class="btn-quiet" style="width:100%" data-act="close">' + Sh.cancel + '</button></div>';
+    }
+    if (s.type === 'remove') {
+      var q = person(s.id), had = S.items.filter(function (i) { return i.who.indexOf(q.id) >= 0; }), orphan = had.filter(function (i) { return i.who.length === 1; });
+      return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><h3>' + esc(T.ppl.removeTitle(q.name)) + '</h3>' +
+        '<p class="t-sub" style="margin:8px 0 16px;color:var(--ink)">' + esc(T.ppl.removeBody(q.name, had.length, orphan.map(function (i) { return i.name; }), had.length - orphan.length > 0)) + '</p>' +
+        '<div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:2" data-act="close">' + esc(T.ppl.keep(q.name)) + '</button><button class="btn btn-warn" style="flex:1" data-act="confirm-remove" data-id="' + q.id + '">' + T.ppl.remove + '</button></div></div>';
+    }
+    if (s.type === 'continue-bad') {
+      var i0 = issues()[0];
+      return '<div class="scrim" data-act="close"></div><div class="sheet"><div class="grab"></div><div style="display:flex;gap:10px;align-items:center">' + R.svg('worried', 64) + '<h3>' + T.rev.badTitle + '</h3></div>' +
+        '<p class="t-sub" style="margin:10px 0 16px;color:var(--ink)">' + T.rev.badBody(fmt(Math.abs(i0.diff))) + '</p>' +
+        '<div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:2" data-act="close">' + T.rev.fixIt + '</button><button class="btn btn-secondary" style="flex:1" data-act="continue-anyway">' + T.rev.keepGoing + '</button></div></div>';
+    }
+    return '';
+  }
+
+  /* ------------------------------------------------------------ render */
+  var appEl, fxEl, timers = {};
+  function render() {
+    var scrolls = {}; appEl.querySelectorAll('[data-scroll]').forEach(function (e) { scrolls[e.dataset.scroll] = [e.scrollTop, e.scrollLeft]; });
+    var html = V[S.screen]();
+    if (S.sheet && S.sheet.type !== 'assign' && S.sheet.type !== 'share' && S.sheet.type !== 'success') html += globalSheet();
+    if (S.toast) html += '<div class="toast" role="status">' + esc(S.toast) + '</div>';
+    appEl.innerHTML = html;
+    appEl.classList.toggle('dark-chrome', S.screen === 'capture' && S.cap !== 'denied');
+    document.querySelector('.screen').classList.toggle('dark-chrome', S.screen === 'capture' && S.cap !== 'denied');
+    appEl.querySelectorAll('[data-scroll]').forEach(function (e) { var s = scrolls[e.dataset.scroll]; if (s) { e.scrollTop = s[0]; e.scrollLeft = s[1]; } });
+    tweenAmts();
+    LAST.sheetOpen = S.sheet && S.sheet.type;
+    LAST.screen = S.screen;
+    schedule();
+    var tt = document.getElementById('ttl'); if (tt) tt.textContent = TITLES[S.screen] || '';
+  }
+  var TITLES = T.titles;
+  var prevAmt = {};
+  function tweenAmts() {
+    appEl.querySelectorAll('[data-amt]').forEach(function (el) {
+      var k = S.screen + ':' + el.dataset.key, v = +el.dataset.v, p = prevAmt[k]; prevAmt[k] = v;
+      if (p === undefined || p === v || reduced()) return;
+      var t0 = performance.now(), dur = 380; el.classList.add('pop');
+      (function step(t) { var x = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - x, 3); el.textContent = fmt(Math.round(p + (v - p) * e)); if (x < 1) requestAnimationFrame(step); else el.classList.remove('pop'); })(t0);
+    });
+  }
+  function fly(fromEl, toEl, text) {
+    if (reduced() || !fromEl || !toEl) return;
+    var sr = document.querySelector('.screen').getBoundingClientRect(), a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect(), k = sr.width / 390;
+    var el = document.createElement('div'); el.className = 'fly'; el.textContent = text; fxEl.appendChild(el);
+    var x0 = (a.left + a.width / 2 - sr.left) / k, y0 = (a.top + a.height / 2 - sr.top) / k, x1 = (b.left + b.width / 2 - sr.left) / k, y1 = (b.top + b.height / 2 - sr.top) / k;
+    el.style.left = x0 + 'px'; el.style.top = y0 + 'px';
+    el.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: 'translate(calc(-50% + ' + (x1 - x0) + 'px),calc(-50% + ' + (y1 - y0) + 'px)) scale(.7)', opacity: .1 }], { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = function () { el.remove(); };
+  }
+  function haptic(kind) {
+    var h = document.getElementById('haptic'); if (!h) return; h.textContent = '((•)) ' + T.hapticWord + ': ' + (T.haptic[kind] || kind); h.classList.add('on'); clearTimeout(timers.h); timers.h = setTimeout(function () { h.classList.remove('on'); }, 1400);
+  }
+  function toast(m) { S.toast = m; render(); clearTimeout(timers.t); timers.t = setTimeout(function () { S.toast = null; render(); }, 2400); }
+  function go(to) {
+    S.screen = to; S.sheet = null; S.warn = false; S.paint = null; S.toast = null; S.draft = {};
+    if (to === 'capture' && S.cap !== 'denied') S.cap = 'live';
+    if (to === 'processing') { S.proc.showManual = false; if (!START.failed) S.proc.failed = false; }
+    render(); var sc = appEl.querySelector('.scroll'); if (sc) sc.scrollTop = 0;
+  }
+
+  /* scheduled behaviour for the processing screen */
+  function schedule() {
+    clearTimeout(timers.p1); clearTimeout(timers.p2); clearTimeout(timers.p3); clearInterval(timers.pm);
+    if (S.screen !== 'processing' || S.proc.failed) return;
+    var msgs = T.proc.msgs, i = 0;
+    timers.pm = setInterval(function () { var e = document.getElementById('pmsg'); if (!e) return; i = (i + 1) % msgs.length; e.textContent = msgs[i]; }, 1700);
+    if (!S.proc.showManual) timers.p2 = setTimeout(function () { if (S.screen === 'processing') { S.proc.showManual = true; render(); } }, 8000);
+    if (S.fromFlow) timers.p3 = setTimeout(function () { if (S.screen === 'processing') { S.fromFlow = false; go('review'); } }, 4800);
+  }
+
+  /* ------------------------------------------------------------ actions */
+  function assignToggle(id, pid, withFly) {
+    var it = itemById(id), idx = it.who.indexOf(pid);
+    if (idx >= 0) it.who.splice(idx, 1); else it.who.push(pid);
+    haptic('selection tick');
+    if (S.warn && !unassigned().length) S.warn = false;
+    render();
+    revealChip(pid);
+    if (withFly && idx < 0) { var sh = shareOf(it); fly(appEl.querySelector('[data-prow="' + pid + '"]') || appEl.querySelector('[data-id="' + id + '"]'), appEl.querySelector('[data-chip="' + pid + '"]'), '+' + fmt(sh[pid])); }
+  }
+  function revealChip(pid) { // keep the changing subtotal on screen
+    var c = appEl.querySelector('[data-chip="' + pid + '"]'); if (!c) return;
+    var box = c.parentElement, l = c.offsetLeft, r = l + c.offsetWidth;
+    if (r > box.scrollLeft + box.clientWidth - 8) box.scrollLeft = r - box.clientWidth + 24;
+    else if (l < box.scrollLeft + 8) box.scrollLeft = Math.max(0, l - 16);
+  }
+  var A = {
+    go: function (d) { go(d.to); },
+    toast: function (d) { toast(d.msg); },
+    'start-scan': function () { S.fromFlow = true; S.cap = 'live'; go('capture'); },
+    'start-photo': function () { S.fromFlow = true; S.cap = 'captured'; go('capture'); S.cap = 'captured'; render(); },
+    shutter: function () { var f = document.getElementById('flash'); if (f && !reduced()) f.classList.add('go'); setTimeout(function () { S.cap = 'captured'; render(); }, reduced() ? 0 : 160); },
+    retake: function () { S.cap = 'live'; render(); },
+    'use-photo': function () { S.proc.failed = !!START.failed && START.screen === 'processing'; go('processing'); },
+    retry: function () { S.proc.failed = false; S.fromFlow = true; go('processing'); },
+    manual: function () { S.items = []; S.receipt = { subtotal: 0, tax: 0, total: 0 }; go('review'); },
+    thumb: function () { S.thumb = !S.thumb; render(); },
+    'add-item': function () { var id = ++S.nextId; S.items.push({ id: id, name: '', price: 0, flag: null, who: [] }); S.draft = {}; S.sheet = { type: 'edit-item', id: id, isNew: true }; render(); },
+    'review-continue': function () { if (!S.items.length) return toast(T.rev.needOne); if (issues().length) { haptic('warning'); S.sheet = { type: 'continue-bad' }; render(); } else go('people'); },
+    'continue-anyway': function () { go('people'); },
+    sheet: function (d) { S.draft = {}; S.sheet = { type: d.type, id: d.id ? (isNaN(+d.id) ? d.id : +d.id) : null, field: d.field }; render(); },
+    close: function () { S.sheet = null; S.draft = {}; render(); },
+    'save-item': function (d) {
+      var it = itemById(+d.id), dr = S.draft.item || {}, c = parseCents(dr.price), name = (dr.name || '').trim();
+      if (!name || c === null) { var e = document.getElementById('e-err'); if (e) e.textContent = !name ? T.sheet.errName : T.sheet.errPrice; return; }
+      it.name = name; it.price = c; it.flag = null; S.sheet = null; S.draft = {}; render();
+    },
+    'delete-item': function (d) { S.items = S.items.filter(function (i) { return i.id !== +d.id; }); S.sheet = null; render(); },
+    'save-field': function (d) { var c = parseCents((S.draft.field || {}).v); if (c === null) { var e = document.getElementById('e-err'); if (e) e.textContent = T.sheet.errAmt; return; } S.receipt[d.field] = c; S.sheet = null; S.draft = {}; render(); },
+    'add-person': function () {
+      var inp = document.getElementById('pname'), v = (inp.value || '').trim();
+      if (!v) { S.draft.err = T.ppl.errName; render(); return; }
+      if (S.people.some(function (p) { return p.name.toLowerCase() === v.toLowerCase(); })) { S.draft.err = T.ppl.errDup(v); S.draft.person = v; render(); return; }
+      var used = S.people.map(function (p) { return p.slot; }), slot = 1; while (used.indexOf(slot) >= 0 && slot <= 8) slot++;
+      if (slot > 8) slot = (S.people.length % 8) + 1;
+      S.people.push({ id: 'p' + (++S.nextPerson), name: v, slot: slot }); S.draft = {}; haptic('selection tick'); render(); var n = document.getElementById('pname'); if (n) n.focus();
+    },
+    'remove-person': function (d) {
+      var had = S.items.some(function (i) { return i.who.indexOf(d.id) >= 0; });
+      if (had) { S.sheet = { type: 'remove', id: d.id }; haptic('warning'); render(); } else { S.people = S.people.filter(function (p) { return p.id !== d.id; }); render(); }
+    },
+    'confirm-remove': function (d) { S.people = S.people.filter(function (p) { return p.id !== d.id; }); S.items.forEach(function (i) { i.who = i.who.filter(function (w) { return w !== d.id; }); }); S.sheet = null; render(); },
+    'save-rename': function (d) { var v = ((S.draft.rename || {}).v || '').trim(); if (v) person(d.id).name = v; S.sheet = null; S.draft = {}; render(); },
+    'people-continue': function () { if (!S.people.length) { haptic('warning'); return toast(T.ppl.needOne); } go('assign'); },
+    item: function (d) {
+      var id = +d.id;
+      if (S.paint) { assignToggle(id, S.paint, false); var it = itemById(id); if (it.who.indexOf(S.paint) >= 0) fly(appEl.querySelector('[data-id="' + id + '"]'), appEl.querySelector('[data-chip="' + S.paint + '"]'), '+' + fmt(shareOf(it)[S.paint])); return; }
+      S.sheet = { type: 'assign', id: id }; LAST.sheetOpen = null; render();
+    },
+    toggle: function (d) { assignToggle(+d.id, d.pid, true); },
+    everyone: function (d) { var it = itemById(+d.id); it.who = it.who.length === S.people.length ? [] : S.people.map(function (p) { return p.id; }); haptic('selection tick'); if (S.warn && !unassigned().length) S.warn = false; render(); },
+    paint: function (d) { S.paint = S.paint === d.id ? null : d.id; S.sheet = null; render(); if (S.paint) revealChip(S.paint); },
+    'review-split': function () {
+      var left = unassigned();
+      if (left.length) { S.warn = true; S.paint = null; haptic('warning'); render(); var b = document.getElementById('rsbtn'); if (b && !reduced()) b.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(0)' }], { duration: 320 });
+        var u = appEl.querySelector('.irow.un'); if (u) u.scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' }); }
+      else { haptic('success'); go('totals'); }
+    },
+    tip: function (d) { if (d.pct === 'custom') S.tip = { mode: 'custom', cents: tipCents() }; else S.tip = { mode: 'pct', pct: +d.pct }; render(); },
+    tipstep: function (d) { S.tip = { mode: 'custom', cents: Math.max(0, tipCents() + (+d.d)) }; render(); },
+    expand: function (d) { S.expanded[d.id] = !S.expanded[d.id]; render(); },
+    share: function () { var un = unassigned().length, ok = !un && bill().total === S.receipt.total + tipCents(); if (!ok) { haptic('warning'); return toast(T.tot.blockedToast); } S.sheet = { type: 'share' }; render(); },
+    shared: function () { S.sheet = { type: 'success' }; haptic('success'); render(); },
+    'split-rest': function () { S.items.forEach(function (i) { if (!i.who.length) i.who = S.people.map(function (p) { return p.id; }); }); S.warn = false; haptic('selection tick'); render(); },
+    'new-bill': function () { var d = dataset('scanned'); S.items = d.items; S.people = []; S.receipt = d.receipt; S.tip = d.tip; S.fromFlow = false; go('home'); }
+  };
+
+  /* ------------------------------------------------------------ boot */
+  function boot() {
+    var screenEl = document.querySelector('.screen');
+    appEl = document.getElementById('app'); fxEl = document.getElementById('fx');
+    screenEl.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-act]'); if (!t || !screenEl.contains(t)) return;
+      if (t.classList.contains('is-disabled') && !/review-continue|people-continue|share/.test(t.dataset.act)) return;
+      var f = A[t.dataset.act]; if (f) f(t.dataset);
+    });
+    screenEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && e.target.id === 'pname') { A['add-person'](); return; }
+      if (e.key === 'Enter' && e.target.id === 'ctip') { e.target.blur(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-act]')) { e.preventDefault(); e.target.click(); }
+    });
+    screenEl.addEventListener('input', function (e) {
+      var t = e.target; if (t.id === 'pname') { S.draft.person = t.value; S.draft.err = ''; var pe = document.getElementById('perr'); if (pe) pe.textContent = ''; return; }
+      if (t.dataset.bind) { var k = t.dataset.bind.split('.'); (S.draft[k[0]] = S.draft[k[0]] || {})[k[1]] = t.value; }
+    });
+    screenEl.addEventListener('change', function (e) { if (e.target.id === 'ctip') { var c = parseCents(e.target.value); if (c !== null) { S.tip = { mode: 'custom', cents: c }; render(); } } });
+    render();
+    chrome();
+  }
+
+  /* ------------------------------------------------------------ page chrome: toolbar, theme, fit */
+  function setTheme(t) {
+    root.dataset.theme = t;
+    try { localStorage.setItem('esp-theme', t); } catch (e) {}
+    document.querySelectorAll('[data-theme-btn]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.themeBtn === t); });
+  }
+  function applyData(name) {
+    var d = dataset(name); S.data = name; S.items = d.items; S.people = d.people; S.receipt = d.receipt; S.sheet = null; S.warn = false; S.paint = null; S.tip = d.tip;
+    document.querySelectorAll('[data-data-btn]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.dataBtn === name); });
+    render();
+  }
+  function chrome() {
+    var stored = null; try { stored = localStorage.getItem('esp-theme'); } catch (e) {}
+    var t = qs.get('theme') || stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(t);
+    if (qs.get('reduce') === '1') root.dataset.reduce = '1';
+    window.addEventListener('message', function (e) { var m = e.data; if (m && m.esp === 'theme') setTheme(m.v); if (m && m.esp === 'reduce') root.dataset.reduce = m.v ? '1' : '0'; });
+    var tb = document.getElementById('toolbar');
+    if (EMBED) { document.body.classList.add('embed'); if (tb) tb.remove(); return; }
+    var q = location.search.replace(/^\?/, '');
+    var Tb = T.tb, here = decodeURIComponent((location.pathname.split('/').pop() || 'index.html'));
+    tb.innerHTML = '<a href="index.html" id="back-index">' + Tb.all + '</a><span class="ttl" id="ttl"></span>' +
+      '<span><span class="tb-label">' + Tb.mode + '</span><span class="seg"><button data-theme-btn="light">' + Tb.light + '</button><button data-theme-btn="dark">' + Tb.dark + '</button></span></span>' +
+      '<span><span class="tb-label">' + Tb.demo + '</span><span class="seg"><button data-data-btn="scanned" title="' + esc(Tb.scanTip) + '">' + Tb.scan + '</button><button data-data-btn="midway" title="' + esc(Tb.midTip) + '">' + Tb.mid + '</button><button data-data-btn="complete" title="' + esc(Tb.completeTip) + '">' + Tb.complete + '</button><button data-data-btn="service" title="' + esc(Tb.serviceTip) + '">' + Tb.service + '</button></span></span>' +
+      '<label style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="rm"> ' + Tb.reduce + '</label><span class="haptic" id="haptic"></span>' +
+      '<span><span class="tb-label">' + Tb.lang + '</span><span class="seg"><button aria-pressed="true" disabled>' + T.thisLabel + '</button><a class="langsw" id="lang-sw" href="../' + T.other + '/' + here + '">' + T.otherLabel + '</a></span></span>';
+    tb.querySelectorAll('[data-theme-btn]').forEach(function (b) { b.onclick = function () { setTheme(b.dataset.themeBtn); }; b.setAttribute('aria-pressed', b.dataset.themeBtn === root.dataset.theme); });
+    tb.querySelectorAll('[data-data-btn]').forEach(function (b) { b.onclick = function () { applyData(b.dataset.dataBtn); }; b.setAttribute('aria-pressed', b.dataset.dataBtn === S.data); });
+    document.getElementById('rm').onchange = function (e) { root.dataset.reduce = e.target.checked ? '1' : '0'; };
+    document.getElementById('back-index').addEventListener('click', function (e) { e.currentTarget.href = 'index.html?theme=' + root.dataset.theme; });
+    document.getElementById('lang-sw').addEventListener('click', function (e) { e.currentTarget.href = '../' + T.other + '/' + here + '?theme=' + root.dataset.theme; });
+    var tt = document.getElementById('ttl'); tt.textContent = TITLES[S.screen] || '';
+    fit();
+    window.addEventListener('resize', fit);
+  }
+  function fit() {
+    var f = document.getElementById('fit'), tb = document.getElementById('toolbar'); if (!f) return;
+    var availH = innerHeight - (tb ? tb.offsetHeight : 0) - 16, availW = innerWidth - 16;
+    var s = Math.min(1, availH / 868, availW / 414); f.style.transform = 'scale(' + s + ')'; f.parentElement.style.height = (868 * s) + 'px';
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+
+</script>
+</body>
+</html>

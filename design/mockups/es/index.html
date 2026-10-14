@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="es-PR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Esplitéalo · diseños de pantallas</title>
+<link rel="icon" href="data:,">
+<style>
+/* Esplitéalo HTML mockups — tokens from docs/DESIGN_GUIDE.md */
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:400;font-display:swap;src:url(../_src/fonts/Unkempt-Regular-latin.woff2) format("woff2")}
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:700;font-display:swap;src:url(../_src/fonts/Unkempt-Bold-latin.woff2) format("woff2")}
+:root{
+  --paper:#FBF7EF; --surface:#FFFFFF; --well:#F1EADB; --ink:#1E2933; --ink2:#5B6670;
+  --line:#DDD3BE; --primary:#1F7A5A; --primary-lip:#145A42; --on-primary:#FFFFFF;
+  --accent:#F2B84B; --warn:#C23A1D; --warn-bg:#FBEAE4; --ok-bg:#E3F1EA;
+  --scrim:rgba(20,24,28,.46); --shadow:0 1px 2px rgba(30,41,51,.08),0 6px 18px rgba(30,41,51,.07);
+  --p1:#2F6FA8; --p2:#A85A14; --p3:#7A4FB5; --p4:#1B7F72; --p5:#C23D7B; --p6:#58781C; --p7:#8A6D00; --p8:#5B6B80;
+  --on-p:#FFFFFF;
+  --page:#E8E2D4; --page-ink:#1E2933; --page-ink2:#5B6670; --page-card:#F6F2E8;
+  --f-text:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro",system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --f-round:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,sans-serif;
+  --f-title:"Unkempt","Marker Felt","Chalkboard SE",ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,sans-serif;
+  --f-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+:root[data-theme="dark"]{
+  --paper:#14181C; --surface:#1E252B; --well:#28313A; --ink:#F2EEE6; --ink2:#A5AEB6;
+  --line:#36414B; --primary:#4CC59A; --primary-lip:#2E9C77; --on-primary:#0E1F18;
+  --accent:#F5C766; --warn:#FF8466; --warn-bg:#3A2420; --ok-bg:#1B3029;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.28);
+  --p1:#6FA8DC; --p2:#E39B52; --p3:#B79AE0; --p4:#55C2B2; --p5:#E67FB0; --p6:#A5C55A; --p7:#E8C85A; --p8:#9AA8BA;
+  --on-p:#14181C;
+  --page:#0B0D10; --page-ink:#F2EEE6; --page-ink2:#A5AEB6; --page-card:#171C21;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--page);color:var(--page-ink);font-family:var(--f-text);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+input{font:inherit;color:inherit}
+
+/* ---------- page chrome (outside the phone) ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:center;padding:12px 16px;font-size:14px;color:var(--page-ink2)}
+.toolbar a{color:var(--page-ink);text-decoration:none;font-weight:600}
+.toolbar a:hover{text-decoration:underline}
+.toolbar .ttl{color:var(--page-ink);font-weight:600}
+.seg{display:inline-flex;background:var(--page-card);border:1px solid var(--line);border-radius:10px;padding:2px}
+.seg button{padding:5px 11px;border-radius:8px;font-size:13px;font-weight:600;color:var(--page-ink2)}
+.seg button[aria-pressed="true"]{background:var(--page-ink);color:var(--page)}
+.tb-label{font-size:12px;margin-right:6px}
+.haptic{min-width:170px;font-family:var(--f-mono);font-size:12px;opacity:0;transition:opacity .2s;color:var(--page-ink)}
+.haptic.on{opacity:1}
+.stage{display:flex;justify-content:center;padding:4px 0 28px}
+.fit{transform-origin:top center}
+
+/* ---------- device ---------- */
+.device{width:414px;height:868px;padding:12px;border-radius:66px;background:#0B0C0E;box-shadow:0 0 0 2px #2b2e33,0 24px 60px rgba(0,0,0,.35);position:relative}
+.screen{width:390px;height:844px;border-radius:54px;overflow:hidden;position:relative;background:var(--paper);color:var(--ink);font-size:17px;line-height:1.3;isolation:isolate}
+.island{position:absolute;top:11px;left:50%;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000;z-index:60}
+.status{position:absolute;top:0;left:0;right:0;height:54px;padding:18px 34px 0 40px;display:flex;justify-content:space-between;align-items:flex-start;font-weight:600;font-size:16px;z-index:50;pointer-events:none;font-family:var(--f-text)}
+.status svg{display:block;fill:currentColor}
+.status .ic{display:flex;gap:6px;align-items:center;margin-top:3px}
+.home-ind{position:absolute;bottom:8px;left:50%;width:138px;height:5px;margin-left:-69px;border-radius:3px;background:var(--ink);opacity:.85;z-index:55;pointer-events:none}
+.dark-chrome .status,.dark-chrome .home-ind{color:#fff}
+.dark-chrome .home-ind{background:#fff}
+
+.view{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:54px}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 16px 24px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.footer{padding:12px 16px 34px;background:linear-gradient(to top,var(--paper) 78%,transparent);position:relative;z-index:3;display:flex;flex-direction:column;gap:8px}
+.footer.bar{background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -6px 16px rgba(0,0,0,.04)}
+
+/* ---------- type ---------- */
+.t-display{font:600 40px/1.05 var(--f-round);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.t-title{font:400 26px/1.2 var(--f-title);letter-spacing:.01em}
+.wordmark{font:700 24px/1 var(--f-title);letter-spacing:.02em;text-transform:uppercase;font-synthesis:none}
+.t-amount{font:500 22px/1.15 var(--f-round);font-variant-numeric:tabular-nums}
+.t-head{font-weight:600;font-size:17px}
+.t-body{font-size:17px}
+.t-sub{font-size:15px;color:var(--ink2)}
+.t-foot{font-size:13px;color:var(--ink2);line-height:1.35}
+.t-cap{font-size:12px;font-weight:500;color:var(--ink2)}
+.num{font-variant-numeric:tabular-nums}
+.warn-t{color:var(--warn)}
+.ok-t{color:var(--primary)}
+
+/* ---------- nav ---------- */
+.nav{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 6px 0 4px;flex:none}
+.back{display:flex;align-items:center;gap:2px;min-height:44px;min-width:44px;padding:0 8px;color:var(--primary);font-size:17px}
+.back svg{width:12px;height:20px}
+.step{font-size:13px;color:var(--ink2);padding-right:10px}
+.head{padding:2px 16px 12px;flex:none}
+.head .t-title{margin:0}
+.head .t-sub{margin-top:4px}
+
+/* ---------- buttons ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border-radius:16px;font-size:17px;font-weight:600;text-align:center;transition:transform .1s,filter .1s}
+.btn:active{transform:scale(.97);filter:brightness(.8)}
+.btn-primary{background:var(--primary);color:var(--on-primary);border-bottom:3px solid var(--primary-lip);box-shadow:0 2px 0 rgba(0,0,0,.06)}
+.btn-secondary{background:var(--surface);color:var(--primary);border:1.5px solid var(--primary);min-height:52px}
+.btn-quiet{min-height:44px;color:var(--primary);font-weight:600;font-size:17px}
+.btn-warn{background:var(--surface);color:var(--warn);border:1.5px solid var(--warn);min-height:52px}
+.btn[disabled],.btn.is-disabled{background:var(--well);color:var(--ink2);border:1.5px dashed var(--line);box-shadow:none;cursor:not-allowed}
+.btn.is-disabled:active{transform:none;filter:none}
+.btn svg{width:22px;height:22px;flex:none}
+.btn.sm{min-height:44px;font-size:15px;border-radius:12px}
+.link{color:var(--primary);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
+
+/* ---------- cards, chips, avatars ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.well{background:var(--well);border-radius:16px}
+.av{width:28px;height:28px;border-radius:50%;flex:none;display:inline-flex;align-items:center;justify-content:center;font:600 14px/1 var(--f-text);color:var(--on-p);background:var(--pc,var(--p8))}
+.av.lg{width:40px;height:40px;font-size:18px}
+.av.xl{width:48px;height:48px;font-size:20px}
+.av.ring{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--pc);background-clip:padding-box}
+.av.dotted{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--pc);outline:2px dotted var(--pc);outline-offset:3px}
+.s1{--pc:var(--p1)}.s2{--pc:var(--p2)}.s3{--pc:var(--p3)}.s4{--pc:var(--p4)}.s5{--pc:var(--p5)}.s6{--pc:var(--p6)}.s7{--pc:var(--p7)}.s8{--pc:var(--p8)}
+.av-stack{display:inline-flex}
+.av-stack .av{margin-left:-6px;box-shadow:0 0 0 2px var(--surface)}
+.av-stack .av:first-child{margin-left:0}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;line-height:1.3}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.ok{background:var(--ok-bg);color:var(--primary)}
+.pill.neutral{background:var(--well);color:var(--ink2)}
+.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- banners ---------- */
+.banner{display:flex;gap:12px;align-items:flex-start;border-radius:16px;padding:12px 14px;border:1.5px solid}
+.banner.warn{background:var(--warn-bg);border-color:var(--warn);color:var(--ink)}
+.banner.ok{background:var(--ok-bg);border-color:var(--primary);color:var(--ink)}
+.banner .b-ico{flex:none;width:24px;height:24px;margin-top:1px}
+.banner.warn .b-ico{color:var(--warn)} .banner.ok .b-ico{color:var(--primary)}
+.banner>div>b:first-child,.banner b.hd{display:block;font-size:17px;font-weight:600}
+.banner .t-foot{color:var(--ink2);margin-top:2px}
+.banner .rc-wrap{flex:none;margin:-6px -4px -6px 0}
+
+/* ---------- meter ---------- */
+.meter{height:22px;border-radius:11px;background:var(--well);border:1.5px solid var(--line);padding:4px;display:block}
+.meter i{display:block;height:100%;border-radius:7px;background:var(--primary);min-width:0;transition:width .35s cubic-bezier(.3,1.4,.5,1)}
+.meter.done{border-color:var(--primary)}
+
+/* ---------- sheet ---------- */
+.scrim{position:absolute;inset:0;background:var(--scrim);z-index:20;animation:fadein .2s ease both}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-radius:24px 24px 0 0;padding:8px 16px 34px;box-shadow:0 -10px 40px rgba(0,0,0,.25);animation:sheetup .3s cubic-bezier(.2,.9,.3,1) both;max-height:92%;overflow-y:auto;scrollbar-width:none}
+.sheet.still{animation:none}
+.sheet::-webkit-scrollbar{display:none}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sheet h3{margin:0;font:600 22px/1.2 var(--f-round)}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes sheetup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------- forms ---------- */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;color:var(--ink2);font-weight:500}
+.input{height:52px;border-radius:12px;background:var(--well);border:1.5px solid transparent;padding:0 14px;font-size:17px;width:100%;outline:none}
+.input:focus{border-color:var(--primary);background:var(--surface)}
+.input.err{border-color:var(--warn)}
+.input.amt{font:500 22px var(--f-round);font-variant-numeric:tabular-nums;text-align:right}
+
+/* ---------- generic list rows ---------- */
+.group-label{font-size:13px;font-weight:600;color:var(--ink2);margin:18px 4px 8px}
+
+/* ---------- toast ---------- */
+.toast{position:absolute;left:16px;right:16px;bottom:120px;z-index:40;background:var(--ink);color:var(--paper);border-radius:14px;padding:12px 14px;font-size:15px;box-shadow:var(--shadow);animation:sheetup .25s ease both}
+
+/* ---------- reduced motion ---------- */
+:root[data-reduce="1"] *,:root[data-reduce="1"] *::before,:root[data-reduce="1"] *::after{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important}
+}
+
+/* ---------- mascot motion ---------- */
+.rc,.scene{display:block;overflow:visible}
+.rc .pupil,.scene .pupil{transition:transform .3s}
+@keyframes lookaround{0%,100%{transform:translateX(0)}30%{transform:translateX(5px)}65%{transform:translateX(-5px)}}
+.look-around .pupil{animation:lookaround 2.6s ease-in-out infinite}
+@keyframes glass{0%,100%{transform:translate(110px,176px)}50%{transform:translate(190px,176px)}}
+.scene .glass{animation:glass 2.6s ease-in-out infinite;transform:translate(110px,176px)}
+@keyframes scan{0%,100%{transform:translateY(0)}50%{transform:translateY(54px)}}
+.scene .scanline{animation:scan 2.6s ease-in-out infinite}
+@keyframes wag{0%,100%{transform:rotate(0)}50%{transform:rotate(6deg)}}
+.tail-wag{transform-origin:262px 150px;animation:wag 3s ease-in-out infinite}
+@keyframes conf{0%{transform-box:fill-box;opacity:0;translate:0 -14px}20%{opacity:1}100%{opacity:1;translate:0 10px}}
+.conf{animation:conf 1.1s ease-out both;transform-box:fill-box}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.rc-neutral .eyes,.rc-thinking .eyes{transform-box:fill-box;transform-origin:center;animation:blink 5s infinite}
+
+/* ======================= screens ======================= */
+body.embed{background:transparent}
+body.embed .stage{padding:0}
+.fadein{animation:fadein .3s ease both}
+.rc-wrap{flex:none}
+.rbill{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:62px;padding:8px 16px}
+.rbill:active{background:var(--well)}
+
+/* capture */
+.vf{position:absolute;inset:0;background:#15110e;overflow:hidden}
+.vf .table{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 40%,#3a312a 0%,#1b1612 70%);}
+.vf .table::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(95deg,rgba(255,255,255,.035) 0 2px,transparent 2px 38px)}
+.vf.frozen{filter:saturate(.92) brightness(.9)}
+.brk{position:absolute;width:34px;height:34px;border:4px solid #fff;border-right:0;border-bottom:0;border-radius:10px 0 0 0;opacity:.95}
+.brk.r{border:4px solid #fff;border-left:0;border-bottom:0;border-radius:0 10px 0 0}
+.brk.b{border:4px solid #fff;border-right:0;border-top:0;border-radius:0 0 0 10px}
+.brk.br{border:4px solid #fff;border-left:0;border-top:0;border-radius:0 0 10px 0}
+.cam-top{position:absolute;top:58px;left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;z-index:5}
+.cam-btn{min-width:44px;min-height:44px;padding:0 14px;border-radius:22px;background:rgba(0,0,0,.45);color:#fff;font-weight:600;font-size:17px;display:flex;align-items:center;justify-content:center}
+.guide-pill{position:absolute;top:116px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:8px;align-items:center;width:max-content;max-width:344px;padding:9px 16px;border-radius:22px;text-align:left;line-height:1.25;background:rgba(255,255,255,.86);color:#1E2933;font-size:15px;font-weight:500;backdrop-filter:blur(8px)}
+.guide-pill .ico{width:18px;height:18px}
+.cam-bottom{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 34px;background:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));z-index:5;display:flex;flex-direction:column}
+.cam-bottom.row{flex-direction:row;align-items:center;justify-content:space-between;padding:20px 22px 40px}
+.shutter{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+.shutter i{width:60px;height:60px;border-radius:50%;background:#fff;display:block}
+.shutter:active{transform:scale(.94)}
+.lib{width:76px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:12px;font-weight:500;min-height:44px}
+.lib-th{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.6)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9}
+.flash.go{animation:flashgo .22s ease-out}
+@keyframes flashgo{0%{opacity:.9}100%{opacity:0}}
+
+/* receipt paper */
+.paper{background:#FFFDF7;color:#2a2a2a;font-family:var(--f-mono);line-height:1.5;padding:1.1em 1.2em 1.7em;border-radius:3px;box-shadow:0 8px 26px rgba(0,0,0,.35);-webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/1.4em 100%;mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/1.4em 100%;margin-bottom:0;position:relative}
+.paper .pc{text-align:center;opacity:.82;font-size:.86em}.paper .pc.big{font-weight:700;font-size:1.1em;opacity:1;letter-spacing:.05em}
+.paper .pd{border-top:1px dashed rgba(0,0,0,.4);margin:.55em 0}
+.paper .pl{display:flex;justify-content:space-between;gap:.6em;white-space:nowrap}.paper .pl.b{font-weight:700}
+.paper .pl.hl{background:rgba(194,58,29,.14);outline:1.5px solid #C23A1D;outline-offset:1px;border-radius:2px}
+
+/* processing */
+.ibar{width:220px;height:6px;border-radius:3px;background:var(--well);overflow:hidden;position:relative}
+.ibar i{position:absolute;top:0;bottom:0;width:40%;border-radius:3px;background:var(--primary);animation:slide 1.4s ease-in-out infinite}
+@keyframes slide{0%{left:-40%}100%{left:100%}}
+
+/* review */
+.rrow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:60px;padding:8px 16px;border-top:1px solid var(--line)}
+.rrow:first-child{border-top:0}
+.rrow:active{background:var(--well)}
+.rrow.flag{background:var(--warn-bg);box-shadow:inset 4px 0 0 var(--warn)}
+.rr-l{display:flex;flex-direction:column;min-width:0}
+.frow{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:56px;padding:8px 16px;border-top:1px solid var(--line)}
+.frow:first-child{border-top:0}
+.frow.bad{background:var(--warn-bg);box-shadow:inset 4px 0 0 var(--warn)}
+.thumb{overflow:hidden}
+.thumb-h{display:flex;align-items:center;gap:12px;width:100%;padding:8px 14px 8px 8px;min-height:64px}
+.th-mini{width:48px;height:48px;overflow:hidden;border-radius:8px;background:var(--well);display:block;position:relative;flex:none}
+.th-mini .paper{position:absolute;left:-12px;top:2px;box-shadow:none}
+.th-body{padding:4px 12px 14px;background:var(--well)}
+.th-body .paper{box-shadow:0 4px 14px rgba(0,0,0,.2);margin-top:10px}
+
+/* people */
+.prow2{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 8px 8px 14px;border-top:1px solid var(--line)}
+.prow2:first-child{border-top:0}
+.mini{min-height:44px;padding:0 10px;font-size:15px;font-weight:600;color:var(--primary);border-radius:10px}
+.mini:active{background:var(--well)}
+.mini.warn-t{color:var(--warn)}
+
+/* assign */
+.chips-wrap{position:relative;z-index:25;background:var(--paper);flex:none;padding-bottom:6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 16px 4px;scroll-snap-type:x proximity;scroll-padding-left:16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;width:124px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--pc);border-radius:14px;padding:8px 10px 8px;display:flex;flex-direction:column;gap:2px;text-align:left;transition:transform .15s,box-shadow .15s}
+.chip-top{display:flex;align-items:center;gap:8px}.chip-top b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip .t-amount{display:block}
+.chip:active{transform:scale(.97)}
+.chip.on{box-shadow:0 0 0 2.5px var(--pc);background:var(--surface)}
+.pop{animation:pop .38s ease}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.1)}100%{transform:scale(1)}}
+.paintbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 16px 0;padding:2px 4px 2px 12px;border-radius:12px;background:var(--well);border-left:5px solid var(--pc);font-size:14px;position:relative;z-index:2}
+.ilist{display:flex;flex-direction:column;gap:8px}
+.irow{position:relative;display:flex;min-height:68px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .1s,filter .1s;outline-offset:2px}
+.irow:active{transform:scale(.985);filter:brightness(.92)}
+.irow .bar{display:flex;flex-direction:column;width:7px;flex:none}
+.irow .bar s{flex:1;background:var(--pc);display:block}
+.ir-main{flex:1;min-width:0;padding:9px 14px 9px 12px;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.ir-1{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.ir-name{min-width:0;overflow-wrap:anywhere}
+.ir-2{display:flex;align-items:center;gap:8px;min-height:28px}
+.ir-2 .t-foot{white-space:nowrap}
+.irow.un{background:var(--warn-bg);border:2px dashed var(--warn)}
+.irow.un .ir-main{padding-left:14px}
+.irow.pulse{animation:pulsew .9s ease 2}
+@keyframes pulsew{0%,100%{transform:none}30%{transform:translateX(-5px)}60%{transform:translateX(5px)}}
+.prows{display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:12px;min-height:60px;padding:6px 14px 6px 10px;border-radius:14px;background:var(--well);border:2px solid transparent;transition:background .15s,border-color .15s}
+.prow.on{border-color:var(--pc);background:var(--surface);box-shadow:0 0 0 1px var(--line) inset}
+.prow:active{filter:brightness(.92)}
+.ck{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink2);display:flex;align-items:center;justify-content:center;flex:none;color:var(--on-primary)}
+.prow.on .ck{background:var(--primary);border-color:var(--primary)}
+.ck .ico{width:16px;height:16px;stroke-width:3}
+.fly{position:absolute;z-index:70;pointer-events:none;background:var(--primary);color:var(--on-primary);font:600 15px var(--f-round);padding:3px 10px;border-radius:999px;box-shadow:var(--shadow);font-variant-numeric:tabular-nums}
+
+/* totals */
+.segm{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--well);border-radius:14px;padding:4px}
+.segm button{min-height:44px;border-radius:11px;font-weight:600;font-size:16px;color:var(--ink2);text-align:center}
+.segm button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.18),0 0 0 1.5px var(--primary)}
+.sum{padding:12px 16px;margin-top:10px}
+.sum3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;padding-top:10px;border-top:1px solid var(--line)}
+.sum3 div{display:flex;flex-direction:column;gap:2px}
+.sbar{display:flex;height:34px;border-radius:10px;overflow:hidden;gap:2px;background:var(--paper)}
+.sbar span{background:var(--pc);color:var(--on-p);font:600 15px/34px var(--f-text);text-align:center;transition:width .35s}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 2px 12px;font-size:13px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:50%;background:var(--pc);display:block}
+.cards{display:flex;flex-direction:column;gap:10px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--pc);border-radius:16px;overflow:hidden}
+.pc-h{display:block;width:100%;padding:12px 14px 12px 12px;min-height:44px}
+.pc-top{display:flex;align-items:center;gap:10px}
+.pc-line{margin-top:6px}
+.pc-body{padding:2px 14px 12px 14px;border-top:1px dashed var(--line);margin:0 0}
+.ln{display:flex;justify-content:space-between;font-size:15px;padding:6px 0}
+.round{display:flex;gap:10px;align-items:flex-start;padding:12px 14px 12px 8px;margin-top:12px;background:var(--well);border-style:dashed}
+.round li{margin:2px 0}
+.doc{width:44px;height:44px;border-radius:10px;background:var(--well);display:flex;align-items:center;justify-content:center;color:var(--primary)}
+.sumtxt{margin:0 0 12px;padding:12px;background:var(--well);border-radius:12px;font:13px/1.45 var(--f-mono);white-space:pre-wrap;max-height:196px;overflow:auto;color:var(--ink)}
+.apps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.apps button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--ink2);min-height:44px}
+.apps span{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.apps svg{width:28px;height:28px}
+.success{position:absolute;inset:0;z-index:35;background:var(--paper);display:flex;align-items:center;justify-content:center;padding-top:54px}
+.how{list-style:none;padding:0;margin:12px 0 16px;counter-reset:s;display:flex;flex-direction:column;gap:10px}
+.how li{counter-increment:s;display:flex;gap:12px;align-items:center;min-height:44px}
+.how li::before{content:counter(s);width:32px;height:32px;border-radius:50%;background:var(--ok-bg);color:var(--primary);font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.how b{display:block;font-size:17px}.how span{font-size:15px;color:var(--ink2)}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:70}
+
+/* bilingual additions */
+.say{position:relative;display:inline-block;max-width:300px;padding:7px 14px;border-radius:16px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);font:600 14px/1.25 var(--f-round);text-align:center;box-shadow:var(--shadow)}
+.say::before{content:"";position:absolute;left:50%;top:-7px;width:12px;height:12px;background:var(--surface);border-left:1.5px solid var(--line);border-top:1.5px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+.seg a.langsw{display:inline-flex;align-items:center;padding:5px 11px;border-radius:8px;font-size:13px;font-weight:600;color:var(--page-ink);text-decoration:none}
+.seg a.langsw:hover{text-decoration:underline}
+.seg button[disabled]{cursor:default}
+
+body{padding:0 0 60px}
+.wrap{max-width:1500px;margin:0 auto;padding:0 24px}
+header.top{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between;padding:22px 0 10px}
+header.top h1{margin:0;font:400 30px/1.1 var(--f-title);letter-spacing:.02em;display:flex;gap:12px;align-items:center}
+header.top h1 .wordmark{font-size:30px}
+header.top p{margin:6px 0 0;color:var(--page-ink2);font-size:15px;max-width:640px}
+.ctrls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;font-size:14px;color:var(--page-ink2)}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:var(--on-primary);font-weight:600;padding:12px 18px;border-radius:14px;text-decoration:none;border-bottom:3px solid var(--primary-lip)}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 4px;position:sticky;top:0;z-index:20;background:var(--page);padding:10px 0;border-bottom:1px solid var(--line)}
+.flow a{color:var(--page-ink);text-decoration:none;font-size:14px;font-weight:600;padding:6px 12px;border-radius:999px;background:var(--page-card);border:1px solid var(--line)}
+.flow a:hover{border-color:var(--primary)}
+.flow i{font-style:normal;color:var(--page-ink2)}
+#groups{display:flex;flex-wrap:wrap;gap:34px 56px;align-items:flex-start;margin-top:26px}
+section.grp{scroll-margin-top:70px}
+section.grp>h2{margin:0 0 4px;font:400 24px var(--f-title);display:flex;gap:10px;align-items:baseline}
+section.grp>h2 span{font:500 14px var(--f-text);text-transform:none;color:var(--page-ink2)}
+.row{display:flex;flex-wrap:wrap;gap:22px 28px;margin-top:14px}
+figure{margin:0;width:248px}
+.ph{width:248px;height:521px;position:relative;border-radius:calc(66px*0.6)}
+.ph iframe{position:absolute;left:0;top:0;width:414px;height:868px;border:0;transform:scale(0.6);transform-origin:top left;background:transparent;color-scheme:normal}
+figcaption{margin-top:10px;font-size:14px;line-height:1.35;color:var(--page-ink2)}
+figcaption b{display:block;color:var(--page-ink);font-size:15px}
+figcaption a{color:var(--primary);font-weight:600;text-decoration:none;white-space:nowrap}
+figcaption a:hover{text-decoration:underline}
+.legend2{font-size:13px;color:var(--page-ink2);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div><h1><span id="logo"></span><span id="h1"></span></h1>
+  <p id="intro"></p></div>
+  <div class="ctrls">
+    <span><span class="tb-label" id="l-mode"></span><span class="seg"><button data-theme-btn="light" id="b-light"></button><button data-theme-btn="dark" id="b-dark"></button></span></span>
+    <label style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="rm"> <span id="l-rm"></span></label>
+    <span class="seg"><button aria-pressed="true" disabled id="lang-here"></button><a class="langsw" id="lang-sw"></a></span>
+    <a class="cta" id="proto" href="prototype.html"></a>
+  </div>
+</header>
+<nav class="flow" id="flow"></nav>
+<div id="groups"></div>
+</div>
+<script>
+window.ESP_LANG = 'es';
+/* Esplitéalo — all user-facing strings, Spanish (Puerto Rico) and English.
+   Voice: the raccoon, Chavito, speaks in the first person ("yo" / "I").
+   Slang dial (see data/esplitealo-copy-slang/report.md): amounts, warnings, errors, confirms and permission text stay plain. */
+(function (root) {
+  'use strict';
+  function joinEs(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1]; }
+  function joinEn(a) { return a.length < 2 ? a.join('') : a.length === 2 ? a.join(' and ') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
+
+  var es = {
+    lang: 'es', htmlLang: 'es-PR', other: 'en', otherLabel: 'English', thisLabel: 'Español',
+    titleSuffix: ' · maqueta de Esplitéalo', brand: 'Esplitéalo',
+    /* sample data */
+    merchant: 'Fonda Doña Lola',
+    itemNames: ['Jugo de parcha', 'Medalla', 'Surtido de frituras', 'Mofongo de camarones', 'Pernil con gandules', 'Ensalada de pulpo', 'Bistec encebollado', 'Flan para compartir'],
+    recent: [['Pinchos en Piñones', '4 oct', 6210, 3], ['Brunch en Santurce', '28 sep', 8740, 5]],
+    dateShort: '13 oct',
+    paper: { addr: 'Calle Loíza 214 · Mesa 12', when: '10/13/26 · 7:42 PM · Mesera: Neidy', sub: 'Subtotal', tax: 'Impuesto 11.5%', service: 'Cargo por servicio 15%', total: 'TOTAL', thanks: '¡Gracias por su visita!' },
+    /* chrome */
+    tb: { all: '← Todas las pantallas', mode: 'Modo', light: 'Claro', dark: 'Oscuro', demo: 'Datos de ejemplo', scan: 'Escaneo', mid: 'A medias', complete: 'Completo', service: 'Con servicio', reduce: 'Reducir movimiento',
+      scanTip: 'Escaneo nuevo con un error de lectura', midTip: 'Cuatro amigos, 6 de 8 artículos marcados', completeTip: 'Todos los artículos marcados', serviceTip: 'El recibo trae cargo por servicio: la propina empieza en $0',
+      lang: 'Idioma' },
+    titles: { home: '1 · Inicio', capture: '2 · Cámara', processing: '3 · Procesando el escaneo', review: '4 · Chequear el recibo', people: '5 · Añadir personas', assign: '6 · Marcar artículos', totals: '7 · Totales y compartir' },
+    haptic: { 'selection tick': 'toque de selección', warning: 'aviso', success: 'éxito' }, hapticWord: 'háptico',
+    step: function (n) { return 'Paso ' + n + ' de 5'; },
+    /* home */
+    home: { how: 'Cómo funciona', bubble: 'Soy Chavito. Yo cuadro la cuenta.', title: 'Divide la cuenta.<br>Con la matemática bregamos nosotros.',
+      sub: 'Toma una foto del recibo, marca quién pidió qué y comparte lo que le toca a cada cual.',
+      scan: 'Escanear recibo', photo: 'Elegir foto', privacy: 'Lee el recibo en tu celular. Sin registrarte.', recent: 'Cuentas recientes',
+      people: function (n) { return n + ' personas'; }, placeholder: 'Las cuentas guardadas son opcionales en la v1; esta fila es solo un ejemplo.' },
+    how: { title: 'Cómo funciona', steps: [['Escanea', 'Toma la foto del recibo. Yo lo leo en tu celular.'], ['Chequea', 'Corrige cualquier precio que leí mal.'], ['Marca', 'Toca cada artículo y escoge quién lo pidió.'], ['Comparte', 'Mándale a cada cual lo suyo, al centavo.']], ok: 'Entendido' },
+    /* capture */
+    cap: { cancel: 'Cancelar', flash: 'Flash', flashToast: 'El flash es un control nativo de la cámara.', guide: 'Encuadra todo el recibo: artículos, impuesto y total',
+      looks: '¿Se ve bien? Revisa los bordes', use: 'Usar foto', retake: 'Tomar otra', choose: 'Elegir foto', shutter: 'Tomar foto',
+      deniedTitle: 'La cámara está desactivada', deniedBody: 'Para escanear, activa la cámara para Esplitéalo en Ajustes › Esplitéalo. O elige una foto que ya tengas.', openSettings: 'Abrir Ajustes', settingsToast: 'Abriría los Ajustes de iOS.' },
+    /* processing */
+    proc: { back: 'Atrás', cancel: 'Cancelar', msgs: ['Leyendo el recibo', 'Buscando los precios', 'Cuadrando el total'], bar: 'Leyendo el recibo',
+      foot: 'Se lee en tu celular. Tu recibo nunca sale de ahí.', manual: 'Añadir los artículos a mano',
+      failTitle: 'Ay bendito, no pude leer ese recibo', failBody: 'Puede que la foto esté borrosa o cortada. Trátalo otra vez o añade los artículos a mano. No se perdió nada.',
+      retry: 'Tratar otra vez', another: 'Elegir otra foto' },
+    /* review */
+    rev: { back: 'Tomar otra', title: 'Chequea el recibo', sub: 'Corrige lo que leí mal. Yo nunca cambio tus totales por mi cuenta.',
+      origTitle: 'Recibo original', origOpen: 'Toca para cerrar', origClosed: 'Toca para comparar mientras editas',
+      origNote: function (printed, read) { return 'Precio impreso del flan: ' + printed + '. Leí ' + read + '.'; },
+      warnTitle: 'Los números como quiera no cuadran',
+      warnSub: function (items, sub) { return 'Tus artículos suman <b class="num" style="display:inline">' + items + '</b>, pero el subtotal del recibo dice <b class="num" style="display:inline">' + sub + '</b>.'; },
+      warnTot: function (calc, tot) { return 'El subtotal más el impuesto es <b class="num" style="display:inline">' + calc + '</b>, pero el total del recibo dice <b class="num" style="display:inline">' + tot + '</b>.'; },
+      warnTotSvc: function (calc, tot) { return 'El subtotal más impuesto y servicio es <b class="num" style="display:inline">' + calc + '</b>, pero el total del recibo dice <b class="num" style="display:inline">' + tot + '</b>.'; },
+      diff: function (d) { return ' Diferencia: ' + d + '. '; }, checkRow: 'Chequea la fila señalada.', checkAmts: 'Chequea las cantidades de abajo.',
+      okTitle: 'Todo quedó nítido', okBody: 'Los artículos, el impuesto y el total coinciden con el recibo.',
+      flag: 'Chequear · el precio parece alto', check: 'Chequear', needsLook: 'Para chequear', items: 'Artículos', add: 'Añadir artículo', amounts: 'Totales del recibo',
+      subtotal: 'Subtotal', tax: 'Impuesto', service: 'Cargo por servicio', total: 'Total', itemsAddUp: function (v) { return 'Los artículos suman ' + v; }, subPlusTax: function (v) { return 'Subtotal + impuesto es ' + v; }, subPlusTaxSvc: function (v) { return 'Subtotal + impuesto + servicio es ' + v; },
+      empty: 'Todavía no hay artículos', emptyBody: 'Añade cada línea del recibo para comenzar.', cont: 'Seguir con el corillo', needOne: 'Añade al menos un artículo primero.',
+      badTitle: 'Los números como quiera no cuadran', badBody: function (d) { return 'Diferencia: ' + d + '. Puedes seguir, pero no podrás compartir hasta que cuadre.'; }, fixIt: 'Arreglarlo', keepGoing: 'Continuar' },
+    sheet: { newItem: 'Artículo nuevo', editItem: 'Editar artículo', flagNote: function (v) { return 'Leí <b class="num">' + v + '</b>. Compáralo con el recibo original y corrígelo si hace falta.'; },
+      desc: 'Descripción', price: 'Precio', descPh: 'ej. Mofongo de camarones', save: 'Guardar', del: 'Eliminar artículo', cancel: 'Cancelar',
+      errName: 'Añade una descripción.', errPrice: 'Escribe un precio como 12.50.', receiptTotal: 'Total del recibo', typeIt: 'Escribe lo que dice el recibo.', amount: 'Cantidad',
+      errAmt: 'Escribe una cantidad como 11.62.', rename: 'Renombrar', name: 'Nombre' },
+    /* people */
+    ppl: { back: 'Recibo', title: '¿Quiénes están en el corillo?', sub: 'Escribe los nombres y ya. Sin usuarios ni contactos.', placeholder: 'Nombre', add: 'Añadir persona',
+      assigned: function (n) { return n + (n === 1 ? ' artículo marcado' : ' artículos marcados'); }, none: 'Sin artículos todavía', rename: 'Renombrar', remove: 'Quitar',
+      atTable: function (n) { return n + ' en la mesa'; }, emptyTitle: 'La mesa está vacía, añade a alguien.', emptyBody: 'Escribe un nombre arriba y toca “Añadir persona”. Necesitas al menos una.',
+      next: 'Marcar artículos', errName: 'Escribe un nombre primero.', errDup: function (v) { return v + ' ya está en la mesa. Prueba con la inicial del apellido.'; }, needOne: 'Añade al menos una persona primero.',
+      removeTitle: function (n) { return '¿Quitar a ' + n + '?'; },
+      removeBody: function (n, had, orphanNames, shared) { return n + ' tiene ' + had + (had === 1 ? ' artículo marcado. ' : ' artículos marcados. ') + (orphanNames.length ? joinEs(orphanNames) + (orphanNames.length > 1 ? ' volverán' : ' volverá') + ' a quedar sin marcar. ' : '') + (shared ? 'Los artículos compartidos se quedan con las demás personas.' : ''); },
+      keep: function (n) { return 'Dejar a ' + n; } },
+    /* assign */
+    asg: { back: 'Personas', title: 'Marcar artículos', progress: function (d, n) { return d + ' de ' + n; }, meter: 'Artículos marcados', chips: 'Subtotales antes del impuesto',
+      unassigned: 'Sin marcar', tapChoose: 'Toca para escoger quién', equal: function (v) { return 'Partes iguales · ' + v + ' cada uno'; }, equalMix: function (v) { return 'Partes iguales · ' + v; },
+      aria: function (name, price, who) { return name + ', ' + price + ', ' + (who ? 'marcado para ' + who : 'sin marcar'); },
+      warnTitle: function (n) { return n === 1 ? 'Falta 1 artículo por marcar' : 'Faltan ' + n + ' artículos por marcar'; },
+      warnBody: function (n) { return (n === 1 ? 'Márcalo' : 'Márcalos') + ' para continuar. No se divide nada hasta que cada artículo tenga una persona.'; },
+      restEven: 'Dividir el resto en partes iguales', paintBar: function (n) { return 'Pintando para <b>' + n + '</b>. Toca los artículos para añadir o quitar.'; }, done: 'Listo',
+      allDone: function (n) { return '¡Los ' + n + ' artículos tienen dueño!'; }, left: function (v, n) { return 'Sin marcar: <b class="num" style="color:var(--warn)">' + v + '</b> en ' + n + (n === 1 ? ' artículo' : ' artículos'); },
+      btn: function (left) { return 'Chequear el espliteo' + (left ? ' · faltan ' + left : ''); }, foot: 'Toca un artículo para escoger quién lo pidió, o toca un nombre arriba para pintar artículos uno tras otro.',
+      who: '¿Quién pidió esto?', everyone: 'Todos', clear: 'Ninguno', pickOne: 'Escoge al menos a una persona para este artículo.', all: 'Le toca todo.', splitN: function (n) { return 'Dividido en ' + n + ' partes iguales.'; },
+      extra: function (n, c, names) { return 'Dividido en ' + n + '. Sobran ' + c + '¢; van a ' + joinEs(names) + ' (orden de la lista).'; }, sheetLabel: function (n) { return '¿Quién pidió ' + n + '?'; },
+      none: 'Ninguno' },
+    /* totals */
+    tot: { back: 'Marcar', title: 'Totales', notSettled: 'Aún no está completo', notSettledBody: function (n, v) { return 'Hay ' + n + (n === 1 ? ' artículo sin marcar (' : ' artículos sin marcar (') + v + '). ' + (n === 1 ? 'Márcalo' : 'Márcalos') + ' para compartir.'; },
+      offTitle: function (d) { return 'Diferencia de ' + d + '. Todavía no se puede compartir'; },
+      offBody: function (shortItems, sub) { return shortItems !== null ? 'Los artículos suman ' + shortItems + ', pero el subtotal del recibo dice ' + sub + '.' : 'Tu espliteo y el total del recibo no coinciden.'; }, offFix: ' Arregla el recibo y este aviso desaparece.',
+      okTitle: function (v) { return 'Suma ' + v; }, okSub: 'Machea con el recibo y la propina, hasta el último chavito',
+      tipLabel: function (v) { return 'Propina · sobre ' + v + ' antes del impuesto'; }, custom: 'Otra', tipDec: 'Bajar propina', tipInc: 'Subir propina', tipCustomAria: 'Propina personalizada en dólares', tipAria: 'Propina',
+      tipSvc: function (v) { return 'El recibo ya trae cargo por servicio (' + v + '), así que dejé la propina en $0.00. Súbela si quieres dar más.'; },
+      tipSvcMore: function (v) { return 'El recibo ya trae cargo por servicio (' + v + '). Chequea que no estés dando propina doble.'; },
+      billTotal: 'Total de la cuenta con propina', subtotal: 'Subtotal', tax: 'Impuesto', service: 'Servicio', tip: 'Propina', whoOwes: 'Cuánto le toca a cada cual', barAria: 'Parte de la cuenta por persona',
+      line: function (i, t, s, p) { return 'artículos ' + i + ' · impuesto ' + t + (s ? ' · servicio ' + s : '') + ' · propina ' + p; },
+      rounding: function (n) { return 'Incluye ' + n + '¢ de redondeo'; },
+      roundTitle: 'Dónde cayeron los chavitos sueltos', roundCoin: 'Chavito sostiene una moneda de un centavo',
+      roundItem: function (name, price, n, left, names) { return name + ' ' + price + ' ÷ ' + n + ' deja ' + left + '¢ sobrante' + (left === 1 ? '' : 's') + '. ' + joinEs(names) + (names.length === 1 ? ' paga' : ' pagan') + ' 1¢ más.'; },
+      roundPool: function (label, n, names) { return label + ': ' + n + '¢ sobrante' + (n === 1 ? ' va' : 's van') + ' a ' + joinEs(names) + '.'; }, poolTax: 'Impuesto', poolSvc: 'Servicio', poolTip: 'Propina',
+      roundRule: 'Los centavos que sobran van primero a quien estuvo más cerca de completar el siguiente centavo; si hay empate, se sigue el orden de la lista. Mismos datos, mismo resultado.',
+      share: 'Compartir espliteo', blocked: 'No se puede compartir hasta que los números cuadren.', blockedToast: 'Arregla la diferencia primero y entonces puedes compartir.', editAsg: 'Editar marcado', editReceipt: 'Editar recibo' },
+    /* share + success */
+    share: { docTitle: function (m) { return 'Espliteo de ' + m; }, docSub: function (n) { return 'Resumen en texto · ' + n + ' personas'; }, native: 'Aquí se abrirá la hoja de compartir de iOS.', cancel: 'Cancelar', apps: { Messages: 'Mensajes', Mail: 'Correo', Notes: 'Notas', Copy: 'Copiar' },
+      head: function (m, d, bill, tipLabel, tip, conf, svc) { return m + ' · ' + d + '\nCuenta ' + bill + (svc ? ' (incluye servicio ' + svc + ')' : '') + ' + ' + tipLabel + ' ' + tip + ' = ' + conf + '\n'; },
+      tipPct: function (p) { return 'propina ' + p + '%'; }, tipFlat: 'propina',
+      person: function (n, tot, i, t, s, p) { return '\n' + n + ' debe ' + tot + '\n  artículos ' + i + ' · impuesto ' + t + (s ? ' · servicio ' + s : '') + ' · propina ' + p + '\n'; },
+      close: function (v) { return '\nTodo cuadra en ' + v + '. Esplitéalo y listo 🦝'; } },
+    ok: { title: '¡Wepa! Cuentas claras.', body: function (n, v) { return 'Se enviaron ' + n + ' totales que suman <b class="num" style="color:var(--ink)">' + v + '</b>. Nadie tuvo que bregar con la matemática; yo me encargué.'; }, again: 'Comenzar otra cuenta', back: 'Regresar a los totales' },
+    mascot: { expr: { neutral: 'Chavito, el mapache', happy: 'Chavito, el mapache, contento', thinking: 'Chavito, el mapache, pensando', worried: 'Chavito, el mapache, preocupado' },
+      home: 'Chavito, el mapache, con un recibo largo', processing: 'Chavito leyendo un recibo con una lupa', failed: 'Chavito, preocupado, con un recibo borroso', empty: 'Chavito esperando junto a cuatro sillas vacías', success: 'Chavito celebrando' },
+    /* gallery */
+    idx: { title: 'Esplitéalo · diseños de pantallas', h1: '<span class="wordmark">Esplitéalo</span> · diseños de pantallas',
+      intro: 'Siete pantallas dibujadas como HTML clicable dentro de un iPhone. Todos los teléfonos de abajo funcionan: toca filas, abre hojas, edita precios. Abre cualquier pantalla a tamaño completo o recorre todo el flujo en un solo teléfono.',
+      mode: 'Modo', light: 'Claro', dark: 'Oscuro', reduce: 'Reducir movimiento', proto: 'Abrir el prototipo completo →', flow: 'Flujo de pantallas', state: ' estado', states: ' estados', open: 'Abrir a tamaño completo ↗' }
+  };
+
+  var en = {
+    lang: 'en', htmlLang: 'en', other: 'es', otherLabel: 'Español', thisLabel: 'English',
+    titleSuffix: ' · Esplitéalo mockup', brand: 'Esplitéalo',
+    merchant: 'Fonda Doña Lola',
+    itemNames: ['Passion fruit juice', 'Medalla beer', 'Fritters sampler', 'Shrimp mofongo', 'Roast pork & rice', 'Octopus salad', 'Steak & onions', 'Flan to share'],
+    recent: [['Pinchos in Piñones', 'Oct 4', 6210, 3], ['Brunch in Santurce', 'Sep 28', 8740, 5]],
+    dateShort: 'Oct 13',
+    paper: { addr: 'Calle Loíza 214 · Table 12', when: '10/13/26 · 7:42 PM · Server: Neidy', sub: 'Subtotal', tax: 'Tax 11.5%', service: 'Service charge 15%', total: 'TOTAL', thanks: 'Thank you!' },
+    tb: { all: '← All screens', mode: 'Mode', light: 'Light', dark: 'Dark', demo: 'Demo data', scan: 'Scan', mid: 'Mid-way', complete: 'Complete', service: 'With service', reduce: 'Reduce motion',
+      scanTip: 'Fresh scan with an OCR mistake', midTip: 'Four friends, 6 of 8 items assigned', completeTip: 'All items assigned', serviceTip: 'The receipt has a service charge: tip starts at $0', lang: 'Language' },
+    titles: { home: '1 · Home', capture: '2 · Capture', processing: '3 · Scan processing', review: '4 · Review receipt', people: '5 · Add people', assign: '6 · Assign items', totals: '7 · Totals and share' },
+    haptic: { 'selection tick': 'selection tick', warning: 'warning', success: 'success' }, hapticWord: 'haptic',
+    step: function (n) { return 'Step ' + n + ' of 5'; },
+    home: { how: 'How it works', bubble: 'I’m Chavito. I do the math.', title: 'Split the check,<br>skip the math', sub: 'Snap the receipt, tap who had what, and share what everyone owes.',
+      scan: 'Scan receipt', photo: 'Choose photo', privacy: 'Reads receipts on your phone. No account.', recent: 'Recent bills',
+      people: function (n) { return n + ' people'; }, placeholder: 'Saved bills are optional for v1, so this row is a placeholder.' },
+    how: { title: 'How it works', steps: [['Scan', 'Photograph the receipt. I read it on your phone.'], ['Check', 'Fix any price I misread.'], ['Tap', 'Tap each item and pick who had it.'], ['Share', 'Send everyone their exact amount.']], ok: 'Got it' },
+    cap: { cancel: 'Cancel', flash: 'Flash', flashToast: 'Flash is a native camera control.', guide: 'Fit the whole receipt: items, tax, total', looks: 'Looks good? Check the edges', use: 'Use photo', retake: 'Retake', choose: 'Choose photo', shutter: 'Take photo',
+      deniedTitle: 'Camera access is off', deniedBody: 'To scan, turn on Camera for Esplitéalo in Settings › Esplitéalo. Or pick a photo you already took.', openSettings: 'Open Settings', settingsToast: 'Would open iOS Settings.' },
+    proc: { back: 'Back', cancel: 'Cancel', msgs: ['Reading receipt', 'Finding prices', 'Checking the total'], bar: 'Reading receipt', foot: 'Read on your phone. Your receipt never leaves it.', manual: 'Enter items manually',
+      failTitle: 'I couldn’t read that one', failBody: 'The photo may be blurry or cut off. Try again, or type the items in yourself. Nothing is lost.', retry: 'Try again', another: 'Choose another photo' },
+    rev: { back: 'Retake', title: 'Check the receipt', sub: 'Fix anything I misread. I never change your totals for you.',
+      origTitle: 'Original receipt', origOpen: 'Tap to collapse', origClosed: 'Tap to compare while you edit',
+      origNote: function (printed, read) { return 'Printed flan price: ' + printed + '. I read ' + read + '.'; },
+      warnTitle: 'Numbers don’t add up yet',
+      warnSub: function (items, sub) { return 'Your items add up to <b class="num" style="display:inline">' + items + '</b>, but the receipt subtotal says <b class="num" style="display:inline">' + sub + '</b>.'; },
+      warnTot: function (calc, tot) { return 'Subtotal plus tax is <b class="num" style="display:inline">' + calc + '</b>, but the receipt total says <b class="num" style="display:inline">' + tot + '</b>.'; },
+      warnTotSvc: function (calc, tot) { return 'Subtotal plus tax and service is <b class="num" style="display:inline">' + calc + '</b>, but the receipt total says <b class="num" style="display:inline">' + tot + '</b>.'; },
+      diff: function (d) { return ' Off by ' + d + '. '; }, checkRow: 'Check the flagged row.', checkAmts: 'Check the amounts below.',
+      okTitle: 'Everything adds up', okBody: 'Items, tax and total match the receipt.',
+      flag: 'Check · price looks high', check: 'Check', needsLook: 'Needs a look', items: 'Items', add: 'Add item', amounts: 'Receipt amounts',
+      subtotal: 'Subtotal', tax: 'Tax', service: 'Service charge', total: 'Total', itemsAddUp: function (v) { return 'Items add up to ' + v; }, subPlusTax: function (v) { return 'Subtotal + tax is ' + v; }, subPlusTaxSvc: function (v) { return 'Subtotal + tax + service is ' + v; },
+      empty: 'No items yet', emptyBody: 'Add each line from the receipt to get started.', cont: 'Continue to people', needOne: 'Add at least one item first.',
+      badTitle: 'The numbers still don’t match', badBody: function (d) { return 'Off by ' + d + '. You can keep going, but you won’t be able to share until it adds up.'; }, fixIt: 'Fix it', keepGoing: 'Continue' },
+    sheet: { newItem: 'New item', editItem: 'Edit item', flagNote: function (v) { return 'I read <b class="num">' + v + '</b>. Compare it with the original receipt, then correct it if needed.'; },
+      desc: 'Description', price: 'Price', descPh: 'e.g. Shrimp mofongo', save: 'Save', del: 'Delete item', cancel: 'Cancel',
+      errName: 'Add a description.', errPrice: 'Enter a price like 12.50.', receiptTotal: 'Receipt total', typeIt: 'Type what is printed on the receipt.', amount: 'Amount', errAmt: 'Enter an amount like 11.62.', rename: 'Rename', name: 'Name' },
+    ppl: { back: 'Receipt', title: 'Who’s splitting?', sub: 'Just type names. No accounts, no contacts.', placeholder: 'Name', add: 'Add person',
+      assigned: function (n) { return n + (n === 1 ? ' item' : ' items') + ' assigned'; }, none: 'No items yet', rename: 'Rename', remove: 'Remove',
+      atTable: function (n) { return n + (n === 1 ? ' person' : ' people') + ' at the table'; }, emptyTitle: 'No one’s at the table yet', emptyBody: 'Type a name above and tap Add person. You need at least one.',
+      next: 'Assign items', errName: 'Type a name first.', errDup: function (v) { return v + ' is already at the table. Try a last initial.'; }, needOne: 'Add at least one person first.',
+      removeTitle: function (n) { return 'Remove ' + n + '?'; },
+      removeBody: function (n, had, orphanNames, shared) { return n + ' has ' + had + (had === 1 ? ' item' : ' items') + ' assigned. ' + (orphanNames.length ? joinEn(orphanNames) + ' will go back to Unassigned. ' : '') + (shared ? 'Shared items keep their other people.' : ''); },
+      keep: function (n) { return 'Keep ' + n; } },
+    asg: { back: 'People', title: 'Assign items', progress: function (d, n) { return d + ' of ' + n; }, meter: 'Items assigned', chips: 'Pre-tax subtotals',
+      unassigned: 'Unassigned', tapChoose: 'Tap to choose who', equal: function (v) { return 'Equal split · ' + v + ' each'; }, equalMix: function (v) { return 'Equal split · ' + v; },
+      aria: function (name, price, who) { return name + ', ' + price + ', ' + (who ? 'assigned to ' + who : 'unassigned'); },
+      warnTitle: function (n) { return n + (n === 1 ? ' item still needs' : ' items still need') + ' someone'; },
+      warnBody: function (n) { return 'Assign ' + (n === 1 ? 'it' : 'them') + ' to move on. Nothing is split until every item has a person.'; },
+      restEven: 'Split the rest evenly', paintBar: function (n) { return 'Painting for <b>' + n + '</b>. Tap items to add or remove.'; }, done: 'Done',
+      allDone: function (n) { return 'All ' + n + ' items assigned'; }, left: function (v, n) { return 'Unassigned: <b class="num" style="color:var(--warn)">' + v + '</b> across ' + n + (n === 1 ? ' item' : ' items'); },
+      btn: function (left) { return 'Review split' + (left ? ' · ' + left + ' left' : ''); }, foot: 'Tap an item to choose who had it. Or tap a name above to paint items one after another.',
+      who: 'Who had this?', everyone: 'Everyone', clear: 'Clear', pickOne: 'Pick at least one person to settle this item.', all: 'Gets all of it.', splitN: function (n) { return 'Split ' + n + ' ways, equal shares.'; },
+      extra: function (n, c, names) { return 'Split ' + n + ' ways. ' + c + '¢ left over goes to ' + joinEn(names) + ' (list order).'; }, sheetLabel: function (n) { return 'Who had ' + n + '?'; } },
+    tot: { back: 'Assign', title: 'Totals', notSettled: 'Not settled yet', notSettledBody: function (n, v) { return n + ' unassigned ' + (n === 1 ? 'item' : 'items') + ' (' + v + '). Assign them to share.'; },
+      offTitle: function (d) { return 'Off by ' + d + '. Can’t share yet'; },
+      offBody: function (shortItems, sub) { return shortItems !== null ? 'Items add up to ' + shortItems + ' but the receipt subtotal says ' + sub + '.' : 'Your split and the receipt total differ.'; }, offFix: ' Fix the receipt and this clears.',
+      okTitle: function (v) { return 'Adds up to ' + v; }, okSub: 'Matches the receipt + tip, to the cent',
+      tipLabel: function (v) { return 'Tip · on ' + v + ' before tax'; }, custom: 'Custom', tipDec: 'Decrease tip', tipInc: 'Increase tip', tipCustomAria: 'Custom tip in dollars', tipAria: 'Tip',
+      tipSvc: function (v) { return 'The receipt already has a service charge (' + v + '), so I set the tip to $0.00. Raise it if you want to give more.'; },
+      tipSvcMore: function (v) { return 'The receipt already has a service charge (' + v + '). Check that you’re not tipping twice.'; },
+      billTotal: 'Bill total with tip', subtotal: 'Subtotal', tax: 'Tax', service: 'Service', tip: 'Tip', whoOwes: 'Who owes what', barAria: 'Share of the bill by person',
+      line: function (i, t, s, p) { return 'items ' + i + ' · tax ' + t + (s ? ' · service ' + s : '') + ' · tip ' + p; },
+      rounding: function (n) { return 'Includes ' + n + '¢ rounding'; },
+      roundTitle: 'Where the stray cents went', roundCoin: 'Chavito holding a one-cent coin',
+      roundItem: function (name, price, n, left, names) { return name + ' ' + price + ' ÷ ' + n + ' leaves ' + left + '¢. ' + joinEn(names) + (names.length === 1 ? ' pays' : ' pay') + ' 1¢ more.'; },
+      roundPool: function (label, n, names) { return label + ': ' + n + (n === 1 ? '¢ of leftovers goes to ' : '¢ of leftovers go to ') + joinEn(names) + '.'; }, poolTax: 'Tax', poolSvc: 'Service', poolTip: 'Tip',
+      roundRule: 'Leftover cents go to the largest remainder, ties by list order. Same inputs, same result.',
+      share: 'Share breakdown', blocked: 'Sharing is blocked until the numbers match.', blockedToast: 'Fix the difference first, then you can share.', editAsg: 'Edit assignments', editReceipt: 'Edit receipt' },
+    share: { docTitle: function (m) { return m + ' split'; }, docSub: function (n) { return 'Text summary · ' + n + ' people'; }, native: 'The native iOS share sheet will open here.', cancel: 'Cancel', apps: { Messages: 'Messages', Mail: 'Mail', Notes: 'Notes', Copy: 'Copy' },
+      head: function (m, d, bill, tipLabel, tip, conf, svc) { return m + ' · ' + d + '\nBill ' + bill + (svc ? ' (includes service ' + svc + ')' : '') + ' + ' + tipLabel + ' ' + tip + ' = ' + conf + '\n'; },
+      tipPct: function (p) { return p + '% tip'; }, tipFlat: 'tip',
+      person: function (n, tot, i, t, s, p) { return '\n' + n + ' owes ' + tot + '\n  items ' + i + ' · tax ' + t + (s ? ' · service ' + s : '') + ' · tip ' + p + '\n'; },
+      close: function (v) { return '\nAdds up to ' + v + '. Split with Esplitéalo'; } },
+    ok: { title: 'All settled up!', body: function (n, v) { return n + ' amounts sent, adding up to <b class="num" style="color:var(--ink)">' + v + '</b>. Nobody had to do math. I took care of it.'; }, again: 'Start a new bill', back: 'Back to totals' },
+    mascot: { expr: { neutral: 'Chavito the raccoon', happy: 'Chavito the raccoon, happy', thinking: 'Chavito the raccoon, thinking', worried: 'Chavito the raccoon, worried' },
+      home: 'Chavito the raccoon holding a long receipt', processing: 'Chavito reading a receipt with a magnifying glass', failed: 'Chavito, worried, holding a blurry receipt', empty: 'Chavito waiting beside four empty seats', success: 'Chavito celebrating' },
+    idx: { title: 'Esplitéalo · screen designs', h1: '<span class="wordmark">Esplitéalo</span> · screen designs',
+      intro: 'Seven screens, drawn as clickable HTML in an iPhone frame. Every phone below is live: tap rows, open sheets, edit prices. Open any screen full size, or click through the whole flow in one phone.',
+      mode: 'Mode', light: 'Light', dark: 'Dark', reduce: 'Reduce motion', proto: 'Open full prototype →', flow: 'Screen flow', state: ' state', states: ' states', open: 'Open full size ↗' }
+  };
+
+  root.ESP_I18N = { es: es, en: en };
+  root.ESP_T = root.ESP_I18N[root.ESP_LANG || 'es'];
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* Original raccoon mascot ("Chavito", formerly the working name "Rocco"), drawn as inline SVG. Flat style, four expressions.
+   Head is drawn in a 200x200 box; scenes compose it with paws, tail, receipts, confetti. */
+(function (root) {
+  'use strict';
+  var FUR = '#9AA5B1', FURD = '#5A6470', MASK = '#2B333D', CREAM = '#F5EEDF', PINK = '#F0A9A3', GOLD = '#F2B84B';
+  var uid = 0;
+
+  function eyeAt(cx, look) {
+    return '<circle cx="' + cx + '" cy="108" r="10.5" fill="#fff"/>' +
+      '<g class="pupil" style="transform:translate(' + look[0] + 'px,' + look[1] + 'px)">' +
+      '<circle cx="' + cx + '" cy="108" r="5.6" fill="' + MASK + '"/><circle cx="' + (cx + 1.8) + '" cy="105.6" r="1.9" fill="#fff"/></g>';
+  }
+
+  // Returns the head as SVG group markup (200x200 coordinate space).
+  function head(expr, o) {
+    o = o || {};
+    var look = o.look || (expr === 'thinking' ? [3, -4] : expr === 'worried' ? [-2, 2] : [0, 0]);
+    var eyes, brows = '', mouth, extra = '', cheeks = '';
+    if (expr === 'happy') {
+      eyes = '<g class="eyes-shut" fill="none" stroke="' + CREAM + '" stroke-width="4.6" stroke-linecap="round">' +
+        '<path d="M61 113 Q72 98 83 113"/><path d="M117 113 Q128 98 139 113"/></g>';
+      mouth = '<path d="M86 147 Q100 172 114 147 Z" fill="' + MASK + '"/><path d="M93 160 Q100 152 107 160 Q100 168 93 160Z" fill="' + PINK + '"/>';
+      cheeks = '<ellipse cx="55" cy="139" rx="11" ry="7" fill="' + PINK + '" opacity=".55"/><ellipse cx="145" cy="139" rx="11" ry="7" fill="' + PINK + '" opacity=".55"/>';
+    } else {
+      eyes = '<g class="eyes">' + eyeAt(72, look) + eyeAt(128, look) + '</g>';
+      if (expr === 'worried') {
+        brows = '<path d="M59 92 L85 81" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/><path d="M115 81 L141 92" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/>';
+        mouth = '<path d="M87 157 Q100 145 113 157" fill="none" stroke="' + MASK + '" stroke-width="4" stroke-linecap="round"/>';
+        extra = '<path d="M164 62 C171 73 173 80 164 85 C155 80 157 73 164 62Z" fill="#7FC4E8"/><ellipse cx="162" cy="78" rx="2" ry="3" fill="#fff" opacity=".7"/>';
+      } else if (expr === 'thinking') {
+        brows = '<path d="M62 87 L83 87" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/><path d="M117 82 Q130 74 143 81" fill="none" stroke="' + MASK + '" stroke-width="4.5" stroke-linecap="round"/>';
+        mouth = '<path d="M90 153 Q103 148 113 154" fill="none" stroke="' + MASK + '" stroke-width="4" stroke-linecap="round"/>';
+        extra = '<circle cx="162" cy="46" r="4" fill="' + CREAM + '" stroke="' + FURD + '" stroke-width="1.5"/><circle cx="173" cy="32" r="6" fill="' + CREAM + '" stroke="' + FURD + '" stroke-width="1.5"/>';
+      } else {
+        mouth = '<path d="M88 150 Q100 160 112 150" fill="none" stroke="' + MASK + '" stroke-width="4" stroke-linecap="round"/>';
+        cheeks = '<ellipse cx="56" cy="140" rx="10" ry="6" fill="' + PINK + '" opacity=".45"/><ellipse cx="144" cy="140" rx="10" ry="6" fill="' + PINK + '" opacity=".45"/>';
+      }
+    }
+    return '' +
+      // ears
+      '<circle cx="52" cy="62" r="23" fill="' + FUR + '"/><circle cx="54" cy="65" r="12" fill="' + FURD + '"/>' +
+      '<circle cx="148" cy="62" r="23" fill="' + FUR + '"/><circle cx="146" cy="65" r="12" fill="' + FURD + '"/>' +
+      // cheek tufts + head
+      '<path d="M34 112 L12 130 L38 142Z" fill="' + FUR + '"/><path d="M166 112 L188 130 L162 142Z" fill="' + FUR + '"/>' +
+      '<path d="M28 116 C28 72 62 48 100 48 C138 48 172 72 172 116 C172 152 142 174 100 174 C58 174 28 152 28 116Z" fill="' + FUR + '"/>' +
+      // forehead stripe
+      '<path d="M91 50 L109 50 L106 84 L94 84Z" fill="' + FURD + '"/>' +
+      // brow patches, muzzle, mask
+      '<ellipse cx="72" cy="87" rx="15" ry="8" fill="' + CREAM + '"/><ellipse cx="128" cy="87" rx="15" ry="8" fill="' + CREAM + '"/>' +
+      '<ellipse cx="100" cy="143" rx="35" ry="27" fill="' + CREAM + '"/>' +
+      '<path d="M36 106 C48 88 80 86 100 99 C120 86 152 88 164 106 C162 130 134 136 117 124 C108 119 92 119 83 124 C66 136 38 130 36 106Z" fill="' + MASK + '"/>' +
+      eyes + brows + cheeks +
+      // nose + philtrum + mouth
+      '<path d="M89 127 C89 121 111 121 111 127 C111 133 105 137 100 138 C95 137 89 133 89 127Z" fill="' + MASK + '"/>' +
+      '<path d="M100 138 L100 148" stroke="' + MASK + '" stroke-width="3.2" stroke-linecap="round"/>' +
+      mouth + extra +
+      (o.coin ? '<g class="coin"><ellipse cx="146" cy="176" rx="17" ry="11" fill="' + FUR + '"/><circle cx="160" cy="162" r="19" fill="' + GOLD + '" stroke="#C99A2E" stroke-width="3"/><text x="160" y="168" text-anchor="middle" font-family="-apple-system,system-ui,sans-serif" font-weight="700" font-size="16" fill="#6B4D0A">1¢</text></g>' : '');
+  }
+
+  function svg(expr, size, o) {
+    o = o || {};
+    var M = (root.ESP_T && root.ESP_T.mascot) || { expr: {} };
+    var label = o.label || M.expr[expr] || ('Raccoon mascot, ' + expr);
+    var h = o.coin ? 200 : 190;
+    return '<svg class="rc rc-' + expr + '" viewBox="0 6 200 ' + (h) + '" width="' + size + '" height="' + Math.round(size * h / 200) + '" role="img" aria-label="' + label + '">' + head(expr, o) + '</svg>';
+  }
+
+  function ML_() { return (root.ESP_T && root.ESP_T.mascot) || {}; }
+  var ML = new Proxy({}, { get: function (_, k) { return ML_()[k] || ''; } });
+
+  function paw(x, y, rot) {
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + (rot || 0) + ')"><ellipse rx="19" ry="13" fill="' + FUR + '"/>' +
+      '<path d="M-7 -4 v6 M0 -5 v7 M7 -4 v6" stroke="' + FURD + '" stroke-width="2.6" stroke-linecap="round"/></g>';
+  }
+
+  function tail(x, y, rot, id) {
+    // striped tail: rounded bar clipped, with dark rings
+    return '<g transform="translate(' + x + ' ' + y + ') rotate(' + rot + ')"><clipPath id="' + id + '"><rect x="-70" y="-24" width="140" height="48" rx="24"/></clipPath>' +
+      '<g clip-path="url(#' + id + ')"><rect x="-70" y="-24" width="140" height="48" fill="' + FUR + '"/>' +
+      [-48, -18, 12, 42].map(function (px) { return '<rect x="' + px + '" y="-24" width="14" height="48" fill="' + FURD + '"/>'; }).join('') +
+      '<rect x="46" y="-24" width="24" height="48" fill="' + MASK + '"/></g></g>';
+  }
+
+  var lines = function (x, y, w, n, gap, col) {
+    var s = '';
+    for (var i = 0; i < n; i++) {
+      var ww = i % 3 === 2 ? w * 0.6 : w;
+      s += '<rect x="' + x + '" y="' + (y + i * gap) + '" width="' + ww + '" height="4" rx="2" fill="' + col + '"/>';
+    }
+    return s;
+  };
+
+  /* ---------- scenes ---------- */
+  // Home hero: raccoon peeks over a long receipt it is holding; tail curls out the side.
+  function sceneHome(w) {
+    var id = 'tl' + (++uid);
+    return '<svg class="scene" viewBox="0 0 320 232" width="' + w + '" height="' + Math.round(w * 232 / 320) + '" role="img" aria-label="' + ML.home + '">' +
+      '<circle cx="160" cy="120" r="104" fill="var(--ok-bg)"/>' +
+      '<g class="tail-wag">' + tail(262, 150, -28, id) + '</g>' +
+      '<g transform="translate(60 6)">' + head('happy', {}) + '</g>' +
+      '<g transform="translate(94 150)"><path d="M0 0 H132 V92 L121 84 L110 92 L99 84 L88 92 L77 84 L66 92 L55 84 L44 92 L33 84 L22 92 L11 84 L0 92Z" fill="#FFFDF7" stroke="#D9D0BC" stroke-width="1.5"/>' +
+      '<rect x="14" y="16" width="52" height="5" rx="2.5" fill="#2B333D" opacity=".75"/><rect x="92" y="16" width="26" height="5" rx="2.5" fill="#2B333D" opacity=".75"/>' +
+      '<rect x="14" y="30" width="64" height="4" rx="2" fill="#2B333D" opacity=".28"/><rect x="92" y="30" width="26" height="4" rx="2" fill="#2B333D" opacity=".28"/>' +
+      '<rect x="14" y="43" width="44" height="4" rx="2" fill="#2B333D" opacity=".28"/><rect x="92" y="43" width="26" height="4" rx="2" fill="#2B333D" opacity=".28"/>' +
+      '<rect x="14" y="62" width="104" height="14" rx="4" fill="#1F7A5A"/></g>' +
+      paw(106, 156, -8) + paw(214, 156, 8) +
+      '</svg>';
+  }
+
+  // Processing: raccoon reads a receipt through a magnifier that slides along the lines.
+  function sceneProcessing(w) {
+    var id = 'pr' + (++uid);
+    return '<svg class="scene" viewBox="0 0 280 240" width="' + w + '" height="' + Math.round(w * 240 / 280) + '" role="img" aria-label="' + ML.processing + '">' +
+      '<circle cx="140" cy="122" r="108" fill="var(--ok-bg)"/>' +
+      '<g transform="translate(40 0) scale(1)"><g class="look-around">' + head('thinking', {}) + '</g></g>' +
+      '<g transform="translate(70 148)"><path d="M0 0 H140 V84 L128 76 L116 84 L104 76 L92 84 L80 76 L68 84 L56 76 L44 84 L32 76 L20 84 L10 76 L0 84Z" fill="#FFFDF7" stroke="#D9D0BC" stroke-width="1.5"/>' +
+      lines(14, 14, 78, 5, 12, 'rgba(43,51,61,.28)') +
+      '<g fill="rgba(43,51,61,.4)"><rect x="104" y="14" width="22" height="4" rx="2"/><rect x="104" y="26" width="22" height="4" rx="2"/><rect x="104" y="38" width="22" height="4" rx="2"/><rect x="104" y="50" width="22" height="4" rx="2"/></g>' +
+      '<rect class="scanline" x="4" y="10" width="132" height="10" rx="3" fill="var(--primary)" opacity=".28"/></g>' +
+      '<g class="glass"><circle cx="0" cy="0" r="25" fill="rgba(255,255,255,.55)" stroke="' + FURD + '" stroke-width="6"/><path d="M18 18 L40 40" stroke="' + FURD + '" stroke-width="8" stroke-linecap="round"/>' +
+      '<path d="M-14 -8 A16 16 0 0 1 -4 -16" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>' +
+      paw(88, 168, 12) +
+      '</svg>';
+  }
+
+  // Failed scan: worried raccoon, receipt with a question mark.
+  function sceneFailed(w) {
+    return '<svg class="scene" viewBox="0 0 280 240" width="' + w + '" height="' + Math.round(w * 240 / 280) + '" role="img" aria-label="' + ML.failed + '">' +
+      '<circle cx="140" cy="122" r="108" fill="var(--warn-bg)"/>' +
+      '<g transform="translate(40 0)">' + head('worried', {}) + '</g>' +
+      '<g transform="translate(78 150) rotate(-4 60 40)"><path d="M0 0 H124 V80 L113 72 L102 80 L91 72 L80 80 L69 72 L58 80 L47 72 L36 80 L25 72 L14 80 L0 72Z" fill="#FFFDF7" stroke="#D9D0BC" stroke-width="1.5"/>' +
+      lines(14, 14, 60, 3, 12, 'rgba(43,51,61,.18)') +
+      '<text x="96" y="52" font-family="-apple-system,system-ui,sans-serif" font-weight="700" font-size="34" fill="#C23A1D" text-anchor="middle">?</text></g>' +
+      paw(92, 160, 10) + paw(202, 160, -10) +
+      '</svg>';
+  }
+
+  // Empty state: raccoon waiting at a table with empty seats.
+  function sceneEmpty(w) {
+    return '<svg class="scene" viewBox="0 0 300 200" width="' + w + '" height="' + Math.round(w * 200 / 300) + '" role="img" aria-label="' + ML.empty + '">' +
+      '<ellipse cx="150" cy="168" rx="124" ry="22" fill="var(--well)"/>' +
+      '<g transform="translate(75 0) scale(.75)"><g class="look-around">' + head('neutral', { look: [-4, 1] }) + '</g></g>' +
+      [0, 1, 2, 3].map(function (i) {
+        var x = 60 + i * 60;
+        return '<g><circle cx="' + x + '" cy="168" r="19" fill="none" stroke="var(--ink2)" stroke-width="2.5" stroke-dasharray="4 5" opacity=".7"/>' +
+          '<path d="M' + (x - 6) + ' 168 H' + (x + 6) + ' M' + x + ' 162 V174" stroke="var(--ink2)" stroke-width="2.5" stroke-linecap="round" opacity=".7"/></g>';
+      }).join('') +
+      '</svg>';
+  }
+
+  // Success: happy raccoon with paws up and a little confetti (skippable, respects Reduce Motion).
+  function sceneSuccess(w) {
+    var conf = [[40, 40, '#2F6FA8', 8], [248, 52, '#C23D7B', 7], [70, 96, '#F2B84B', 9], [226, 104, '#1B7F72', 8], [24, 150, '#7A4FB5', 7], [262, 158, '#F2B84B', 8], [150, 14, '#A85A14', 7], [108, 36, '#58781C', 6], [196, 30, '#2F6FA8', 6]];
+    return '<svg class="scene" viewBox="0 0 290 250" width="' + w + '" height="' + Math.round(w * 250 / 290) + '" role="img" aria-label="' + ML.success + '">' +
+      '<circle cx="145" cy="132" r="104" fill="var(--ok-bg)"/>' +
+      conf.map(function (c, i) {
+        return '<rect class="conf" style="animation-delay:' + (i * 0.12) + 's" x="' + c[0] + '" y="' + c[1] + '" width="' + c[3] + '" height="' + (c[3] * 1.6) + '" rx="2" fill="' + c[2] + '" transform="rotate(' + (i * 37 % 90 - 30) + ' ' + c[0] + ' ' + c[1] + ')"/>';
+      }).join('') +
+      '<g transform="translate(45 20)">' + head('happy', {}) + '</g>' +
+      paw(62, 128, -50) + paw(228, 128, 50) +
+      '<g transform="translate(206 196)"><circle r="26" fill="var(--primary)" stroke="var(--surface)" stroke-width="4"/><path d="M-11 0 L-3 9 L12 -9" fill="none" stroke="var(--on-primary)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></g>' +
+      '</svg>';
+  }
+
+  // Favicon-sized mark used for the wordmark.
+  function mark(size) {
+    return '<svg viewBox="0 0 200 200" width="' + size + '" height="' + size + '" aria-hidden="true">' + head('neutral', {}) + '</svg>';
+  }
+
+  root.Raccoon = { svg: svg, head: head, mark: mark, scenes: { home: sceneHome, processing: sceneProcessing, failed: sceneFailed, empty: sceneEmpty, success: sceneSuccess } };
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+(function(){
+  var SCREENS = [{"file": "01-home.html", "group": {"es": "1 · Inicio", "en": "1 · Home"}, "title": {"es": "Inicio", "en": "Home"}, "desc": {"es": "Chavito en el inicio, un botón principal para escanear el recibo, otro para elegir una foto y cuentas recientes opcionales.", "en": "Chavito on Home, one main Scan receipt button, Choose photo, optional recent bills."}, "start": {"screen": "home"}}, {"file": "02-capture.html", "group": {"es": "2 · Cámara", "en": "2 · Capture"}, "title": {"es": "Cámara: visor", "en": "Capture: viewfinder"}, "desc": {"es": "Cámara con una guía y las esquinas de encuadre. Toca el obturador para capturar.", "en": "Camera with a guidance pill and corner marks. Tap the shutter to capture."}, "start": {"screen": "capture"}}, {"file": "02b-capture-photo.html", "group": {"es": "2 · Cámara", "en": "2 · Capture"}, "title": {"es": "Cámara: foto tomada", "en": "Capture: photo taken"}, "desc": {"es": "Botones de ancho completo: “Tomar otra” y “Usar foto”.", "en": "Retake / Use photo as full-width buttons."}, "start": {"screen": "capture", "cap": "captured"}}, {"file": "02c-capture-denied.html", "group": {"es": "2 · Cámara", "en": "2 · Capture"}, "title": {"es": "Cámara: sin permiso", "en": "Capture: camera denied"}, "desc": {"es": "Explica cómo activar la cámara y deja Elegir foto disponible.", "en": "Explains how to enable the camera and keeps Choose photo available."}, "start": {"screen": "capture", "cap": "denied"}}, {"file": "03-processing.html", "group": {"es": "3 · Procesando el escaneo", "en": "3 · Scan processing"}, "title": {"es": "Procesando el escaneo", "en": "Scan processing"}, "desc": {"es": "Chavito leyendo, barra fina indeterminada y un mensaje de estado. Añadir los artículos a mano aparece a los 8 s.", "en": "Working Chavito, thin indeterminate bar, plain status text. Enter items manually appears after 8 s."}, "start": {"screen": "processing"}}, {"file": "03b-processing-failed.html", "group": {"es": "3 · Procesando el escaneo", "en": "3 · Scan processing"}, "title": {"es": "El escaneo falló", "en": "Scan failed"}, "desc": {"es": "Chavito preocupado: tratar otra vez o añadir a mano.", "en": "Worried Chavito, retry or enter manually."}, "start": {"screen": "processing", "failed": true}}, {"file": "04-review.html", "group": {"es": "4 · Chequear el recibo", "en": "4 · Review receipt"}, "title": {"es": "Chequear: diferencia", "en": "Review: discrepancy"}, "desc": {"es": "Un precio mal leído queda señalado (ícono y la palabra “Chequear”) y el aviso muestra la diferencia exacta. Toca la fila del flan, corrígela a 9.00 y el aviso desaparece.", "en": "A misread price is flagged (icon + the word Check) and the banner shows the exact difference. Tap the flan row, fix it to 9.00, and the warning clears."}, "start": {"screen": "review", "data": "scanned"}}, {"file": "04b-review-compare.html", "group": {"es": "4 · Chequear el recibo", "en": "4 · Review receipt"}, "title": {"es": "Chequear: recibo original abierto", "en": "Review: original receipt open"}, "desc": {"es": "La miniatura del recibo original abierta, con el precio impreso resaltado.", "en": "The original receipt thumbnail expanded, with the printed price highlighted."}, "start": {"screen": "review", "data": "scanned", "thumb": true}}, {"file": "04c-review-edit.html", "group": {"es": "4 · Chequear el recibo", "en": "4 · Review receipt"}, "title": {"es": "Chequear: editar una fila", "en": "Review: edit a row"}, "desc": {"es": "Hoja de edición para el artículo señalado.", "en": "Edit sheet for the flagged item."}, "start": {"screen": "review", "data": "scanned", "sheet": {"type": "edit-item", "id": 8}}}, {"file": "04d-review-fixed.html", "group": {"es": "4 · Chequear el recibo", "en": "4 · Review receipt"}, "title": {"es": "Chequear: todo cuadra", "en": "Review: all matches"}, "desc": {"es": "Después del arreglo: confirmación en verde, nada señalado.", "en": "After the fix: green confirmation, nothing flagged."}, "start": {"screen": "review", "data": "fixed"}}, {"file": "05-people-empty.html", "group": {"es": "5 · Añadir personas", "en": "5 · Add people"}, "title": {"es": "Personas: mesa vacía", "en": "People: empty state"}, "desc": {"es": "Chavito espera junto a cuatro sillas vacías. Escribe nombres para llenarlas.", "en": "Chavito waiting beside four open seats. Type names to fill them."}, "start": {"screen": "people", "data": "fixed"}}, {"file": "05b-people.html", "group": {"es": "5 · Añadir personas", "en": "5 · Add people"}, "title": {"es": "Personas: cuatro amigos", "en": "People: four friends"}, "desc": {"es": "Cada persona toma el próximo color libre. Renombrar y quitar son botones de texto visibles.", "en": "Chips take the next free color slot automatically. Rename and Remove are visible text buttons."}, "start": {"screen": "people", "data": "midway"}}, {"file": "05c-people-remove.html", "group": {"es": "5 · Añadir personas", "en": "5 · Add people"}, "title": {"es": "Personas: quitar con artículos", "en": "People: remove with assignments"}, "desc": {"es": "Confirmación asimétrica: el botón de dejar a la persona es más ancho que el de quitar.", "en": "Asymmetric confirm: Keep person is wider than Remove."}, "start": {"screen": "people", "data": "midway", "sheet": {"type": "remove", "id": "b"}}}, {"file": "06-assign.html", "group": {"es": "6 · Marcar artículos", "en": "6 · Assign items"}, "title": {"es": "Marcar artículos", "en": "Assign items"}, "desc": {"es": "La pantalla principal. Toca filas para marcar. 6 de 8 marcados, un artículo compartido, dos sin marcar y con aviso.", "en": "The core screen. Tap rows to assign. 6 of 8 assigned, one shared item, two unassigned items flagged."}, "start": {"screen": "assign", "data": "midway"}}, {"file": "06b-assign-sheet.html", "group": {"es": "6 · Marcar artículos", "en": "6 · Assign items"}, "title": {"es": "Marcar: artículo compartido", "en": "Assign: shared item"}, "desc": {"es": "Hoja de selección en un artículo de $14.00 entre tres: $4.67 / $4.67 / $4.66, con el centavo extra a la vista.", "en": "Selection sheet on a $14.00 item split three ways: $4.67 / $4.67 / $4.66, extra cents shown."}, "start": {"screen": "assign", "data": "midway", "sheet": {"type": "assign", "id": 3}}}, {"file": "06c-assign-warn.html", "group": {"es": "6 · Marcar artículos", "en": "6 · Assign items"}, "title": {"es": "Marcar: chequear el espliteo con artículos pendientes", "en": "Assign: Review split with items left"}, "desc": {"es": "El botón sigue activo y avisa al tocarlo, con el atajo de dividir el resto en partes iguales. Las filas sin marcar parpadean.", "en": "The button stays enabled and warns on tap, with the split-the-rest-evenly shortcut. Unassigned rows pulse."}, "start": {"screen": "assign", "data": "midway", "warn": true}}, {"file": "06d-assign-paint.html", "group": {"es": "6 · Marcar artículos", "en": "6 · Assign items"}, "title": {"es": "Marcar: modo pintar", "en": "Assign: paint mode"}, "desc": {"es": "Modo rápido opcional: toca un nombre y luego toca artículos.", "en": "Optional quick mode: tap a name, then tap items."}, "start": {"screen": "assign", "data": "midway", "paint": "c"}}, {"file": "06e-assign-complete.html", "group": {"es": "6 · Marcar artículos", "en": "6 · Assign items"}, "title": {"es": "Marcar: todo marcado", "en": "Assign: everything assigned"}, "desc": {"es": "Medidor lleno, sin avisos y con el botón de chequear el espliteo listo.", "en": "Full meter, no flags, Review split is ready."}, "start": {"screen": "assign", "data": "complete"}}, {"file": "07-totals.html", "group": {"es": "7 · Totales y compartir", "en": "7 · Totals and share"}, "title": {"es": "Totales: cuadra", "en": "Totals: reconciled"}, "desc": {"es": "Selector de propina, barra de partes, tarjetas por persona y una tarjeta de redondeo con Chavito sosteniendo el centavo suelto.", "en": "Tip selector, share bar, per-person cards, and a rounding card with Chavito holding the stray cent."}, "start": {"screen": "totals", "data": "complete"}}, {"file": "07b-totals-mismatch.html", "group": {"es": "7 · Totales y compartir", "en": "7 · Totals and share"}, "title": {"es": "Totales: diferencia", "en": "Totals: discrepancy"}, "desc": {"es": "Los números no cuadran: Chavito preocupado, diferencia exacta, compartir bloqueado.", "en": "Numbers don’t reconcile: worried Chavito, exact difference, sharing blocked."}, "start": {"screen": "totals", "data": "complete-bad"}}, {"file": "07c-share.html", "group": {"es": "7 · Totales y compartir", "en": "7 · Totals and share"}, "title": {"es": "Hoja de compartir", "en": "Share sheet"}, "desc": {"es": "Resumen en texto legible para la hoja de compartir nativa de iOS.", "en": "Readable text summary for the native iOS share sheet."}, "start": {"screen": "totals", "data": "complete", "sheet": {"type": "share"}}}, {"file": "07d-success.html", "group": {"es": "7 · Totales y compartir", "en": "7 · Totals and share"}, "title": {"es": "Éxito", "en": "Success"}, "desc": {"es": "Chavito contento y una celebración sutil que se puede saltar.", "en": "Happy Chavito, one subtle skippable celebration."}, "start": {"screen": "totals", "data": "complete", "sheet": {"type": "success"}}}, {"file": "07e-totals-service.html", "group": {"es": "7 · Totales y compartir", "en": "7 · Totals and share"}, "title": {"es": "Totales: recibo con cargo por servicio", "en": "Totals: receipt with service charge"}, "desc": {"es": "Si el recibo ya trae cargo por servicio, la propina empieza en $0.00 y Chavito lo explica.", "en": "When the receipt already shows a service charge, the tip starts at $0.00 and Chavito says why."}, "start": {"screen": "totals", "data": "service"}}], S = 0.6, T = window.ESP_T, X = T.idx, L = T.lang;
+  var H = function(id, v){ document.getElementById(id).innerHTML = v; };
+  H('h1', X.h1); H('intro', X.intro); H('l-mode', X.mode); H('b-light', X.light); H('b-dark', X.dark); H('l-rm', X.reduce); H('proto', X.proto); H('lang-here', T.thisLabel); H('lang-sw', T.otherLabel);
+  document.getElementById('flow').setAttribute('aria-label', X.flow);
+  document.getElementById('lang-sw').href = '../' + T.other + '/index.html';
+  var root = document.documentElement, qs = new URLSearchParams(location.search);
+  var theme = qs.get('theme'); try { theme = theme || localStorage.getItem('esp-theme'); } catch(e){}
+  theme = theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.getElementById('logo').innerHTML = Raccoon.mark(40);
+  var groups = [], by = {};
+  SCREENS.forEach(function(s){ var g = s.group[L]; if(!by[g]){ by[g]=[]; groups.push(g);} by[g].push(s); });
+  var flow = document.getElementById('flow');
+  flow.innerHTML = groups.map(function(g,i){ return '<a href="#g'+i+'">'+g+'</a>'+(i<groups.length-1?'<i>→</i>':''); }).join('');
+  document.getElementById('groups').innerHTML = groups.map(function(g,i){
+    return '<section class="grp" id="g'+i+'"><h2>'+g+'<span>'+by[g].length+(by[g].length>1?X.states:X.state)+'</span></h2><div class="row">'+by[g].map(function(s){
+      return '<figure><div class="ph"><iframe loading="lazy" title="'+s.title[L]+'" data-file="'+s.file+'"></iframe></div><figcaption><b>'+s.title[L]+'</b>'+s.desc[L]+' <a href="'+s.file+'" data-open>'+X.open+'</a></figcaption></figure>';
+    }).join('')+'</div></section>';
+  }).join('');
+  function frames(){ return document.querySelectorAll('iframe'); }
+  function setTheme(t){
+    theme = t; root.dataset.theme = t; try{localStorage.setItem('esp-theme',t);}catch(e){}
+    document.querySelectorAll('[data-theme-btn]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.themeBtn===t); });
+    frames().forEach(function(f){ try{ f.contentWindow.postMessage({esp:'theme',v:t},'*'); }catch(e){} });
+    document.querySelectorAll('a[href]').forEach(function(a){ if(/\.html/.test(a.getAttribute('href'))){ a.href = a.getAttribute('href').split('?')[0]+'?theme='+t; } });
+  }
+  frames().forEach(function(f){
+    f.src = f.dataset.file+'?embed=1&theme='+theme;
+    f.addEventListener('load', function(){ try{ f.contentWindow.postMessage({esp:'theme',v:theme},'*'); f.contentWindow.postMessage({esp:'reduce',v:document.getElementById('rm').checked},'*'); }catch(e){} });
+  });
+  document.querySelectorAll('[data-theme-btn]').forEach(function(b){ b.onclick=function(){ setTheme(b.dataset.themeBtn); }; });
+  document.getElementById('rm').onchange=function(e){ root.dataset.reduce = e.target.checked?'1':'0'; frames().forEach(function(f){ try{ f.contentWindow.postMessage({esp:'reduce',v:e.target.checked},'*'); }catch(x){} }); };
+  setTheme(theme);
+})();
+</script>
+</body>
+</html>

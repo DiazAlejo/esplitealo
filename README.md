@@ -33,6 +33,7 @@ In development. The calculation engine (`BillCalculator`, a Swift package with u
 - [Architecture](docs/ARCHITECTURE.md): technology and code layout.
 - [Roadmap](docs/ROADMAP.md): milestones and what is explicitly out of scope for launch.
 - [Design guide](docs/DESIGN_GUIDE.md): principles, starter palette, type scale, and screen-by-screen visual guidance.
+- [HTML mockups](design/mockups/README.md): bilingual static screen designs (open offline by double-clicking).
 - [Tab analysis](docs/research/TAB_ANALYSIS.md): research on an existing bill-splitting app, with candidate rules (proposals, not decisions).
 
 ## Tech stack (planned)

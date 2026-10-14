@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es-PR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Esplitéalo · Español / English</title>
+<link rel="icon" href="data:,">
+<style>
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:400;font-display:swap;src:url(_src/fonts/Unkempt-Regular-latin.woff2) format("woff2")}
+@font-face{font-family:"Unkempt";font-style:normal;font-weight:700;font-display:swap;src:url(_src/fonts/Unkempt-Bold-latin.woff2) format("woff2")}
+:root{--bg:#E8E2D4;--card:#F6F2E8;--ink:#1E2933;--ink2:#5B6670;--line:#DDD3BE;--primary:#1F7A5A;--lip:#145A42;--on:#fff;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#14181C;--card:#1E252B;--ink:#F2EEE6;--ink2:#A5AEB6;--line:#36414B;--primary:#4CC59A;--lip:#2E9C77;--on:#0E1F18;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 56px}
+h1,.card h2{font-family:"Unkempt","Marker Felt","Chalkboard SE",ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;font-weight:400;letter-spacing:.02em}
+.wordmark{font-weight:700;text-transform:uppercase;font-synthesis:none}
+h1{font-size:30px;line-height:1.15;margin:0 0 6px}
+p{margin:0 0 20px;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.card h2{margin:0 0 4px;font-size:22px}
+.card p{margin:0 0 14px;font-size:15px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:14px;background:var(--primary);color:var(--on);font-weight:600;text-decoration:none;border-bottom:3px solid var(--lip)}
+.btn.alt{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+small{display:block;margin-top:22px;color:var(--ink2);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1><span class="wordmark">Esplitéalo</span> · maquetas HTML / HTML mockups</h1>
+  <p>Chavito, el mapache, cuadra la cuenta. / Chavito the raccoon does the math.</p>
+  <div class="grid">
+    <section class="card">
+      <h2>Español (Puerto Rico)</h2>
+      <p>23 pantallas y estados con el vocabulario boricua que escogió el dueño del proyecto, un recibo de ejemplo de un restaurante de Puerto Rico y un prototipo completo.</p>
+      <div class="row"><a class="btn" href="es/index.html">Ver todas las pantallas</a><a class="btn alt" href="es/prototype.html">Prototipo</a></div>
+    </section>
+    <section class="card">
+      <h2>English</h2>
+      <p>The same 23 screens and states in English, with the same Puerto Rico restaurant sample receipt and Chavito speaking in the first person.</p>
+      <div class="row"><a class="btn" href="en/index.html">See all screens</a><a class="btn alt" href="en/prototype.html">Prototype</a></div>
+    </section>
+  </div>
+  <small>Cada versión funciona sin conexión: haz doble clic en el archivo. / Each version works offline: just double-click the file. Dentro de cada maqueta hay un cambio de idioma. / Each mockup has a language switch.</small>
+</main>
+</body>
+</html>

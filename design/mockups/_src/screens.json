@@ -1,0 +1,457 @@
+[
+ {
+  "file": "01-home.html",
+  "group": {
+   "es": "1 · Inicio",
+   "en": "1 · Home"
+  },
+  "title": {
+   "es": "Inicio",
+   "en": "Home"
+  },
+  "desc": {
+   "es": "Chavito en el inicio, un botón principal para escanear el recibo, otro para elegir una foto y cuentas recientes opcionales.",
+   "en": "Chavito on Home, one main Scan receipt button, Choose photo, optional recent bills."
+  },
+  "start": {
+   "screen": "home"
+  }
+ },
+ {
+  "file": "02-capture.html",
+  "group": {
+   "es": "2 · Cámara",
+   "en": "2 · Capture"
+  },
+  "title": {
+   "es": "Cámara: visor",
+   "en": "Capture: viewfinder"
+  },
+  "desc": {
+   "es": "Cámara con una guía y las esquinas de encuadre. Toca el obturador para capturar.",
+   "en": "Camera with a guidance pill and corner marks. Tap the shutter to capture."
+  },
+  "start": {
+   "screen": "capture"
+  }
+ },
+ {
+  "file": "02b-capture-photo.html",
+  "group": {
+   "es": "2 · Cámara",
+   "en": "2 · Capture"
+  },
+  "title": {
+   "es": "Cámara: foto tomada",
+   "en": "Capture: photo taken"
+  },
+  "desc": {
+   "es": "Botones de ancho completo: “Tomar otra” y “Usar foto”.",
+   "en": "Retake / Use photo as full-width buttons."
+  },
+  "start": {
+   "screen": "capture",
+   "cap": "captured"
+  }
+ },
+ {
+  "file": "02c-capture-denied.html",
+  "group": {
+   "es": "2 · Cámara",
+   "en": "2 · Capture"
+  },
+  "title": {
+   "es": "Cámara: sin permiso",
+   "en": "Capture: camera denied"
+  },
+  "desc": {
+   "es": "Explica cómo activar la cámara y deja Elegir foto disponible.",
+   "en": "Explains how to enable the camera and keeps Choose photo available."
+  },
+  "start": {
+   "screen": "capture",
+   "cap": "denied"
+  }
+ },
+ {
+  "file": "03-processing.html",
+  "group": {
+   "es": "3 · Procesando el escaneo",
+   "en": "3 · Scan processing"
+  },
+  "title": {
+   "es": "Procesando el escaneo",
+   "en": "Scan processing"
+  },
+  "desc": {
+   "es": "Chavito leyendo, barra fina indeterminada y un mensaje de estado. Añadir los artículos a mano aparece a los 8 s.",
+   "en": "Working Chavito, thin indeterminate bar, plain status text. Enter items manually appears after 8 s."
+  },
+  "start": {
+   "screen": "processing"
+  }
+ },
+ {
+  "file": "03b-processing-failed.html",
+  "group": {
+   "es": "3 · Procesando el escaneo",
+   "en": "3 · Scan processing"
+  },
+  "title": {
+   "es": "El escaneo falló",
+   "en": "Scan failed"
+  },
+  "desc": {
+   "es": "Chavito preocupado: tratar otra vez o añadir a mano.",
+   "en": "Worried Chavito, retry or enter manually."
+  },
+  "start": {
+   "screen": "processing",
+   "failed": true
+  }
+ },
+ {
+  "file": "04-review.html",
+  "group": {
+   "es": "4 · Chequear el recibo",
+   "en": "4 · Review receipt"
+  },
+  "title": {
+   "es": "Chequear: diferencia",
+   "en": "Review: discrepancy"
+  },
+  "desc": {
+   "es": "Un precio mal leído queda señalado (ícono y la palabra “Chequear”) y el aviso muestra la diferencia exacta. Toca la fila del flan, corrígela a 9.00 y el aviso desaparece.",
+   "en": "A misread price is flagged (icon + the word Check) and the banner shows the exact difference. Tap the flan row, fix it to 9.00, and the warning clears."
+  },
+  "start": {
+   "screen": "review",
+   "data": "scanned"
+  }
+ },
+ {
+  "file": "04b-review-compare.html",
+  "group": {
+   "es": "4 · Chequear el recibo",
+   "en": "4 · Review receipt"
+  },
+  "title": {
+   "es": "Chequear: recibo original abierto",
+   "en": "Review: original receipt open"
+  },
+  "desc": {
+   "es": "La miniatura del recibo original abierta, con el precio impreso resaltado.",
+   "en": "The original receipt thumbnail expanded, with the printed price highlighted."
+  },
+  "start": {
+   "screen": "review",
+   "data": "scanned",
+   "thumb": true
+  }
+ },
+ {
+  "file": "04c-review-edit.html",
+  "group": {
+   "es": "4 · Chequear el recibo",
+   "en": "4 · Review receipt"
+  },
+  "title": {
+   "es": "Chequear: editar una fila",
+   "en": "Review: edit a row"
+  },
+  "desc": {
+   "es": "Hoja de edición para el artículo señalado.",
+   "en": "Edit sheet for the flagged item."
+  },
+  "start": {
+   "screen": "review",
+   "data": "scanned",
+   "sheet": {
+    "type": "edit-item",
+    "id": 8
+   }
+  }
+ },
+ {
+  "file": "04d-review-fixed.html",
+  "group": {
+   "es": "4 · Chequear el recibo",
+   "en": "4 · Review receipt"
+  },
+  "title": {
+   "es": "Chequear: todo cuadra",
+   "en": "Review: all matches"
+  },
+  "desc": {
+   "es": "Después del arreglo: confirmación en verde, nada señalado.",
+   "en": "After the fix: green confirmation, nothing flagged."
+  },
+  "start": {
+   "screen": "review",
+   "data": "fixed"
+  }
+ },
+ {
+  "file": "05-people-empty.html",
+  "group": {
+   "es": "5 · Añadir personas",
+   "en": "5 · Add people"
+  },
+  "title": {
+   "es": "Personas: mesa vacía",
+   "en": "People: empty state"
+  },
+  "desc": {
+   "es": "Chavito espera junto a cuatro sillas vacías. Escribe nombres para llenarlas.",
+   "en": "Chavito waiting beside four open seats. Type names to fill them."
+  },
+  "start": {
+   "screen": "people",
+   "data": "fixed"
+  }
+ },
+ {
+  "file": "05b-people.html",
+  "group": {
+   "es": "5 · Añadir personas",
+   "en": "5 · Add people"
+  },
+  "title": {
+   "es": "Personas: cuatro amigos",
+   "en": "People: four friends"
+  },
+  "desc": {
+   "es": "Cada persona toma el próximo color libre. Renombrar y quitar son botones de texto visibles.",
+   "en": "Chips take the next free color slot automatically. Rename and Remove are visible text buttons."
+  },
+  "start": {
+   "screen": "people",
+   "data": "midway"
+  }
+ },
+ {
+  "file": "05c-people-remove.html",
+  "group": {
+   "es": "5 · Añadir personas",
+   "en": "5 · Add people"
+  },
+  "title": {
+   "es": "Personas: quitar con artículos",
+   "en": "People: remove with assignments"
+  },
+  "desc": {
+   "es": "Confirmación asimétrica: el botón de dejar a la persona es más ancho que el de quitar.",
+   "en": "Asymmetric confirm: Keep person is wider than Remove."
+  },
+  "start": {
+   "screen": "people",
+   "data": "midway",
+   "sheet": {
+    "type": "remove",
+    "id": "b"
+   }
+  }
+ },
+ {
+  "file": "06-assign.html",
+  "group": {
+   "es": "6 · Marcar artículos",
+   "en": "6 · Assign items"
+  },
+  "title": {
+   "es": "Marcar artículos",
+   "en": "Assign items"
+  },
+  "desc": {
+   "es": "La pantalla principal. Toca filas para marcar. 6 de 8 marcados, un artículo compartido, dos sin marcar y con aviso.",
+   "en": "The core screen. Tap rows to assign. 6 of 8 assigned, one shared item, two unassigned items flagged."
+  },
+  "start": {
+   "screen": "assign",
+   "data": "midway"
+  }
+ },
+ {
+  "file": "06b-assign-sheet.html",
+  "group": {
+   "es": "6 · Marcar artículos",
+   "en": "6 · Assign items"
+  },
+  "title": {
+   "es": "Marcar: artículo compartido",
+   "en": "Assign: shared item"
+  },
+  "desc": {
+   "es": "Hoja de selección en un artículo de $14.00 entre tres: $4.67 / $4.67 / $4.66, con el centavo extra a la vista.",
+   "en": "Selection sheet on a $14.00 item split three ways: $4.67 / $4.67 / $4.66, extra cents shown."
+  },
+  "start": {
+   "screen": "assign",
+   "data": "midway",
+   "sheet": {
+    "type": "assign",
+    "id": 3
+   }
+  }
+ },
+ {
+  "file": "06c-assign-warn.html",
+  "group": {
+   "es": "6 · Marcar artículos",
+   "en": "6 · Assign items"
+  },
+  "title": {
+   "es": "Marcar: chequear el espliteo con artículos pendientes",
+   "en": "Assign: Review split with items left"
+  },
+  "desc": {
+   "es": "El botón sigue activo y avisa al tocarlo, con el atajo de dividir el resto en partes iguales. Las filas sin marcar parpadean.",
+   "en": "The button stays enabled and warns on tap, with the split-the-rest-evenly shortcut. Unassigned rows pulse."
+  },
+  "start": {
+   "screen": "assign",
+   "data": "midway",
+   "warn": true
+  }
+ },
+ {
+  "file": "06d-assign-paint.html",
+  "group": {
+   "es": "6 · Marcar artículos",
+   "en": "6 · Assign items"
+  },
+  "title": {
+   "es": "Marcar: modo pintar",
+   "en": "Assign: paint mode"
+  },
+  "desc": {
+   "es": "Modo rápido opcional: toca un nombre y luego toca artículos.",
+   "en": "Optional quick mode: tap a name, then tap items."
+  },
+  "start": {
+   "screen": "assign",
+   "data": "midway",
+   "paint": "c"
+  }
+ },
+ {
+  "file": "06e-assign-complete.html",
+  "group": {
+   "es": "6 · Marcar artículos",
+   "en": "6 · Assign items"
+  },
+  "title": {
+   "es": "Marcar: todo marcado",
+   "en": "Assign: everything assigned"
+  },
+  "desc": {
+   "es": "Medidor lleno, sin avisos y con el botón de chequear el espliteo listo.",
+   "en": "Full meter, no flags, Review split is ready."
+  },
+  "start": {
+   "screen": "assign",
+   "data": "complete"
+  }
+ },
+ {
+  "file": "07-totals.html",
+  "group": {
+   "es": "7 · Totales y compartir",
+   "en": "7 · Totals and share"
+  },
+  "title": {
+   "es": "Totales: cuadra",
+   "en": "Totals: reconciled"
+  },
+  "desc": {
+   "es": "Selector de propina, barra de partes, tarjetas por persona y una tarjeta de redondeo con Chavito sosteniendo el centavo suelto.",
+   "en": "Tip selector, share bar, per-person cards, and a rounding card with Chavito holding the stray cent."
+  },
+  "start": {
+   "screen": "totals",
+   "data": "complete"
+  }
+ },
+ {
+  "file": "07b-totals-mismatch.html",
+  "group": {
+   "es": "7 · Totales y compartir",
+   "en": "7 · Totals and share"
+  },
+  "title": {
+   "es": "Totales: diferencia",
+   "en": "Totals: discrepancy"
+  },
+  "desc": {
+   "es": "Los números no cuadran: Chavito preocupado, diferencia exacta, compartir bloqueado.",
+   "en": "Numbers don’t reconcile: worried Chavito, exact difference, sharing blocked."
+  },
+  "start": {
+   "screen": "totals",
+   "data": "complete-bad"
+  }
+ },
+ {
+  "file": "07c-share.html",
+  "group": {
+   "es": "7 · Totales y compartir",
+   "en": "7 · Totals and share"
+  },
+  "title": {
+   "es": "Hoja de compartir",
+   "en": "Share sheet"
+  },
+  "desc": {
+   "es": "Resumen en texto legible para la hoja de compartir nativa de iOS.",
+   "en": "Readable text summary for the native iOS share sheet."
+  },
+  "start": {
+   "screen": "totals",
+   "data": "complete",
+   "sheet": {
+    "type": "share"
+   }
+  }
+ },
+ {
+  "file": "07d-success.html",
+  "group": {
+   "es": "7 · Totales y compartir",
+   "en": "7 · Totals and share"
+  },
+  "title": {
+   "es": "Éxito",
+   "en": "Success"
+  },
+  "desc": {
+   "es": "Chavito contento y una celebración sutil que se puede saltar.",
+   "en": "Happy Chavito, one subtle skippable celebration."
+  },
+  "start": {
+   "screen": "totals",
+   "data": "complete",
+   "sheet": {
+    "type": "success"
+   }
+  }
+ },
+ {
+  "file": "07e-totals-service.html",
+  "group": {
+   "es": "7 · Totales y compartir",
+   "en": "7 · Totals and share"
+  },
+  "title": {
+   "es": "Totales: recibo con cargo por servicio",
+   "en": "Totals: receipt with service charge"
+  },
+  "desc": {
+   "es": "Si el recibo ya trae cargo por servicio, la propina empieza en $0.00 y Chavito lo explica.",
+   "en": "When the receipt already shows a service charge, the tip starts at $0.00 and Chavito says why."
+  },
+  "start": {
+   "screen": "totals",
+   "data": "service"
+  }
+ }
+]
