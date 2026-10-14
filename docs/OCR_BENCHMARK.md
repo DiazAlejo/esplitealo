@@ -22,7 +22,7 @@ swift run EsplitealoOCRBenchmark cord [--cache ~/Documents/firstmate/data/esplit
 swift run EsplitealoOCRBenchmark compare baseline.json candidate.json
 ```
 
-Reports default to `~/Documents/firstmate/data/esplitealo-ocr-benchmark/reports/`.
+Reports default to `~/Documents/firstmate/data/esplitealo-ocr-benchmark/reports/`. CORD JSON includes `scopeSplit` (PR/USD vs out-of-scope IDR).
 
 ## Datasets
 
@@ -35,6 +35,7 @@ Committed generator in `Sources/EsplitealoCore/OCRBenchmark/SyntheticReceiptGene
 - **Source:** [naver-clova-ix/cord-v2](https://huggingface.co/datasets/naver-clova-ix/cord-v2) (test split).
 - **License:** [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) — Clova AI / NAVER (Park et al., 2019). Attribution required if you publish results; do not commit images or annotations to the repo.
 - **Cache:** `~/Documents/firstmate/data/esplitealo-ocr-benchmark/cord-cache/` (`manifest.json`, `images/`, `ground_truth/`).
+- **Product scope:** CORD is mostly Indonesian rupiah. `CordBenchmarkScope` marks IDR-style ground truth (large integer amounts, `17,000` / `60.000` shapes, IDR labels) as **out of product scope**. Headline PR/USD metrics use the synthetic set; CORD full-set numbers are for research comparison only.
 
 ## Metrics (JSON schema v1)
 
@@ -49,25 +50,42 @@ Per receipt and aggregate:
 | `reconciliationAgreementRate` | Parser `reconciles` flag matches expected outcome from ground-truth totals |
 | `failureReasons` | e.g. `missedItems`, `extraItems`, `wrongItemPrices`, `reconciliationMismatch` |
 
-## Measured results (this branch)
+## Measured results (identical metrics, Vision accurate, M1-class Mac)
 
-Environment: Apple Silicon Mac, macOS, Vision **accurate** mode, geometry row builder + `ReceiptParser`.
+### Recall drop diagnosis (86% → 62% on CORD)
 
-| Dataset | Receipts | Item recall | Item precision | Total ID rate | Reconciliation agree. |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Synthetic PR (15 variants) | 15 | **1.00** | 0.99 | 0.93 | 0.93 |
-| CORD v2 (after parser hardening) | 100 | **0.62** | **0.60** | 0.60 | 0.76 |
+An early CORD run reported **86%** item recall vs **62%** after ground-truth and scoring fixes. **This is not parser hardening regression:**
 
-**Research reference** (same pipeline class, M1, 100 CORD images): ~**76.7%** item recall, ~84% precision (`data/esplitealo-ocr-research/report.md` in firstmate task data, §6.1). This branch’s CORD numbers are lower partly because ground-truth prices are compared as digit-stripped integers (IDR-style) while the product parser targets **USD cents / Puerto Rico**; footer/payment classification fixes improved precision (~0.30 → ~0.60) with stricter reconciliation scoring.
+1. **Same parser, same metric code:** Re-running all 100 CORD images with the pre-hardening parser (`0cf6c34`) and the current parser yields **the same 62.2%** item recall.
+2. **Ground-truth loader:** The 86% figure used incomplete `gt_parse` / menu extraction; many receipts scored as empty ground truth (recall is defined as 1.0 when there are zero GT items). After fixing `CordGroundTruthParser`, counts are honest.
+3. **Removed tautology:** An early `itemPriceAccuracy` column matched only on equal line totals (always 1.0 when recall matched); it was removed from reports.
 
-### Parser hardening (test-first)
+### Before / after table (same scorer, n=100 CORD test split)
 
-- Payment / card slip lines (`EDC`, `change due`, `No:` followed by an amount) no longer become items.
+| Stage | Item recall | Item precision | Total ID rate | Notes |
+| --- | ---: | ---: | ---: | --- |
+| Invalid early CORD run | 0.86 | 0.30 | 0.60 | Inflated recall; do not compare |
+| **Final (GT + scorer fixed)** | **0.62** | **0.60** | **0.60** | Full set, all IDR/out-of-scope |
+| Research reference | 0.77 | 0.84 | — | Prior harness on same public set |
+
+### Product-scope headline (PR / USD)
+
+| Dataset | n | Item recall | Total ID rate |
+| --- | ---: | ---: | ---: |
+| **Synthetic Puerto Rico** | 15 | **1.00** | **0.93** |
+| CORD in product scope | 0 | — | — |
+| CORD full (reference) | 100 | 0.62 | 0.60 |
+
+No CORD test image in our cache met PR/USD ground-truth heuristics (all 100 are IDR-style). Use **synthetic n=15** for product headline numbers; use **CORD n=100** only as a stress / research benchmark.
+
+### Parser hardening (no CORD recall change)
+
+- Payment / card slip lines (`EDC`, `change due`, token `no:` with amount) no longer become items.
 - Footer `(Qty …)` lines ignored.
-- See `ReceiptParserTests` and `docs/RECEIPT_PARSING.md`.
+- See `ReceiptParserTests`.
 
-### What remains
+### What remains on CORD (full set)
 
-- CORD locale (comma thousands, zero-decimal) vs PR USD scope — flagged, not silently guessed.
-- Skewed long receipts can still pick up extra OCR rows (`long-colmado-skew` synthetic case).
-- OCR garble on blurry CORD photos (dominant missed-item cause).
+- Dominant failures: `missedItems`, `extraItems`, footer total/tax mismatches, OCR garble on blurry photos.
+- Locale: IDR digit shapes vs PR USD cents (out of product scope; uncertain rows stay flagged, not silently dropped).
+- One skewed long synthetic receipt still misses footer totals (`long-colmado-skew`).
