@@ -24,6 +24,10 @@ EsplitealoCore/                    # Swift package root (Package.swift)
 │   │   ├── ReceiptScanner.swift
 │   │   ├── VisionTextRecognizer.swift
 │   │   └── ReceiptScanPipeline.swift
+│   ├── BillSession/
+│   │   ├── BillSession.swift
+│   │   ├── ReceiptDraftEditing.swift
+│   │   └── ShareSummaryBuilder.swift
 │   └── Services/
 │       └── BillCalculator.swift
 ├── Sources/EsplitealoCapture/       # iOS capture bridge (VisionKit, PhotosUI)
@@ -79,4 +83,5 @@ Esplitealo/
 - Vision recognizes text, but it does not understand the structure of every receipt. `ReceiptParser` makes conservative guesses, and the review screen handles uncertainty.
 - `BillCalculator` has no UI or framework dependencies beyond Foundation, so it can be tested in isolation.
 - `ReceiptScanner` wraps Vision and `ReceiptParser` turns its output into a draft `Receipt`, so parsing can be tested against recorded text without the camera.
+- `BillSession` sits on an editable `ReceiptDraft`, participants, and assignments, then calls `BillCalculator` and builds share text. See [Bill session](BILL_SESSION.md).
 - The module is named `Esplitealo` (no accent) for tooling compatibility. The user-facing app name is Esplitéalo.
