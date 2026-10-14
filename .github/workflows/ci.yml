@@ -71,6 +71,19 @@ jobs:
             -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO
 
+  linux-core:
+    name: Linux Core build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+
+      # Only EsplitealoCore: the other targets import Apple-only frameworks.
+      - name: Build EsplitealoCore (Foundation only)
+        run: swift build --target EsplitealoCore
+
   vision-integration:
     name: Vision integration
     runs-on: macos-26
