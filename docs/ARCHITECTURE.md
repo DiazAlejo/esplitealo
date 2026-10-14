@@ -33,6 +33,7 @@ EsplitealoCore/                    # Swift package root (Package.swift)
 ├── Sources/EsplitealoCapture/       # iOS capture bridge (VisionKit, PhotosUI)
 │   └── Capture/
 ├── Sources/ScannerLabKit/           # Scanner Lab logic (developer utility, not the app)
+├── Sources/EsplitealoDesign/        # Chavito mascot in SwiftUI (no dependencies); exports in design/brand/chavito
 ├── Tools/ScannerLab/                # Scanner Lab Xcode project; see its README
 └── Tests/EsplitealoCoreTests/
     ├── BillCalculatorTests.swift
