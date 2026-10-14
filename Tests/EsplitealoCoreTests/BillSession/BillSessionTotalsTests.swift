@@ -13,6 +13,7 @@ final class BillSessionTotalsTests: XCTestCase {
         XCTAssertFalse(session.canShare)
         session.acknowledgeMismatch()
         XCTAssertEqual(session.phase, .needsAssignment)
+        XCTAssertEqual(session.shareBlockReason, .unassignedItems)
         XCTAssertFalse(session.canShare)
     }
 
