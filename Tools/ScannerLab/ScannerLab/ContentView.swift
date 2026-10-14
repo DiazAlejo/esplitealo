@@ -134,7 +134,7 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
             }
 
-            if let shareURL = shareRecognizedTextFileURL() {
+            if let shareURL = state.recognizedTextFileURL {
                 ShareLink(
                     item: shareURL,
                     preview: SharePreview("recognized-text.json", image: Image(systemName: "doc.text"))
@@ -144,14 +144,6 @@ struct ContentView: View {
                 .buttonStyle(.bordered)
             }
         }
-    }
-
-    private func shareRecognizedTextFileURL() -> URL? {
-        guard let data = try? state.recognizedTextJSON() else { return nil }
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("scanner-lab-recognized-text.json")
-        try? data.write(to: url)
-        return url
     }
 
     @ViewBuilder

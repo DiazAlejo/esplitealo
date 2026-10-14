@@ -16,6 +16,7 @@ final class LabScreenState: ObservableObject {
     @Published var showDocumentCamera = false
     @Published var photoPickerItem: PhotosPickerItem?
     @Published var copyConfirmation = false
+    @Published var recognizedTextFileURL: URL?
 
     private var lastResult: ReceiptScanResult?
     private let runner = ScanLabPipelineRunner()
@@ -51,6 +52,7 @@ final class LabScreenState: ObservableObject {
     }
 
     func loadPhotoItem(_ item: PhotosPickerItem) async {
+        defer { photoPickerItem = nil }
         guard let data = try? await item.loadTransferable(type: Data.self) else {
             errorMessage = PhotoImportError.loadFailed.labMessage
             return
@@ -76,6 +78,7 @@ final class LabScreenState: ObservableObject {
         isProcessing = true
         errorMessage = nil
         copyConfirmation = false
+        recognizedTextFileURL = nil
         defer { isProcessing = false }
 
         thumbnail = UIImage(cgImage: image)
@@ -86,10 +89,23 @@ final class LabScreenState: ObservableObject {
                 from: outcome.result,
                 ocrDurationMilliseconds: outcome.ocrDurationMilliseconds
             )
+            recognizedTextFileURL = writeRecognizedTextFile()
         } catch {
             display = nil
             lastResult = nil
             errorMessage = ScanLabErrorMessages.message(for: error)
+        }
+    }
+
+    private func writeRecognizedTextFile() -> URL? {
+        guard let data = try? recognizedTextJSON() else { return nil }
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("scanner-lab-recognized-text.json")
+        do {
+            try data.write(to: url)
+            return url
+        } catch {
+            return nil
         }
     }
 
