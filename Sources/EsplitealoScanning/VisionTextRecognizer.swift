@@ -13,34 +13,24 @@ public struct VisionTextRecognizer: TextRecognizing, Sendable {
         image: CGImage,
         orientation: CGImagePropertyOrientation
     ) async throws -> EsplitealoCore.RecognizedText {
-        let request = VNRecognizeTextRequest()
+        var request = RecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = true
-        request.recognitionLanguages = ReceiptScanner.defaultRecognitionLanguages
-        let handler = VNImageRequestHandler(cgImage: image, orientation: orientation, options: [:])
+        request.recognitionLanguages = ReceiptScanner.defaultRecognitionLanguages.map(Locale.Language.init(identifier:))
+        let observations = try await request.perform(on: image, orientation: orientation)
         let size = orientation.orientedSize(width: image.width, height: image.height)
-
-        return try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                do {
-                    try handler.perform([request])
-                    let observations = request.results ?? []
-                    continuation.resume(returning: Self.makeRecognizedText(observations: observations, size: size))
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        return Self.makeRecognizedText(observations: observations, size: size)
     }
 
     private static func makeRecognizedText(
-        observations: [VNRecognizedTextObservation],
+        observations: [RecognizedTextObservation],
         size: (width: Int, height: Int)
     ) -> EsplitealoCore.RecognizedText {
         let width = CGFloat(size.width)
         let height = CGFloat(size.height)
-        func pixelRect(_ box: CGRect) -> PixelRect {
-            PixelRect(
+        func pixelRect(_ box: NormalizedRect) -> PixelRect {
+            let box = box.cgRect
+            return PixelRect(
                 x: Double(box.minX * width),
                 y: Double((1 - box.maxY) * height),
                 width: Double(box.width * width),
@@ -64,7 +54,7 @@ public struct VisionTextRecognizer: TextRecognizing, Sendable {
                 }
                 guard wordStart < index else { continue }
                 let range = wordStart..<index
-                if let box = try? candidate.boundingBox(for: range) {
+                if let box = candidate.boundingBox(for: range) {
                     words.append(
                         RecognizedWord(
                             text: String(string[range]),
@@ -95,6 +85,6 @@ public struct VisionTextRecognizer: TextRecognizing, Sendable {
         )
     }
 
-    private static let engineLabel = "VNRecognizeTextRequest accurate"
+    private static let engineLabel = "RecognizeTextRequest accurate"
 }
 #endif

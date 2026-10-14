@@ -13,7 +13,7 @@ extension CGImagePropertyOrientation {
 }
 
 public struct ReceiptScanner: Sendable {
-    /// Spanish (Puerto Rico receipts) first, English second. Vision supports `es-ES` (not `es-MX`) on the iOS 17 floor.
+    /// Spanish (Puerto Rico receipts) first, English second. Vision supports `es-ES` (not `es-MX`).
     public static let defaultRecognitionLanguages = ["es-ES", "en-US"]
 
     public var recognizer: any TextRecognizing
