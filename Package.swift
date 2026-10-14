@@ -10,10 +10,15 @@ let package = Package(
     products: [
         .library(name: "EsplitealoCore", targets: ["EsplitealoCore"]),
         .library(name: "EsplitealoCapture", targets: ["EsplitealoCapture"]),
+        .executable(name: "EsplitealoOCRBenchmark", targets: ["EsplitealoOCRBenchmark"]),
     ],
     targets: [
         .target(name: "EsplitealoCore"),
         .target(name: "EsplitealoCapture", dependencies: ["EsplitealoCore"]),
+        .executableTarget(
+            name: "EsplitealoOCRBenchmark",
+            dependencies: ["EsplitealoCore"]
+        ),
         .testTarget(name: "EsplitealoCoreTests", dependencies: ["EsplitealoCore"]),
         .testTarget(
             name: "EsplitealoCaptureTests",
