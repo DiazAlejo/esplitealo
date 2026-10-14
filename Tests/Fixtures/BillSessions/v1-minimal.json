@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "merchantName": "",
+  "serviceChargeCents": 0,
+  "mismatchAcknowledged": false,
+  "tip": { "custom": { "cents": 500 } },
+  "participants": [],
+  "assignments": [],
+  "draft": {
+    "items": [],
+    "adjustments": [],
+    "numberFormat": { "decimalSeparator": ",", "groupSeparator": ".", "fractionDigits": 2, "isGuessed": true },
+    "issues": [],
+    "reconciles": false
+  }
+}
