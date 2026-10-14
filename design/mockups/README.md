@@ -22,7 +22,7 @@ Full roles and dark-mode values live in `_src/tokens.css` and on `colors.html`.
 
 ## Person colours
 
-Default mockups use the **proposed** eight person colours. Append **`?people=old`** to any screen URL (or use the gallery control) to switch to the previous palette from the design guide. Share-sheet styling follows the same switch unless overridden with `?share=old|new`.
+Default mockups use the **proposed** eight person colours. Append **`?people=old`** to any screen URL (or use the gallery control) to switch to the previous v2 palette (Blue, Clay, Violet, Teal, Rose, Olive, Mustard, Slate; defined in `_src/tokens.css`, no longer in the design guide). Share-sheet styling follows the same switch unless overridden with `?share=old|new`.
 
 ## Regenerate pages
 
