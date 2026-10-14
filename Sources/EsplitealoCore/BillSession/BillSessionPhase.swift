@@ -13,6 +13,7 @@ public enum ShareBlockReason: Equatable, Sendable {
     case missingPrintedTotal
     case receiptMismatch
     case unassignedItems
+    case discountNeedsManualAdjustment
 }
 
 public enum AddParticipantResult: Equatable, Sendable {

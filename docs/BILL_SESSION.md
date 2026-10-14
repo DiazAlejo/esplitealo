@@ -57,7 +57,7 @@ Holds:
 | `totals` | Assigned; user can review totals but not share yet |
 | `ready` | `canShare` is true |
 
-After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it moves through assignment and `.totals` as usual while `canShare` stays false until the receipt reconciles. `shareBlockReason` exposes why sharing is blocked (`missingPrintedTotal`, `receiptMismatch`, `unassignedItems`).
+After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it moves through assignment and `.totals` as usual while `canShare` stays false until the receipt reconciles. `shareBlockReason` exposes why sharing is blocked (`missingPrintedTotal`, `receiptMismatch`, `unassignedItems`, `discountNeedsManualAdjustment`). Receipts with discount/adjustment lines are not allocated across people: the tip basis and bill total use the net subtotal, but `canShare` stays false and the share text is empty until discounts are handled manually.
 
 ## Share text
 

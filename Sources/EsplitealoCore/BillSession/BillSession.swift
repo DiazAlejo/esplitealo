@@ -53,13 +53,12 @@ public struct BillSession: Sendable {
         if canShare { return nil }
         if draft.total == nil { return .missingPrintedTotal }
         if !unassignedUnits.isEmpty { return .unassignedItems }
-        if !draft.reconciliation.reconciles { return .receiptMismatch }
-        if !financialTotalsMatch { return .receiptMismatch }
+        if hasUnallocatedAdjustments { return .discountNeedsManualAdjustment }
         return .receiptMismatch
     }
 
     public var canShare: Bool {
-        guard draft.total != nil else { return false }
+        guard draft.total != nil, !hasUnallocatedAdjustments else { return false }
         guard draft.reconciliation.reconciles, splitResult.isSettled, financialTotalsMatch else { return false }
         if let printed = printedReceiptTotalCents {
             return derivedBillTotalCents == printed + sessionTipCents
@@ -67,8 +66,17 @@ public struct BillSession: Sendable {
         return false
     }
 
+    public var hasUnallocatedAdjustments: Bool {
+        draft.adjustments.contains { $0.amount.minorUnits != 0 }
+    }
+
+    public var netItemsSubtotalCents: Int {
+        draft.items.reduce(0) { $0 + $1.lineTotal.minorUnits }
+            + draft.adjustments.reduce(0) { $0 + $1.amount.minorUnits }
+    }
+
     public var sessionTipCents: Int {
-        let itemsSubtotal = draft.items.reduce(0) { $0 + $1.lineTotal.minorUnits }
+        let itemsSubtotal = netItemsSubtotalCents
         let tax = draft.tax?.minorUnits ?? 0
         return BillCalculator.tipAmount(tip: tip, itemsSubtotal: itemsSubtotal, taxCents: tax)
     }
@@ -84,9 +92,8 @@ public struct BillSession: Sendable {
     }
 
     public var derivedBillTotalCents: Int {
-        let items = draft.items.reduce(0) { $0 + $1.lineTotal.minorUnits }
         let tax = draft.tax?.minorUnits ?? 0
-        return items + tax + serviceChargeCents + receiptTipOnBillCents + sessionTipCents
+        return netItemsSubtotalCents + tax + serviceChargeCents + receiptTipOnBillCents + sessionTipCents
     }
 
     public var confirmedBillTotalCents: Int {
