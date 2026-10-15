@@ -3,14 +3,16 @@ import Testing
 
 /// What people type into a price or an amount field becomes integer cents, or nothing: never a guess.
 struct MoneyInputTests {
-    @Test(arguments: [
-        ("12.50", 1250), ("12", 1200), ("12.5", 1250), ("0", 0), ("0.05", 5), (".50", 50), ("12.", 1200),
-        ("12,50", 1250), ("12,5", 1250),
-        ("$12.50", 1250), (" 12.50 ", 1250), ("$ 12.50", 1250),
-        ("1,234.56", 123_456), ("1,234", 123_400), ("999,999.99", 99_999_999),
-    ])
-    func readsAmounts(text: String, cents: Int) {
-        #expect(MoneyInput.cents(from: text) == cents)
+    @Test func readsAmounts() {
+        let cases: [(String, Int)] = [
+            ("12.50", 1250), ("12", 1200), ("12.5", 1250), ("0", 0), ("0.05", 5), (".50", 50), ("12.", 1200),
+            ("12,50", 1250), ("12,5", 1250),
+            ("$12.50", 1250), (" 12.50 ", 1250), ("$ 12.50", 1250),
+            ("1,234.56", 123_456), ("1,234", 123_400), ("999,999.99", 99_999_999),
+        ]
+        for (text, cents) in cases {
+            #expect(MoneyInput.cents(from: text) == cents, "\(text)")
+        }
     }
 
     @Test(arguments: [

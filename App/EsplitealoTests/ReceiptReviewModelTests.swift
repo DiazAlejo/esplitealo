@@ -36,22 +36,24 @@ struct ReceiptReviewModelTests {
         #expect(model.items.map(\.id) == store.session?.draft.items.map(\.id), "the order of the receipt is kept")
     }
 
-    @Test(arguments: [
-        (Set<ItemFlag>([.priceOnNextRow]), ItemFlagReason.priceOnAnotherLine),
-        ([.priceOnPreviousRow], .priceOnAnotherLine),
-        ([.quantityMismatch], .quantityMismatch),
-        ([.zeroPrice], .missingPrice),
-        ([.formatGuessed], .formatGuessed),
-        ([.needsReview], .needsLook),
-        ([.needsReview, .priceOnNextRow], .priceOnAnotherLine),
-        ([.quantityMismatch, .formatGuessed, .zeroPrice], .quantityMismatch),
-    ])
-    func everyParserFlagHasAReason(flags: Set<ItemFlag>, reason: ItemFlagReason) {
-        var draft = SampleBill.scannedDraft()
-        draft.items[2].flags = flags
-        let (model, _) = makeModel(BillSession(draft: draft))
-        #expect(model.flaggedItems.map(\.id) == [draft.items[2].id])
-        #expect(model.flaggedItems.first?.flag == reason)
+    @Test func everyParserFlagHasAReason() {
+        let cases: [(Set<ItemFlag>, ItemFlagReason)] = [
+            ([.priceOnNextRow], .priceOnAnotherLine),
+            ([.priceOnPreviousRow], .priceOnAnotherLine),
+            ([.quantityMismatch], .quantityMismatch),
+            ([.zeroPrice], .missingPrice),
+            ([.formatGuessed], .formatGuessed),
+            ([.needsReview], .needsLook),
+            ([.needsReview, .priceOnNextRow], .priceOnAnotherLine),
+            ([.quantityMismatch, .formatGuessed, .zeroPrice], .quantityMismatch),
+        ]
+        for (flags, reason) in cases {
+            var draft = SampleBill.scannedDraft()
+            draft.items[2].flags = flags
+            let (model, _) = makeModel(BillSession(draft: draft))
+            #expect(model.flaggedItems.map(\.id) == [draft.items[2].id])
+            #expect(model.flaggedItems.first?.flag == reason, "\(flags)")
+        }
     }
 
     @Test func anAmountTheParserWasUnsureAboutIsFlaggedToo() {

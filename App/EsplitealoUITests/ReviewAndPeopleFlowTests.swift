@@ -50,7 +50,7 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
         XCTAssertTrue(row.exists)
         XCTAssertTrue(row.label.contains("Flan para compartir"))
         XCTAssertTrue(row.label.contains("Chequear"))
-        XCTAssertTrue(row.label.contains("$19.00"))
+        XCTAssertTrue(row.label.contains("19 dólares"), row.label)
         XCTAssertTrue(app.buttons["review.item.10000000-0000-0000-0000-000000000001"].exists, "the other rows are still there")
     }
 
@@ -68,7 +68,7 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
         let banner = element(app, "review.banner")
         XCTAssertTrue(banner.waitForExistence(timeout: 5))
         XCTAssertTrue(banner.label.contains("Todo quedó nítido"), banner.label)
-        XCTAssertTrue(app.buttons[flan].label.contains("$9.00"))
+        XCTAssertTrue(app.buttons[flan].label.contains("9 dólares"), app.buttons[flan].label)
         XCTAssertFalse(app.buttons[flan].label.contains("Chequear"))
 
         app.buttons["screen.next"].tap()

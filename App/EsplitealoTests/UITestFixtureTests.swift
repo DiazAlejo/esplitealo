@@ -48,10 +48,16 @@ struct UITestFixtureTests {
         #expect(store.session == nil)
     }
 
-    @Test(arguments: [("review", [AppRoute.capture, .review]), ("people", [.capture, .review, .people]), ("totals", [.capture, .review, .people, .mark, .totals])])
-    func startAtOpensTheScreenWithTheEarlierOnesBehindIt(screen: String, path: [AppRoute]) {
-        let (_, router) = apply(["--uitesting", "--fixture=scanned", "--start-at=\(screen)"])
-        #expect(router.path == path)
+    @Test func startAtOpensTheScreenWithTheEarlierOnesBehindIt() {
+        let cases: [(String, [AppRoute])] = [
+            ("review", [.capture, .review]),
+            ("people", [.capture, .review, .people]),
+            ("totals", [.capture, .review, .people, .mark, .totals]),
+        ]
+        for (screen, path) in cases {
+            let (_, router) = apply(["--uitesting", "--fixture=scanned", "--start-at=\(screen)"])
+            #expect(router.path == path, "\(screen)")
+        }
     }
 
     @Test func startAtWithAnUnknownScreenStaysOnHome() {

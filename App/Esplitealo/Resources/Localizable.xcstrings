@@ -1473,6 +1473,23 @@
         }
       }
     },
+    "people.errLast" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "At least one person has to stay. Rename them if you need to."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiene que quedar al menos una persona. Cámbiale el nombre si hace falta."
+          }
+        }
+      }
+    },
     "people.errName" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1634,6 +1651,23 @@
         }
       }
     },
+    "people.remove.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar a %@"
+          }
+        }
+      }
+    },
     "people.remove.orphansMany" : {
       "comment" : "Several items go back to unassigned. Argument: their names joined.",
       "extractionState" : "manual",
@@ -1717,6 +1751,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Renombrar"
+          }
+        }
+      }
+    },
+    "people.rename.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renombrar a %@"
           }
         }
       }
@@ -2216,6 +2267,91 @@
         }
       }
     },
+    "review.addService" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add service charge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir cargo por servicio"
+          }
+        }
+      }
+    },
+    "review.adjustments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receipt adjustments"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes del recibo"
+          }
+        }
+      }
+    },
+    "review.adjustments.note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I can’t split discounts yet. Take them off the item prices, or remove the row, to be able to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todavía no sé repartir descuentos. Réstalos de los precios de los artículos o quita la fila para poder compartir."
+          }
+        }
+      }
+    },
+    "review.adjustments.remove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar"
+          }
+        }
+      }
+    },
+    "review.adjustments.removeLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar %@"
+          }
+        }
+      }
+    },
     "review.amounts" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2263,6 +2399,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diferencia: %@. Puedes seguir, pero no podrás compartir hasta que cuadre."
+          }
+        }
+      }
+    },
+    "review.bad.bodyMissing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can keep going, but you won’t be able to share until you add the receipt total."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes seguir, pero no podrás compartir hasta que añadas el total del recibo."
           }
         }
       }
@@ -2369,6 +2522,23 @@
         }
       }
     },
+    "review.edit.hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to edit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca para editar"
+          }
+        }
+      }
+    },
     "review.empty.body" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2403,6 +2573,23 @@
         }
       }
     },
+    "review.field.missing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Missing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta"
+          }
+        }
+      }
+    },
     "review.fixIt" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2433,6 +2620,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chequear · el precio parece alto"
+          }
+        }
+      }
+    },
+    "review.flag.anotherLine" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check · the price was on another line"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chequear · el precio estaba en otra línea"
+          }
+        }
+      }
+    },
+    "review.flag.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check · I’m not sure how to read the price"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chequear · no estoy seguro de cómo se lee el precio"
+          }
+        }
+      }
+    },
+    "review.flag.look" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check · take a good look at this line"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chequear · mira bien esta línea"
+          }
+        }
+      }
+    },
+    "review.flag.missingPrice" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check · I couldn’t find the price"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chequear · no encontré el precio"
+          }
+        }
+      }
+    },
+    "review.flag.quantity" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check · quantity and price don’t match"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chequear · la cantidad y el precio no cuadran"
+          }
+        }
+      }
+    },
+    "review.item.quantityEach" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld × %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld × %2$@"
           }
         }
       }
@@ -2484,6 +2773,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continuar"
+          }
+        }
+      }
+    },
+    "review.missingTotal.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I couldn’t find it. Type it the way it’s printed on the receipt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lo encontré. Escríbelo tal como sale en el recibo."
+          }
+        }
+      }
+    },
+    "review.missingTotal.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The receipt total is missing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta el total del recibo"
           }
         }
       }
@@ -3124,6 +3447,40 @@
         }
       }
     },
+    "sheet.leaveEmpty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave it empty if the receipt doesn’t have it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjalo vacío si el recibo no lo trae."
+          }
+        }
+      }
+    },
+    "sheet.lineTotal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line total: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total de la línea: %@"
+          }
+        }
+      }
+    },
     "sheet.name" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3171,6 +3528,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Precio"
+          }
+        }
+      }
+    },
+    "sheet.quantityValue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantity: %lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cantidad: %lld"
           }
         }
       }
@@ -3239,6 +3613,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escribe lo que dice el recibo."
+          }
+        }
+      }
+    },
+    "sheet.unitPrice" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Price each"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Precio por unidad"
           }
         }
       }
