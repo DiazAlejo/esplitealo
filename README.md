@@ -23,7 +23,7 @@ The flow is linear, but you can go back and edit the receipt, assignments, or ti
 
 ## Status
 
-In development. The calculation engine, receipt parser, scanning pipeline, bill session with autosaved draft, and the design system (tokens, components, Chavito) are implemented and tested. The app skeleton (Xcode project, navigation shell with placeholder screens, string catalogs in Spanish and English) is in place; the six screens are built next, one worker each.
+In development. The calculation engine, receipt parser, scanning pipeline, bill session with autosaved draft, and the design system (tokens, components, Chavito) are implemented and tested. The app skeleton (Xcode project, navigation shell with placeholder screens, string catalogs in Spanish and English) is in place; the Review receipt and Add people screens are built; the other screens are built next, one worker each.
 
 ## Documentation
 
