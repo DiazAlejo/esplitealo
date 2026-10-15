@@ -1,12 +1,16 @@
 import Foundation
 import Testing
 
-/// An xcconfig file read into key/value settings. `#include` and `#include?` are followed (a missing optional
-/// include is skipped) and later assignments override earlier ones, as in Xcode.
+/// An xcconfig file read into key/value settings. `#include` is followed and later assignments override earlier
+/// ones, as in Xcode. `#include?` is recorded in `optionalIncludes` and followed only when `followOptionalIncludes`
+/// is set and the file exists, so reading the committed files does not depend on a machine's local overrides.
 struct XCConfig {
     private(set) var settings: [String: String] = [:]
+    private(set) var optionalIncludes: [String] = []
+    private let followOptionalIncludes: Bool
 
-    init(contentsOf url: URL) throws {
+    init(contentsOf url: URL, followOptionalIncludes: Bool = false) throws {
+        self.followOptionalIncludes = followOptionalIncludes
         try load(url)
     }
 
@@ -20,7 +24,10 @@ struct XCConfig {
                 let parts = line.split(separator: "\"")
                 guard parts.count >= 2 else { continue }
                 let included = url.deletingLastPathComponent().appendingPathComponent(String(parts[1]))
-                if optional && !FileManager.default.fileExists(atPath: included.path) { continue }
+                if optional {
+                    optionalIncludes.append(String(parts[1]))
+                    if !followOptionalIncludes || !FileManager.default.fileExists(atPath: included.path) { continue }
+                }
                 try load(included)
                 continue
             }

@@ -74,6 +74,9 @@ struct AppConfigurationTests {
             #expect(((settings["DEVELOPMENT_TEAM"] as? String) ?? "").isEmpty)
         }
         // A local, git-ignored file lets the owner set their personal team.
+        let committed = try XCConfig(contentsOf: AppFiles.config.appendingPathComponent("Shared.xcconfig"))
+        #expect(committed.optionalIncludes == ["Local.xcconfig"])
+        #expect(committed.settings["DEVELOPMENT_TEAM"] == "")
         let local = AppFiles.config.appendingPathComponent("Local.xcconfig")
         #expect(try gitCheckIgnore(local) == true)
         #expect(try gitCheckIgnore(AppFiles.config.appendingPathComponent("Shared.xcconfig")) == false)
@@ -87,7 +90,9 @@ struct AppConfigurationTests {
             try FileManager.default.copyItem(at: AppFiles.config.appendingPathComponent(name), to: directory.appendingPathComponent(name))
         }
         try "DEVELOPMENT_TEAM = ABCDE12345\n".write(to: directory.appendingPathComponent("Local.xcconfig"), atomically: true, encoding: .utf8)
-        #expect(try XCConfig(contentsOf: directory.appendingPathComponent("Shared.xcconfig")).settings["DEVELOPMENT_TEAM"] == "ABCDE12345")
+        let shared = directory.appendingPathComponent("Shared.xcconfig")
+        #expect(try XCConfig(contentsOf: shared, followOptionalIncludes: true).settings["DEVELOPMENT_TEAM"] == "ABCDE12345")
+        #expect(try XCConfig(contentsOf: shared).settings["DEVELOPMENT_TEAM"] == "")
     }
 
     /// Runs `git check-ignore` and returns whether git ignores the path.
