@@ -13,6 +13,7 @@ The logic lives in a Swift package at the repository root, so `swift test` runs 
 | `EsplitealoCapture` | UIKit, VisionKit, PhotosUI, AVFoundation | Document camera, photo import, camera permission bridges (iOS only). |
 | `OCRBenchmarkKit` + `EsplitealoOCRBenchmark` | CoreGraphics, AppKit (synthetic images) | Developer-only OCR benchmark library and its command-line executable. The app never links them. |
 | `ScannerLabKit` | Core, Scanning | Logic for the Scanner Lab developer app. |
+| `EsplitealoDesign` | SwiftUI | The Chavito mascot (`ChavitoView`, expressions, pink disc, motion, accessibility labels) and its SVG/PDF export code. Depends on no other target; reference exports live in `design/brand/chavito/`. |
 | `EsplitealoTestSupport` | Core | Test helpers shared by test targets (not a product). |
 
 Dependencies point one way: `EsplitealoCore` ← `EsplitealoScanning` ← `OCRBenchmarkKit` / `ScannerLabKit`. Nothing in `EsplitealoCore` may import a scanning, capture or benchmark target.
@@ -30,9 +31,10 @@ Dependencies point one way: `EsplitealoCore` ← `EsplitealoScanning` ← `OCRBe
 │   ├── EsplitealoCapture/         # UIKit / VisionKit / PhotosUI bridges
 │   ├── OCRBenchmarkKit/           # benchmark library
 │   ├── EsplitealoOCRBenchmark/    # benchmark executable (EsplitealoOCRBenchmarkCLI.swift)
+│   ├── EsplitealoDesign/          # Chavito mascot in SwiftUI (no dependencies); exports in design/brand/chavito
 │   └── ScannerLabKit/
 ├── Tests/
-│   ├── EsplitealoCoreTests/  EsplitealoScanningTests/  EsplitealoCaptureTests/
+│   ├── EsplitealoCoreTests/  EsplitealoScanningTests/  EsplitealoCaptureTests/  EsplitealoDesignTests/
 │   ├── OCRBenchmarkKitTests/  ScannerLabKitTests/  EsplitealoTestSupport/
 │   └── Fixtures/                  # Receipts/ (parser) and BillSessions/ (stored JSON format)
 └── Tools/ScannerLab/              # Scanner Lab Xcode project; see its README

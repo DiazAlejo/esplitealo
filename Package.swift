@@ -36,7 +36,8 @@ let package = Package(
             name: "ScannerLabKit",
             dependencies: ["EsplitealoCore", "EsplitealoScanning"]
         ),
-        // The SwiftUI design system: tokens, type scale, money formatter, components, bundled Unkempt font.
+        // The SwiftUI design system: tokens, type scale, money formatter, components, bundled Unkempt font, and the
+        // Chavito mascot artwork (Apple-only; depends on nothing else in the package).
         .target(
             name: "EsplitealoDesign",
             resources: [.copy("Resources/Fonts")]

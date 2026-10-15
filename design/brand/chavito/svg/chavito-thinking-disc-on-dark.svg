@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 10 208 208" width="208" height="208" role="img" aria-label="Chavito the raccoon, thinking">
+  <title>Chavito the raccoon, thinking</title>
+  <desc xml:lang="es">Chavito, el mapache, pensando</desc>
+  <rect x="-4" y="10" width="208" height="208" fill="#0F2A21"/>
+  <circle cx="100" cy="114" r="104" fill="#FCE8EC"/>
+  <g id="chavito-thinking-disc-on-dark">
+    <circle cx="52" cy="62" r="23" fill="#9AA5B1"/>
+    <circle cx="54" cy="65" r="12" fill="#5A6470"/>
+    <circle cx="148" cy="62" r="23" fill="#9AA5B1"/>
+    <circle cx="146" cy="65" r="12" fill="#5A6470"/>
+    <path d="M34 112 L12 130 L38 142Z" fill="#9AA5B1"/>
+    <path d="M166 112 L188 130 L162 142Z" fill="#9AA5B1"/>
+    <path d="M28 116 C28 72 62 48 100 48 C138 48 172 72 172 116 C172 152 142 174 100 174 C58 174 28 152 28 116Z" fill="#9AA5B1"/>
+    <path d="M91 50 L109 50 L106 84 L94 84Z" fill="#5A6470"/>
+    <ellipse cx="72" cy="87" rx="15" ry="8" fill="#F5EEDF"/>
+    <ellipse cx="128" cy="87" rx="15" ry="8" fill="#F5EEDF"/>
+    <ellipse cx="100" cy="143" rx="35" ry="27" fill="#F5EEDF"/>
+    <path d="M36 106 C48 88 80 86 100 99 C120 86 152 88 164 106 C162 130 134 136 117 124 C108 119 92 119 83 124 C66 136 38 130 36 106Z" fill="#2B333D"/>
+    <circle cx="72" cy="108" r="10.5" fill="#FFFFFF"/>
+    <circle cx="75" cy="104" r="5.6" fill="#2B333D"/>
+    <circle cx="76.8" cy="101.6" r="1.9" fill="#FFFFFF"/>
+    <circle cx="128" cy="108" r="10.5" fill="#FFFFFF"/>
+    <circle cx="131" cy="104" r="5.6" fill="#2B333D"/>
+    <circle cx="132.8" cy="101.6" r="1.9" fill="#FFFFFF"/>
+    <path d="M62 87 L83 87" fill="none" stroke="#2B333D" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M117 82 Q130 74 143 81" fill="none" stroke="#2B333D" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M88 127 C88 120 112 120 112 127 C112 134 105 139 100 140 C95 139 88 134 88 127Z" fill="#EA5A78" stroke="#2B333D" stroke-width="2.2" stroke-linejoin="round"/>
+    <ellipse cx="94" cy="125.5" rx="3.6" ry="1.9" fill="#FFFFFF" opacity="0.55"/>
+    <path d="M100 140 L100 148" fill="none" stroke="#2B333D" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M90 153 Q103 148 113 154" fill="none" stroke="#2B333D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="162" cy="46" r="4" fill="#F5EEDF" stroke="#5A6470" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="173" cy="32" r="6" fill="#F5EEDF" stroke="#5A6470" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

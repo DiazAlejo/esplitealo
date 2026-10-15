@@ -41,7 +41,7 @@ Final logo and app-icon package for **Dos paredes**: the hand-drawn Un trazo **e
 
 ## Chavito
 
-Marketing mockups use **Chavito**, the friendly raccoon illustration (`design/mockups/_src/mascot.js`). Chavito is not part of this logo package; blush and coin accents in mocks use the same pink tokens as the brand.
+Marketing mockups use **Chavito**, the friendly raccoon illustration (`design/mockups/_src/mascot.js`; native SwiftUI port and reference exports in `design/brand/chavito/`). Chavito is not part of this logo package; blush and coin accents in mocks use the same pink tokens as the brand.
 
 ## Layered icon (inside `Esplitealo.icon`)
 
