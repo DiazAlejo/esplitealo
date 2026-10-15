@@ -1,0 +1,7 @@
+// UI tests: a separate runner app drives the installed Esplitéalo app.
+
+PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER).uitests
+PRODUCT_NAME = $(TARGET_NAME)
+GENERATE_INFOPLIST_FILE = YES
+TEST_TARGET_NAME = Esplitealo
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks

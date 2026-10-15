@@ -36,8 +36,12 @@ let package = Package(
             name: "ScannerLabKit",
             dependencies: ["EsplitealoCore", "EsplitealoScanning"]
         ),
-        // Chavito mascot artwork (SwiftUI, Apple-only); depends on nothing else in the package.
-        .target(name: "EsplitealoDesign"),
+        // The SwiftUI design system: tokens, type scale, money formatter, components, bundled Unkempt font, and the
+        // Chavito mascot artwork (Apple-only; depends on nothing else in the package).
+        .target(
+            name: "EsplitealoDesign",
+            resources: [.copy("Resources/Fonts")]
+        ),
         // Shared helpers for test targets (not a product).
         .target(
             name: "EsplitealoTestSupport",
@@ -64,6 +68,8 @@ let package = Package(
             name: "ScannerLabKitTests",
             dependencies: ["ScannerLabKit"]
         ),
+        // Static checks of the Xcode app's text resources: string catalogs, xcconfig files, privacy manifest.
+        .testTarget(name: "AppResourceTests"),
         .testTarget(
             name: "EsplitealoDesignTests",
             dependencies: ["EsplitealoDesign"]

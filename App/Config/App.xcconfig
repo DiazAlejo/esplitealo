@@ -1,0 +1,28 @@
+// The Esplitéalo app target.
+
+PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER)
+PRODUCT_NAME = Esplitealo
+
+// Swift 6 with Xcode 26's defaults for apps: everything is main-actor isolated unless it says otherwise
+// (`nonisolated`, `@concurrent`), and Approachable Concurrency keeps async code on the caller's actor.
+// Package targets (EsplitealoCore and friends) keep the nonisolated default.
+SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
+SWIFT_APPROACHABLE_CONCURRENCY = YES
+
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_CFBundleDisplayName = Esplitéalo
+INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.finance
+INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO
+INFOPLIST_KEY_UILaunchScreen_Generation = YES
+INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES
+INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
+INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
+
+// The camera is the only permission. The photo picker needs none. The localized versions of this text are in
+// Resources/InfoPlist.xcstrings.
+INFOPLIST_KEY_NSCameraUsageDescription = Esplitéalo usa la cámara para escanear el recibo. La imagen se procesa en tu iPhone y no sale del dispositivo.
+
+ASSETCATALOG_COMPILER_APPICON_NAME = Esplitealo
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
+
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks
