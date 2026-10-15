@@ -30,6 +30,7 @@ In development. The calculation engine, receipt parser, scanning pipeline, bill 
 - [Requirements](docs/REQUIREMENTS.md): MVP scope, functional requirements, and acceptance criteria.
 - [Screens](docs/SCREENS.md): screen-by-screen specification.
 - [Calculation rules](docs/CALCULATION_RULES.md): how items, tax, tip, and rounding are allocated.
+- [Calculator proof](docs/CALCULATOR_PROOF.md): property tests and an independent reference calculator that check every split to the cent.
 - [Architecture](docs/ARCHITECTURE.md): technology and code layout.
 - [The iOS app](docs/APP.md): app structure, design system, strings, how to add a screen, how to run the tests.
 - [Roadmap](docs/ROADMAP.md): milestones and what is explicitly out of scope for launch.

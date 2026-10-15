@@ -190,7 +190,9 @@ public struct BillSession: Sendable, Equatable {
     public mutating func addParticipant(name: String) -> AddParticipantResult {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return .emptyName }
-        let order = participants.count
+        // One past the latest order, not the head count: after removals the count repeats an order
+        // already in use, and the tie-break for leftover cents would stop following who was added first.
+        let order = (participants.map(\.orderIndex).max() ?? -1) + 1
         participants.append(Participant(name: trimmed, orderIndex: order))
         return .added
     }

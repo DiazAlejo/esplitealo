@@ -10,6 +10,7 @@ GitHub Actions workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml
 | **CI / iOS Simulator tests** | No (not in branch protection; a failure still turns the run red) | `xcodebuild test` of the `EsplitealoCore-Package` scheme on an iPhone simulator running an **iOS 18.x** runtime, picked by [`Scripts/ios-simulator-udid.sh`](../Scripts/ios-simulator-udid.sh). Runs every package test target on iOS. The Vision end-to-end tests skip themselves there because the synthetic receipt images need AppKit. |
 | **CI / iOS App** | No (not in branch protection; runs only after the required macOS job passes) | `xcodebuild build` of `App/Esplitealo.xcodeproj` (scheme `Esplitealo`) for an iOS 18.x simulator with `CODE_SIGNING_ALLOWED=NO`, then `xcodebuild test -only-testing:EsplitealoTests` (BillStore, routes, compiled strings, design-system **snapshot tests**), then the XCUITest smoke tests (`EsplitealoUITests`) as a `continue-on-error` step, since launching an app in a simulator is the flakiest part. swift-snapshot-testing (test-only) is cached between runs. Snapshot references are recorded on iOS 18.6, so the job uses the iOS 18 runtime like the job above. See [APP.md](APP.md). |
 | **CI / Linux Core build** | No (`continue-on-error`) | `swift build --target EsplitealoCore` in a `swift:6.0` container on Linux (about $0.006 per minute). Proves the Foundation-only core still builds without Apple frameworks, which keeps Android possible later. Only the build runs: the package test build compiles every target, and most of them import Apple frameworks, so core tests run on macOS and the iOS simulator. |
+| **CI / Reference calculator** | No (`continue-on-error`) | Runs the Python reference calculator's own tests and checks that the committed corpus `Tests/Fixtures/CalculatorProof/reference-corpus-300.json` is what its generator writes, on `ubuntu-latest` (a few seconds). The Swift comparison with that corpus runs in the required macOS job as part of `swift test`. See [CALCULATOR_PROOF.md](CALCULATOR_PROOF.md). |
 | **CI / Vision integration** | No (`continue-on-error`) | Same toolchain; runs `ReceiptScannerVisionTests` (real Vision OCR on synthetic receipt images). May flake on hosted runners; failures do not block merge. |
 | **CI / iOS Capture compile** | No (`continue-on-error`) | `xcodebuild build` for the `EsplitealoCapture` scheme (generic iOS Simulator destination) and for the Scanner Lab app project (generic iOS destination), both with no code signing. Informational compile check for the UIKit/VisionKit capture code and the lab app. |
 
@@ -24,6 +25,12 @@ Requires Xcode 26.3 (Swift 6.2; `Package.swift` uses swift-tools-version 6.0). C
 ```bash
 swift build
 ESPLITEALO_SKIP_VISION_INTEGRATION=1 swift test
+```
+
+Optional (full calculator proof: reference tests, then 5,000 generated bills against the Swift engine; needs Python 3):
+
+```bash
+Scripts/prove-calculator.sh
 ```
 
 Optional (Vision integration):
