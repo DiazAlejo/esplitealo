@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "OCRBenchmarkKit", targets: ["OCRBenchmarkKit"]),
         .executable(name: "EsplitealoOCRBenchmark", targets: ["EsplitealoOCRBenchmark"]),
         .library(name: "ScannerLabKit", targets: ["ScannerLabKit"]),
+        .library(name: "EsplitealoDesign", targets: ["EsplitealoDesign"]),
     ],
     targets: [
         // Pure bill logic: models, receipt parsing, bill session, calculator.
@@ -35,6 +36,8 @@ let package = Package(
             name: "ScannerLabKit",
             dependencies: ["EsplitealoCore", "EsplitealoScanning"]
         ),
+        // Chavito mascot artwork (SwiftUI, Apple-only); depends on nothing else in the package.
+        .target(name: "EsplitealoDesign"),
         // Shared helpers for test targets (not a product).
         .target(
             name: "EsplitealoTestSupport",
@@ -60,6 +63,10 @@ let package = Package(
         .testTarget(
             name: "ScannerLabKitTests",
             dependencies: ["ScannerLabKit"]
+        ),
+        .testTarget(
+            name: "EsplitealoDesignTests",
+            dependencies: ["EsplitealoDesign"]
         ),
     ]
 )
