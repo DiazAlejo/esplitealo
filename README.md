@@ -30,6 +30,7 @@ In development. The calculation engine (`BillCalculator`, a Swift package with u
 - [Requirements](docs/REQUIREMENTS.md): MVP scope, functional requirements, and acceptance criteria.
 - [Screens](docs/SCREENS.md): screen-by-screen specification.
 - [Calculation rules](docs/CALCULATION_RULES.md): how items, tax, tip, and rounding are allocated.
+- [Calculator proof](docs/CALCULATOR_PROOF.md): property tests and an independent reference calculator that check every split to the cent.
 - [Architecture](docs/ARCHITECTURE.md): technology and code layout.
 - [Roadmap](docs/ROADMAP.md): milestones and what is explicitly out of scope for launch.
 - [Design guide](docs/DESIGN_GUIDE.md): principles, starter palette, type scale, and screen-by-screen visual guidance.
