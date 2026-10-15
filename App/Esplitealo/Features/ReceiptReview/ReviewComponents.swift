@@ -21,6 +21,7 @@ struct ReviewBanner: View {
     let model: ReceiptReviewModel
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric(relativeTo: .body) private var mascotSize: CGFloat = 62
 
     var body: some View {
@@ -28,7 +29,7 @@ struct ReviewBanner: View {
         case .noItems:
             EmptyView()
         case .balanced:
-            banner(icon: AnyView(Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.esp.primary).font(.title2)),
+            banner(icon: AnyView(Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.esp.primary).font(.title2).accessibilityHidden(true)),
                    fill: Color.esp.okBackground, outline: Color.esp.primary) {
                 Text("review.ok.title").espText(.headline)
                 Text("review.ok.body").espText(.footnote).foregroundStyle(Color.esp.inkSecondary)
@@ -76,7 +77,9 @@ struct ReviewBanner: View {
 
     private func banner<Lines: View>(icon: AnyView, fill: Color, outline: Color, @ViewBuilder lines: () -> Lines) -> some View {
         let shape = RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
-        return HStack(alignment: .top, spacing: Spacing.sm) {
+        // At accessibility text sizes the picture goes above the words instead of squeezing them.
+        let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xs)) : AnyLayout(HStackLayout(alignment: .top, spacing: Spacing.sm))
+        return layout {
             icon
             VStack(alignment: .leading, spacing: Spacing.xxs) { lines() }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -120,7 +123,7 @@ struct WarnPill: View {
         Label {
             Text(text)
         } icon: {
-            Image(systemName: "exclamationmark.triangle.fill")
+            Image(systemName: "exclamationmark.triangle.fill").accessibilityHidden(true)
         }
         .espText(.footnote)
         .fontWeight(.semibold)
@@ -135,19 +138,16 @@ struct ReviewItemRow: View {
     let action: () -> Void
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         let isFlagged = row.flag != nil
+        // The amount stays at the end of the row; at accessibility text sizes it moves under the description.
+        let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xxs)) : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.sm))
         Button(action: action) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline, spacing: Spacing.sm) {
-                    details
-                    amount
-                }
-                VStack(alignment: .leading, spacing: Spacing.xxs) {
-                    details
-                    amount
-                }
+            layout {
+                details
+                amount
             }
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)
@@ -194,19 +194,15 @@ struct ReviewFieldRow: View {
     let action: () -> Void
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         let needsAttention = model.needsAttention(field)
+        let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xxs)) : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.sm))
         Button(action: action) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline, spacing: Spacing.sm) {
-                    label
-                    value(needsAttention)
-                }
-                VStack(alignment: .leading, spacing: Spacing.xxs) {
-                    label
-                    value(needsAttention)
-                }
+            layout {
+                label
+                value(needsAttention)
             }
             .padding(.horizontal, Spacing.md)
             .padding(.vertical, Spacing.sm)

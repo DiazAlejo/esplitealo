@@ -68,7 +68,10 @@ final class PeopleViewModel {
     var nameDraft: String {
         get { typedName }
         set {
-            typedName = String(newValue.prefix(Self.maxNameLength))
+            // The field writes its text back when it gains focus; only a real edit clears the message.
+            let name = String(newValue.prefix(Self.maxNameLength))
+            guard name != typedName else { return }
+            typedName = name
             message = nil
         }
     }
@@ -103,7 +106,9 @@ final class PeopleViewModel {
     var renameDraft: String {
         get { typedRename }
         set {
-            typedRename = String(newValue.prefix(Self.maxNameLength))
+            let name = String(newValue.prefix(Self.maxNameLength))
+            guard name != typedRename else { return }
+            typedRename = name
             renameMessage = nil
         }
     }

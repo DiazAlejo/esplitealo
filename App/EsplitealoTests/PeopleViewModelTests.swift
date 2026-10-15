@@ -69,6 +69,26 @@ struct PeopleViewModelTests {
         #expect(model.message == nil)
     }
 
+    @Test func writingTheSameTextBackKeepsTheMessage() {
+        // A text field writes its text back to the binding when it gains focus, which must not hide the message.
+        let (model, _) = makeModel()
+        model.addPerson()
+        #expect(model.message == .nameMissing)
+        model.nameDraft = ""
+        #expect(model.message == .nameMissing)
+        model.nameDraft = "A"
+        #expect(model.message == nil)
+    }
+
+    @Test func writingTheSameRenameBackKeepsTheMessage() {
+        let (model, store) = makeModel(SampleBill.midway())
+        model.beginRename(id: store.session!.participants[0].id)
+        model.renameDraft = "yadiel"
+        #expect(!model.commitRename())
+        model.renameDraft = "yadiel"
+        #expect(model.renameMessage == .duplicate("yadiel"))
+    }
+
     @Test func nameLengthIsLimited() {
         let (model, _) = makeModel()
         model.nameDraft = String(repeating: "x", count: 40)

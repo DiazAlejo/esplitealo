@@ -28,13 +28,25 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
         app.descendants(matching: .any)[identifier]
     }
 
+    /// Replaces what is in a text field. A tap puts the caret where it landed, so tap at the far end first, then delete
+    /// as many characters as the field holds.
     @MainActor
     private func replaceText(in field: XCUIElement, with text: String) {
-        field.tap()
+        field.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.5)).tap()
         if let current = field.value as? String, !current.isEmpty {
             field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count))
         }
         field.typeText(text)
+    }
+
+    /// Waits until the element's label contains the text: the screen updates a moment after a sheet closes.
+    @MainActor
+    private func waitForLabel(_ element: XCUIElement, containing text: String, timeout: TimeInterval = 8, file: StaticString = #filePath, line: UInt = #line) {
+        let predicate = NSPredicate(format: "label CONTAINS %@", text)
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+        if XCTWaiter().wait(for: [expectation], timeout: timeout) != .completed {
+            XCTFail("expected a label containing \"\(text)\", got \"\(element.label)\"", file: file, line: line)
+        }
     }
 
     // MARK: Review receipt
@@ -67,7 +79,7 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
 
         let banner = element(app, "review.banner")
         XCTAssertTrue(banner.waitForExistence(timeout: 5))
-        XCTAssertTrue(banner.label.contains("Todo quedó nítido"), banner.label)
+        waitForLabel(banner, containing: "Todo quedó nítido")
         XCTAssertTrue(app.buttons[flan].label.contains("9 dólares"), app.buttons[flan].label)
         XCTAssertFalse(app.buttons[flan].label.contains("Chequear"))
 
@@ -109,18 +121,20 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
         app.buttons["sheet.save"].tap()
 
         let banner = element(app, "review.banner")
-        XCTAssertTrue(banner.label.contains("$112.62"), banner.label)
+        waitForLabel(banner, containing: "$112.62")
         XCTAssertTrue(banner.label.contains("$110.00"), banner.label)
     }
 
     @MainActor
     func testAddingAndDeletingAnItem() {
-        let app = launch(fixture: "scanned", at: "review")
-        XCTAssertTrue(app.buttons["review.add"].waitForExistence(timeout: 15))
+        // An empty receipt keeps the add button at the top, clear of the bottom bar.
+        let app = launch(fixture: "empty", at: "review")
+        XCTAssertTrue(element(app, "review.empty").waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons["screen.next"].isEnabled, "there is nothing to continue with yet")
         app.buttons["review.add"].tap()
 
         let name = app.textFields["sheet.item.name"]
-        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        XCTAssertTrue(name.waitForExistence(timeout: 10))
         name.tap()
         name.typeText("Tostones")
         let price = app.textFields["sheet.item.price"]
@@ -128,15 +142,17 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
         price.typeText("6.00")
         app.buttons["sheet.save"].tap()
 
-        XCTAssertTrue(element(app, "review.banner").waitForExistence(timeout: 5))
-        XCTAssertTrue(element(app, "review.banner").label.contains("no cuadran"), "the new item no longer adds up to the printed subtotal")
         let added = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Tostones'")).firstMatch
-        XCTAssertTrue(added.exists)
+        XCTAssertTrue(added.waitForExistence(timeout: 5))
+        XCTAssertTrue(added.label.contains("6 dólares"), added.label)
+        XCTAssertTrue(app.buttons["screen.next"].isEnabled)
+        // The receipt has no printed total yet, and the screen says so instead of calling it fine.
+        waitForLabel(element(app, "review.banner"), containing: "Falta el total del recibo")
 
         added.tap()
         XCTAssertTrue(app.buttons["sheet.delete"].waitForExistence(timeout: 5))
         app.buttons["sheet.delete"].tap()
-        XCTAssertTrue(element(app, "review.banner").label.contains("Todo quedó nítido"))
+        XCTAssertTrue(element(app, "review.empty").waitForExistence(timeout: 5))
     }
 
     @MainActor
@@ -176,12 +192,14 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
         XCTAssertTrue(app.textFields["people.name"].waitForExistence(timeout: 15))
 
         app.buttons["people.add"].tap()
+        XCTAssertTrue(element(app, "people.message").waitForExistence(timeout: 5))
         XCTAssertEqual(element(app, "people.message").label, "Escribe un nombre primero.")
 
         let name = app.textFields["people.name"]
         name.tap()
         name.typeText("hector")
         app.buttons["people.add"].tap()
+        waitForLabel(element(app, "people.message"), containing: "hector ya está")
         XCTAssertEqual(element(app, "people.message").label, "hector ya está en la mesa. Prueba con la inicial del apellido.")
         XCTAssertFalse(app.buttons["people.row.4"].exists)
     }

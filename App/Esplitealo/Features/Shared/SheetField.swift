@@ -33,7 +33,7 @@ struct SheetField<Field: View>: View {
                 Label {
                     error
                 } icon: {
-                    Image(systemName: "exclamationmark.triangle.fill")
+                    Image(systemName: "exclamationmark.triangle.fill").accessibilityHidden(true)
                 }
                 .espText(.footnote)
                 .foregroundStyle(Color.esp.warn)

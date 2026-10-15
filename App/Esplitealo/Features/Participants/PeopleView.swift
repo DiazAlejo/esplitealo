@@ -39,10 +39,11 @@ private struct PeopleScreen: View {
                     Label {
                         message.text
                     } icon: {
-                        Image(systemName: "exclamationmark.triangle.fill")
+                        Image(systemName: "exclamationmark.triangle.fill").accessibilityHidden(true)
                     }
                     .espText(.footnote)
                     .foregroundStyle(Color.esp.warn)
+                    .accessibilityElement(children: .combine)
                     .accessibilityIdentifier("people.message")
                 }
 
@@ -190,7 +191,7 @@ private struct PersonRow: View {
             }
         }
         .padding(.leading, Spacing.sm)
-        .padding(.trailing, Spacing.xxs)
+        .padding(.trailing, Spacing.xs)
         .padding(.vertical, Spacing.xs)
         .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
     }
