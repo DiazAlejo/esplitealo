@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DraftAmount: Equatable, Sendable {
+public struct DraftAmount: Equatable, Sendable, Codable {
     public var minorUnits: Int
     public var sourceRect: PixelRect?
     public var needsAttention: Bool
@@ -21,7 +21,7 @@ public enum ItemFlag: String, Equatable, Sendable, Codable {
     case needsReview
 }
 
-public struct DraftItem: Identifiable, Equatable, Sendable {
+public struct DraftItem: Identifiable, Equatable, Sendable, Codable {
     public var id: UUID
     public var name: String
     public var quantity: Int
@@ -99,7 +99,7 @@ public struct NumberFormat: Equatable, Sendable, Codable {
     }
 }
 
-public struct DraftAdjustment: Equatable, Sendable {
+public struct DraftAdjustment: Equatable, Sendable, Codable {
     public var label: String
     public var amount: DraftAmount
 
@@ -109,7 +109,7 @@ public struct DraftAdjustment: Equatable, Sendable {
     }
 }
 
-public enum ReceiptIssue: Equatable, Sendable {
+public enum ReceiptIssue: Equatable, Sendable, Codable {
     case itemsDoNotMatchSubtotal(itemsSum: Int, printed: Int)
     case totalsDoNotAddUp(expected: Int, printed: Int)
     case numberFormatGuessed(NumberFormat)
@@ -118,7 +118,7 @@ public enum ReceiptIssue: Equatable, Sendable {
     case unparsedPriceRow(String)
 }
 
-public struct ReceiptDraft: Equatable, Sendable {
+public struct ReceiptDraft: Equatable, Sendable, Codable {
     public var items: [DraftItem]
     public var subtotal: DraftAmount?
     public var tax: DraftAmount?

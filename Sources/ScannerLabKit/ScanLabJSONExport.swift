@@ -1,4 +1,5 @@
 import EsplitealoCore
+import EsplitealoScanning
 import Foundation
 
 public struct ScanLabExportPayload: Equatable, Sendable, Codable {

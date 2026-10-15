@@ -31,7 +31,7 @@ This ordering reduces risk: recognizing a receipt is a messy input problem, whil
 
 ### Optional
 
-- Saved recent bills with SwiftData, if the schedule allows.
+- Saved recent bills as JSON files (one per bill), if the schedule allows. No database.
 
 ## Out of scope for launch
 

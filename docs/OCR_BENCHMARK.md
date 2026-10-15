@@ -28,7 +28,7 @@ Reports default to `~/Documents/firstmate/data/esplitealo-ocr-benchmark/reports/
 
 ### Synthetic (`SyntheticReceiptGenerator`)
 
-Committed generator in `Sources/EsplitealoCore/OCRBenchmark/SyntheticReceiptGenerator.swift`. Styles: Puerto Rico restaurant (IVU 11.5%), colmado, restaurant with service charge, English diner, long colmado list. Variants: clean, skew, low contrast. Ground truth is exact; images are rendered at runtime (not committed).
+Committed generator in `Sources/OCRBenchmarkKit/SyntheticReceiptGenerator.swift`. Styles: Puerto Rico restaurant (IVU 11.5%), colmado, restaurant with service charge, English diner, long colmado list. Variants: clean, skew, low contrast. Ground truth is exact; images are rendered at runtime (not committed).
 
 ### CORD v2 (real world)
 

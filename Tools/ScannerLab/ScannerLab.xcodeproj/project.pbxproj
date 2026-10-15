@@ -14,6 +14,7 @@
 		BF0001000000000000000006 /* EsplitealoCore in Frameworks */ = {isa = PBXBuildFile; productRef = PD0001000000000000000001 /* EsplitealoCore */; };
 		BF0001000000000000000007 /* EsplitealoCapture in Frameworks */ = {isa = PBXBuildFile; productRef = PD0001000000000000000002 /* EsplitealoCapture */; };
 		BF0001000000000000000008 /* ScannerLabKit in Frameworks */ = {isa = PBXBuildFile; productRef = PD0001000000000000000003 /* ScannerLabKit */; };
+		BF0001000000000000000009 /* EsplitealoScanning in Frameworks */ = {isa = PBXBuildFile; productRef = PD0001000000000000000004 /* EsplitealoScanning */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 				BF0001000000000000000006 /* EsplitealoCore in Frameworks */,
 				BF0001000000000000000007 /* EsplitealoCapture in Frameworks */,
 				BF0001000000000000000008 /* ScannerLabKit in Frameworks */,
+				BF0001000000000000000009 /* EsplitealoScanning in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +99,7 @@
 				PD0001000000000000000001 /* EsplitealoCore */,
 				PD0001000000000000000002 /* EsplitealoCapture */,
 				PD0001000000000000000003 /* ScannerLabKit */,
+				PD0001000000000000000004 /* EsplitealoScanning */,
 			);
 			productName = ScannerLab;
 			productReference = FR0001000000000000000010 /* ScannerLab.app */;
@@ -179,7 +182,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -198,7 +201,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -297,6 +300,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = PK0001000000000000000001 /* XCLocalSwiftPackageReference "../.." */;
 			productName = ScannerLabKit;
+		};
+		PD0001000000000000000004 /* EsplitealoScanning */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = PK0001000000000000000001 /* XCLocalSwiftPackageReference "../.." */;
+			productName = EsplitealoScanning;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

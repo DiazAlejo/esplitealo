@@ -37,6 +37,6 @@ In development. The calculation engine (`BillCalculator`, a Swift package with u
 - [HTML mockups](design/mockups/README.md): bilingual static screen designs (open offline by double-clicking).
 - [Tab analysis](docs/research/TAB_ANALYSIS.md): research on an existing bill-splitting app, with candidate rules (proposals, not decisions).
 
-## Tech stack (planned)
+## Tech stack
 
-SwiftUI, Vision (on-device text recognition), AVFoundation and PhotosUI (capture and import), and optionally SwiftData for saved bills. No backend.
+Native Swift 6 and SwiftUI, **iOS 18 or later**. Vision (on-device text recognition), VisionKit, AVFoundation and PhotosUI (capture and import). The bill in progress is autosaved on the phone as a small JSON draft and deleted when the bill is finished; no database. No backend and no third-party dependencies.

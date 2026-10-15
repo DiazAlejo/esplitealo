@@ -1,9 +1,14 @@
 import Foundation
 
 public enum ShareSummaryBuilder {
-    public static func build(for session: BillSession, language: ShareLanguage) -> String {
+    /// `calendar` decides which day the bill's date falls on (the device calendar by default).
+    public static func build(
+        for session: BillSession,
+        language: ShareLanguage,
+        calendar: Calendar = .current
+    ) -> String {
         let strings = ShareSummaryStrings.bundle(for: language)
-        let date = language == .es ? session.dateLabel : session.dateLabelEnglish
+        let date = ShareSummaryStrings.dateLabel(session.date, language: language, calendar: calendar)
         guard !session.hasUnallocatedAdjustments else { return "" }
         guard let printedTotal = session.printedReceiptTotalCents else { return "" }
         let bill = MoneyFormatting.usd(cents: printedTotal)

@@ -1,6 +1,9 @@
 import Foundation
 
 extension BillSession {
+    /// 2026-10-13 12:00 UTC; the share-summary goldens format it with a UTC calendar.
+    static let sampleDate = Date(timeIntervalSince1970: 1_791_892_800)
+
     static func sampleReadyToShare() -> BillSession {
         let alexID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         let samID = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
@@ -28,8 +31,7 @@ extension BillSession {
         return BillSession(
             draft: draft,
             merchantName: "Fonda Doña Lola",
-            dateLabel: "13 oct",
-            dateLabelEnglish: "Oct 13",
+            date: sampleDate,
             participants: [alex, sam],
             assignments: [
                 ItemAssignment(itemID: alexItem.id, unitIndex: 0, participantIDs: [alexID]),
@@ -112,8 +114,7 @@ extension BillSession {
         return BillSession(
             draft: draft,
             merchantName: "Fonda Doña Lola",
-            dateLabel: "13 oct",
-            dateLabelEnglish: "Oct 13",
+            date: sampleDate,
             participants: [alex, sam],
             assignments: [
                 ItemAssignment(itemID: alexItem.id, unitIndex: 0, participantIDs: [alexID]),
