@@ -13,3 +13,7 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 build/
+
+# Python
+__pycache__/
+*.pyc
