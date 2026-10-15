@@ -77,9 +77,11 @@ struct AppConfigurationTests {
         let committed = try XCConfig(contentsOf: AppFiles.config.appendingPathComponent("Shared.xcconfig"))
         #expect(committed.optionalIncludes == ["Local.xcconfig"])
         #expect(committed.settings["DEVELOPMENT_TEAM"] == "")
+        #if os(macOS)
         let local = AppFiles.config.appendingPathComponent("Local.xcconfig")
         #expect(try gitCheckIgnore(local) == true)
         #expect(try gitCheckIgnore(AppFiles.config.appendingPathComponent("Shared.xcconfig")) == false)
+        #endif
     }
 
     @Test func localXcconfigOverridesTheTeamWhenPresent() throws {
@@ -95,7 +97,8 @@ struct AppConfigurationTests {
         #expect(try XCConfig(contentsOf: shared).settings["DEVELOPMENT_TEAM"] == "")
     }
 
-    /// Runs `git check-ignore` and returns whether git ignores the path.
+    #if os(macOS)
+    /// Runs `git check-ignore` and returns whether git ignores the path (`Process` is unavailable on iOS).
     private func gitCheckIgnore(_ url: URL) throws -> Bool {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
@@ -105,6 +108,7 @@ struct AppConfigurationTests {
         process.waitUntilExit()
         return process.terminationStatus == 0
     }
+    #endif
 
     @Test func projectUsesSynchronizedFoldersAndSpanishDevelopmentRegion() throws {
         let project = try project()
