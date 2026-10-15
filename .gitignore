@@ -16,6 +16,10 @@ xcuserdata/
 *.xcuserstate
 build/
 
+# Python
+__pycache__/
+*.pyc
+
 # The owner's personal signing team (see App/Config/Shared.xcconfig). Never committed.
 App/Config/Local.xcconfig
 

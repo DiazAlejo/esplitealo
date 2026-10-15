@@ -153,6 +153,22 @@ jobs:
       - name: Build EsplitealoCore (Foundation only)
         run: swift build --target EsplitealoCore
 
+  # Informational: the Python reference calculator needs no Xcode, so it runs on the cheap Linux runner.
+  # The Swift comparison with its committed corpus already runs in the required macOS job.
+  reference-calculator:
+    name: Reference calculator
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Reference tests and committed corpus check
+        working-directory: Tools/reference-calculator
+        run: |
+          python3 -m unittest -v
+          python3 generate_corpus.py --count 300 --check ../../Tests/Fixtures/CalculatorProof/reference-corpus-300.json
+
   vision-integration:
     name: Vision integration
     runs-on: macos-26

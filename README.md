@@ -41,6 +41,7 @@ To build the app and run its unit, snapshot and UI tests on an iOS simulator, se
 - [Requirements](docs/REQUIREMENTS.md): MVP scope, functional requirements, and acceptance criteria.
 - [Screens](docs/SCREENS.md): screen-by-screen specification.
 - [Calculation rules](docs/CALCULATION_RULES.md): how items, tax, tip, and rounding are allocated.
+- [Calculator proof](docs/CALCULATOR_PROOF.md): property tests and an independent reference calculator that check every split to the cent.
 - [Architecture](docs/ARCHITECTURE.md): technology and code layout.
 - [The iOS app](docs/APP.md): app structure, design system, strings, how to add a screen, how to run the tests.
 - [Continuous integration](docs/CI.md): what runs on every pull request and how to run it locally.

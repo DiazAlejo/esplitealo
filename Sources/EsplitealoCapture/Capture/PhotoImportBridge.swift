@@ -32,17 +32,13 @@ public struct PhotoImportBridge: View {
     }
 
     private func load(item: PhotosPickerItem) async {
-        guard let data = try? await item.loadTransferable(type: Data.self) else {
-            onResult(.failure(.loadFailed))
-            return
-        }
-        guard let image = Self.makeCGImage(from: data) else {
-            onResult(.failure(.notAnImage))
-            return
-        }
-        onResult(.success(image))
+        onResult(await PhotoImport.loadImage(from: item))
     }
+}
 
+/// Turns a `PhotosPickerItem` into an upright `CGImage`, for screens that present the picker themselves
+/// (`photosPicker(isPresented:selection:matching:)`) instead of embedding `PhotoImportBridge`.
+public enum PhotoImport {
     static func makeCGImage(from data: Data) -> CGImage? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
         let options: [CFString: Any] = [
@@ -51,6 +47,16 @@ public struct PhotoImportBridge: View {
             kCGImageSourceThumbnailMaxPixelSize: 12_000,
         ]
         return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+    }
+
+    public static func loadImage(from item: PhotosPickerItem) async -> Result<CGImage, PhotoImportError> {
+        guard let data = try? await item.loadTransferable(type: Data.self) else {
+            return .failure(.loadFailed)
+        }
+        guard let image = makeCGImage(from: data) else {
+            return .failure(.notAnImage)
+        }
+        return .success(image)
     }
 }
 #endif
