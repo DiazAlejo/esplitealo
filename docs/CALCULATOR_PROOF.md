@@ -79,13 +79,28 @@ The mutation harness is not part of the repository; each change is one line in `
 
 ## Open questions for the owner
 
-The documents do not settle these, so the tests do not decide them. Each is left as the code behaves today.
+The documents do not settle these, so the tests do not decide them and no behaviour was changed. For each: what the Swift engine does today, how the reference reads the document, and a recommendation for the owner to accept or overrule.
 
-1. **Service charge and printed tip leftover cents are not surfaced.** Invariant 5 says every rounding adjustment from largest remainder is surfaced and "nothing is silent", but only item-unit, tax and tip pools are listed. `BillSession` allocates a service charge and a printed tip with the same rule through `SessionPoolAllocator`, yet drops their adjustments, so `PersonBreakdown.adjustments` never shows them. In the 5,000-bill sample, 1,490 bills (30%) hand out at least one such cent. Is the service charge or printed tip a pool the UI must itemise?
-2. **"Whenever step 5 gives a cent to someone whose initial quotient was not already the maximum possible".** The engine records an adjustment for every leftover cent. The tests assume that reading, which makes the quoted condition always true.
-3. **A bill whose items are all free but has tax, tip or a service charge** (or has no items at all). With total weight zero the rules allocate nothing, so people owe less than the bill and invariant 1 cannot hold; the engine does not let such a bill be shared. 250 of 5,000 sample bills are like this. Is "cannot share" the intended product behaviour?
-4. **Two people with the same `orderIndex`**, or two assignment rows for the same unit. The rules assume a stable unique order and one row per unit. The session can no longer create either; the calculator, given them directly, would depend on sort stability and on row order.
-5. **A negative custom tip or percentage** is treated as zero by the engine. The documents are silent.
+1. **Service charge and printed-tip leftover cents are not surfaced.** Invariant 5 says every largest-remainder adjustment is surfaced and "nothing is silent", but only item-unit, tax and tip pools are listed.
+   - *Engine:* `BillSession` splits a service charge and a printed tip by largest remainder through `SessionPoolAllocator`, then drops their adjustments, so `PersonBreakdown.adjustments` never shows them. In the 5,000-bill sample, 1,490 bills (30%) hand out at least one such cent.
+   - *Reference:* allocates both pools by the same rule (the amounts match the engine exactly) and does not record adjustments for them, mirroring the pool list in the document.
+   - *Recommendation:* treat service charge and printed tip as pools under invariant 5 and surface their cents in the UI; the amounts do not change.
+2. **A bill whose items are all free but has tax, tip or a service charge** (or has no items at all).
+   - *Engine:* with total weight zero nothing is allocated, so people owe less than the bill, and `canShare` is false. 250 of 5,000 sample bills are like this.
+   - *Reference:* the same: weight zero allocates nothing, the people's totals fall short, `canShare` is false.
+   - *Recommendation:* keep it blocked, and have the UI say why (nobody has items to carry the tax or tip) rather than showing a generic mismatch.
+3. **Two people with the same `orderIndex`, or two assignment rows for the same unit.**
+   - *Engine:* `BillSession` can no longer create either. Given directly, `BillCalculator` depends on sort stability for equal indices and uses the first of several rows for a unit.
+   - *Reference:* assumes unique order indices and one row per unit, as the document says ("stable participant order", "one set per unit").
+   - *Recommendation:* state in the rules that both are invariants of the session; no engine change needed.
+4. **A negative custom tip or percentage.**
+   - *Engine:* treated as zero.
+   - *Reference:* does not generate negative tips; the document does not say.
+   - *Recommendation:* document "negative tip = 0" (the UI should not allow it anyway).
+5. **Wording of "surfacing adjustments"** ("whenever step 5 gives a cent to someone whose initial quotient was not already the maximum possible").
+   - *Engine:* records an adjustment for every leftover cent.
+   - *Reference:* the same, which makes the quoted condition always true.
+   - *Recommendation:* reword to "every leftover cent is an adjustment".
 
 ## What is not covered
 
