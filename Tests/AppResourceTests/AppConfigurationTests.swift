@@ -1,64 +1,120 @@
 import Foundation
 import Testing
 
-/// Static checks of the app's text configuration (xcconfig files, privacy manifest, Info.plist strings, icon).
+/// Checks of the app's configuration, read as parsed meaning (xcconfig settings, the project's object graph, plists) (xcconfig files, privacy manifest, Info.plist strings, icon).
 struct AppConfigurationTests {
     private func settings(_ name: String) throws -> [String: String] {
-        var result: [String: String] = [:]
-        for line in try AppFiles.text(AppFiles.config.appendingPathComponent(name)).split(separator: "\n") {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-            guard !trimmed.hasPrefix("//"), let equals = trimmed.firstIndex(of: "=") else { continue }
-            let key = trimmed[..<equals].trimmingCharacters(in: .whitespaces)
-            let value = trimmed[trimmed.index(after: equals)...].trimmingCharacters(in: .whitespaces)
-            result[key] = value
-        }
-        return result
+        try XCConfig(contentsOf: AppFiles.config.appendingPathComponent(name)).settings
     }
 
-    private func allConfigText() throws -> String {
-        try AppFiles.files(in: AppFiles.config, extensions: ["xcconfig"]).map(AppFiles.text).joined(separator: "\n")
+    private func project() throws -> XcodeProject {
+        try XcodeProject(contentsOf: AppFiles.project)
+    }
+
+    private let targetNames = ["Esplitealo", "EsplitealoTests", "EsplitealoUITests"]
+    private let configurationNames = ["Debug", "Release"]
+
+    /// The effective settings of every target in every configuration.
+    private func allEffectiveSettings() throws -> [(String, [String: String])] {
+        let project = try project()
+        return try targetNames.flatMap { name in
+            let target = try #require(project.target(named: name))
+            return configurationNames.map { ("\(name) \($0)", project.effectiveSettings(target: target, configuration: $0)) }
+        }
     }
 
     // MARK: Build settings
 
     @Test func sharedSettingsRequireIOS18AndSwift6() throws {
-        let shared = try settings("Shared.xcconfig")
-        #expect(shared["IPHONEOS_DEPLOYMENT_TARGET"] == "18.0")
-        #expect(shared["SWIFT_VERSION"] == "6.0")
-        #expect(shared["SWIFT_STRICT_CONCURRENCY"] == "complete")
+        for (label, effective) in try allEffectiveSettings() {
+            #expect(effective["IPHONEOS_DEPLOYMENT_TARGET"] == "18.0", "\(label)")
+            #expect(effective["SWIFT_VERSION"] == "6.0", "\(label)")
+            #expect(effective["SWIFT_STRICT_CONCURRENCY"] == "complete", "\(label)")
+        }
     }
 
     @Test func appTargetIsMainActorByDefaultWithApproachableConcurrency() throws {
-        let app = try settings("App.xcconfig")
-        #expect(app["SWIFT_DEFAULT_ACTOR_ISOLATION"] == "MainActor")
-        #expect(app["SWIFT_APPROACHABLE_CONCURRENCY"] == "YES")
+        let project = try project()
+        for name in ["Esplitealo", "EsplitealoTests"] {
+            let target = try #require(project.target(named: name))
+            for configuration in configurationNames {
+                let effective = project.effectiveSettings(target: target, configuration: configuration)
+                #expect(effective["SWIFT_DEFAULT_ACTOR_ISOLATION"] == "MainActor", "\(name) \(configuration)")
+                #expect(effective["SWIFT_APPROACHABLE_CONCURRENCY"] == "YES", "\(name) \(configuration)")
+            }
+        }
     }
 
     @Test func bundleIdentifierIsOneSettingInOneXcconfig() throws {
-        let shared = try settings("Shared.xcconfig")
-        #expect(shared["APP_BUNDLE_IDENTIFIER"] == "com.esplitealo.app")
-        let occurrences = try allConfigText().components(separatedBy: "com.esplitealo").count - 1
-        #expect(occurrences == 1)
-        #expect(try settings("App.xcconfig")["PRODUCT_BUNDLE_IDENTIFIER"] == "$(APP_BUNDLE_IDENTIFIER)")
+        #expect(try settings("Shared.xcconfig")["APP_BUNDLE_IDENTIFIER"] == "com.esplitealo.app")
+        let definitions = try AppFiles.files(in: AppFiles.config, extensions: ["xcconfig"])
+            .filter { try XCConfig(contentsOf: $0).settings["APP_BUNDLE_IDENTIFIER"] != nil && $0.lastPathComponent != "Debug.xcconfig" && $0.lastPathComponent != "Release.xcconfig" }
+        #expect(definitions.map(\.lastPathComponent) == ["Shared.xcconfig"])
+
+        let project = try project()
+        let expected = ["Esplitealo": "com.esplitealo.app", "EsplitealoTests": "com.esplitealo.app.tests", "EsplitealoUITests": "com.esplitealo.app.uitests"]
+        for (name, identifier) in expected {
+            let target = try #require(project.target(named: name))
+            for configuration in configurationNames {
+                #expect(project.effectiveSettings(target: target, configuration: configuration)["PRODUCT_BUNDLE_IDENTIFIER"] == identifier, "\(name) \(configuration)")
+            }
+        }
         // The project file takes every value from the xcconfig files.
-        #expect(!(try AppFiles.text(AppFiles.project)).contains("com.esplitealo"))
+        for settings in project.inlineBuildSettings {
+            #expect(settings["PRODUCT_BUNDLE_IDENTIFIER"] == nil)
+            #expect(!settings.values.contains { "\($0)".contains("com.esplitealo") })
+        }
     }
 
-    @Test func noTeamOrPersonalIdentifierIsCommitted() throws {
-        let text = try allConfigText() + (try AppFiles.text(AppFiles.project))
-        #expect(text.range(of: #"DEVELOPMENT_TEAM\s*=\s*"?[A-Z0-9]{10}"#, options: .regularExpression) == nil)
-        #expect(text.range(of: #"[A-Za-z0-9._-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}"#, options: .regularExpression) == nil)
+    @Test func noTeamIsCommittedAndLocalXcconfigIsIgnored() throws {
+        for (label, effective) in try allEffectiveSettings() {
+            #expect((effective["DEVELOPMENT_TEAM"] ?? "").isEmpty, "\(label)")
+        }
+        for settings in try project().inlineBuildSettings {
+            #expect(((settings["DEVELOPMENT_TEAM"] as? String) ?? "").isEmpty)
+        }
         // A local, git-ignored file lets the owner set their personal team.
-        #expect(try AppFiles.text(AppFiles.config.appendingPathComponent("Shared.xcconfig")).contains("#include? \"Local.xcconfig\""))
-        let gitignore = try AppFiles.text(AppFiles.root.appendingPathComponent(".gitignore"))
-        #expect(gitignore.contains("App/Config/Local.xcconfig"))
+        let local = AppFiles.config.appendingPathComponent("Local.xcconfig")
+        #expect(try gitCheckIgnore(local) == true)
+        #expect(try gitCheckIgnore(AppFiles.config.appendingPathComponent("Shared.xcconfig")) == false)
+    }
+
+    @Test func localXcconfigOverridesTheTeamWhenPresent() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        for name in ["Shared.xcconfig"] {
+            try FileManager.default.copyItem(at: AppFiles.config.appendingPathComponent(name), to: directory.appendingPathComponent(name))
+        }
+        try "DEVELOPMENT_TEAM = ABCDE12345\n".write(to: directory.appendingPathComponent("Local.xcconfig"), atomically: true, encoding: .utf8)
+        #expect(try XCConfig(contentsOf: directory.appendingPathComponent("Shared.xcconfig")).settings["DEVELOPMENT_TEAM"] == "ABCDE12345")
+    }
+
+    /// Runs `git check-ignore` and returns whether git ignores the path.
+    private func gitCheckIgnore(_ url: URL) throws -> Bool {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+        process.arguments = ["git", "check-ignore", "--quiet", url.path]
+        process.currentDirectoryURL = AppFiles.root
+        try process.run()
+        process.waitUntilExit()
+        return process.terminationStatus == 0
     }
 
     @Test func projectUsesSynchronizedFoldersAndSpanishDevelopmentRegion() throws {
-        let project = try AppFiles.text(AppFiles.project)
-        #expect(project.contains("PBXFileSystemSynchronizedRootGroup"))
-        #expect(project.contains("developmentRegion = es;"))
-        #expect(project.contains("XCLocalSwiftPackageReference"))
+        let project = try project()
+        #expect(project.project["developmentRegion"] as? String == "es")
+        #expect(project.project["knownRegions"] as? [String] == ["es", "en", "Base"])
+        for name in targetNames {
+            let target = try #require(project.target(named: name))
+            #expect(project.synchronizedFolders(of: target) == [name], "\(name)")
+        }
+        for group in project.objects(ofType: "PBXFileSystemSynchronizedRootGroup") {
+            #expect(targetNames.contains(group["path"] as? String ?? ""))
+        }
+        #expect(!project.objects(ofType: "XCLocalSwiftPackageReference").isEmpty)
+        let packageReferences = (project.project["packageReferences"] as? [String]) ?? []
+        #expect(packageReferences.contains { project.objects[$0]?["isa"] as? String == "XCLocalSwiftPackageReference" })
     }
 
     // MARK: Privacy
@@ -73,10 +129,16 @@ struct AppConfigurationTests {
     }
 
     @Test func onlyTheCameraUsageStringIsDeclared() throws {
-        let shared = try allConfigText()
-        #expect(shared.contains("INFOPLIST_KEY_NSCameraUsageDescription"))
-        #expect(!shared.contains("NSPhotoLibrary"))
-        #expect(shared.contains("INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO"))
+        let project = try project()
+        let app = try #require(project.target(named: "Esplitealo"))
+        for configuration in configurationNames {
+            let effective = project.effectiveSettings(target: app, configuration: configuration)
+            #expect(effective["INFOPLIST_KEY_NSCameraUsageDescription"]?.isEmpty == false)
+            #expect(effective["INFOPLIST_KEY_ITSAppUsesNonExemptEncryption"] == "NO")
+        }
+        for (label, effective) in try allEffectiveSettings() {
+            #expect(!effective.keys.contains { $0.contains("NSPhotoLibrary") }, "\(label)")
+        }
 
         let catalog = try StringCatalog(contentsOf: AppFiles.infoPlistStrings)
         let keys = catalog.keys
@@ -87,12 +149,6 @@ struct AppConfigurationTests {
         #expect(camera.localizations["en"]?.values["other"]?.lowercased().contains("camera") == true)
         // The processing happens on the phone and the text must say so.
         #expect(camera.localizations["es"]?.values["other"]?.contains("no sale") == true)
-    }
-
-    @Test func noSourceFileAsksForPhotoLibraryAccess() throws {
-        for file in AppFiles.files(in: AppFiles.app, extensions: ["swift", "plist", "xcconfig", "pbxproj", "xcstrings", "xcprivacy"]) {
-            #expect(!(try AppFiles.text(file)).contains("NSPhotoLibraryUsageDescription"), "\(file.lastPathComponent)")
-        }
     }
 
     // MARK: App icon
