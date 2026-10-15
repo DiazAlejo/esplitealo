@@ -47,9 +47,14 @@ struct TypographyTests {
         }
     }
 
-    @Test func everyStyleScalesWithDynamicType() {
-        for style in TypeStyle.allCases {
-            #expect(style.spec.textStyle != nil, "\(style)")
+    @Test func everyStyleScalesRelativeToASystemTextStyle() {
+        let expected: [TypeStyle: DynamicTextStyle] = [
+            .displayAmount: .largeTitle, .title: .title, .wordmark: .title, .amount: .title2,
+            .headline: .headline, .body: .body, .subhead: .subheadline, .footnote: .footnote, .caption: .caption,
+        ]
+        #expect(Set(expected.keys) == Set(TypeStyle.allCases))
+        for (style, textStyle) in expected {
+            #expect(style.spec.textStyle == textStyle, "\(style)")
         }
     }
 

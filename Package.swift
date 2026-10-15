@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "OCRBenchmarkKit", targets: ["OCRBenchmarkKit"]),
         .executable(name: "EsplitealoOCRBenchmark", targets: ["EsplitealoOCRBenchmark"]),
         .library(name: "ScannerLabKit", targets: ["ScannerLabKit"]),
+        .library(name: "EsplitealoDesign", targets: ["EsplitealoDesign"]),
     ],
     targets: [
         // Pure bill logic: models, receipt parsing, bill session, calculator.
@@ -34,6 +35,11 @@ let package = Package(
         .target(
             name: "ScannerLabKit",
             dependencies: ["EsplitealoCore", "EsplitealoScanning"]
+        ),
+        // The SwiftUI design system: tokens, type scale, money formatter, components, bundled Unkempt font.
+        .target(
+            name: "EsplitealoDesign",
+            resources: [.copy("Resources/Fonts")]
         ),
         // Shared helpers for test targets (not a product).
         .target(
@@ -60,6 +66,10 @@ let package = Package(
         .testTarget(
             name: "ScannerLabKitTests",
             dependencies: ["ScannerLabKit"]
+        ),
+        .testTarget(
+            name: "EsplitealoDesignTests",
+            dependencies: ["EsplitealoDesign"]
         ),
     ]
 )

@@ -6,8 +6,8 @@ import Testing
 struct ContrastTests {
     struct Pair: Sendable, CustomStringConvertible {
         let name: String
-        let foreground: KeyPath<DesignPalette, RGBAColor>
-        let background: KeyPath<DesignPalette, RGBAColor>
+        let foreground: KeyPath<DesignPalette, RGBAColor> & Sendable
+        let background: KeyPath<DesignPalette, RGBAColor> & Sendable
         let minimum: Double
         var description: String { name }
     }
