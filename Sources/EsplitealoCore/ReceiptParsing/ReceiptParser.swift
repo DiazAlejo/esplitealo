@@ -113,7 +113,7 @@ public struct ReceiptParser: Sendable {
 
         var items: [DraftItem] = []
         var subtotal: DraftAmount?
-        var tax: DraftAmount?
+        var taxLines: [(label: String, amount: DraftAmount)] = []
         var tip: DraftAmount?
         var total: DraftAmount?
         var adjustments: [DraftAdjustment] = []
@@ -204,16 +204,9 @@ public struct ReceiptParser: Sendable {
             case .tax:
                 // Every tax line counts (state + county, IVU + municipal). A tax line repeated after the
                 // total is a summary of the same tax, not another one.
-                guard !(totalSeenAfterItems && tax != nil) else { break }
+                guard !(totalSeenAfterItems && !taxLines.isEmpty) else { break }
                 if let a = amount(from: line.amounts, rect: rect) {
-                    if var running = tax {
-                        running.minorUnits += a.minorUnits
-                        running.needsAttention = running.needsAttention || a.needsAttention
-                        running.sourceRect = running.sourceRect.flatMap { r in a.sourceRect.map { r.union($0) } } ?? a.sourceRect
-                        tax = running
-                    } else {
-                        tax = a
-                    }
+                    taxLines.append((line.label, a))
                 }
 
             case .tip:
@@ -332,6 +325,46 @@ public struct ReceiptParser: Sendable {
                 }
             }
             i += 1
+        }
+
+        func isSummaryTaxLabel(_ label: String) -> Bool {
+            let lowered = label.lowercased()
+            return lowered.contains("total") || lowered.contains("summary")
+        }
+
+        func combinedTax(_ lines: [(label: String, amount: DraftAmount)]) -> DraftAmount? {
+            guard var running = lines.first?.amount else { return nil }
+            for line in lines.dropFirst() {
+                running.minorUnits += line.amount.minorUnits
+                running.needsAttention = running.needsAttention || line.amount.needsAttention
+                running.sourceRect = running.sourceRect.flatMap { r in line.amount.sourceRect.map { r.union($0) } } ?? line.amount.sourceRect
+            }
+            return running
+        }
+
+        var tax: DraftAmount?
+        if taxLines.count >= 3,
+           let combined = taxLines.indices.first(where: { k in
+               taxLines[k].amount.minorUnits == taxLines.enumerated().reduce(0) { $0 + ($1.offset == k ? 0 : $1.element.amount.minorUnits) }
+           }) {
+            var individual = taxLines
+            individual.remove(at: combined)
+            tax = combinedTax(individual)
+        } else if taxLines.count >= 2, taxLines.contains(where: { isSummaryTaxLabel($0.label) }) {
+            let withoutSummary = taxLines.filter { !isSummaryTaxLabel($0.label) }
+            let readings = [combinedTax(taxLines), combinedTax(withoutSummary)].compactMap { $0 }
+            let reconciling = readings.filter { reading in
+                guard let sub = subtotal, let tot = total else { return false }
+                return sub.minorUnits + reading.minorUnits + (tip?.minorUnits ?? 0) == tot.minorUnits
+            }
+            if reconciling.count == 1 {
+                tax = reconciling[0]
+            } else {
+                tax = readings.first
+                tax?.needsAttention = true
+            }
+        } else {
+            tax = combinedTax(taxLines)
         }
 
         if items.isEmpty {

@@ -369,6 +369,47 @@ final class ReceiptParserTests: XCTestCase {
         XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
     }
 
+    func testCombinedTaxLineEqualToSumOfOthersIsNotDoubleCounted() {
+        let draft = parser.parse(RecognizedTextTestBuilder.fromRowTexts([
+            "Gift Box 20.00",
+            "Subtotal 20.00",
+            "STATE TAX (10.5%) 2.10",
+            "COUNTY TAX (1%) 0.20",
+            "Total Tax 2.30",
+            "Total 22.30"
+        ]))
+        XCTAssertEqual(draft.tax?.minorUnits, 230)
+        XCTAssertTrue(draft.reconciles)
+        XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
+    }
+
+    func testMismatchedSummaryTaxLineIsDroppedWhenOnlyThatReadingReconciles() {
+        let draft = parser.parse(RecognizedTextTestBuilder.fromRowTexts([
+            "Gift Box 20.00",
+            "Subtotal 20.00",
+            "STATE TAX (10.5%) 2.10",
+            "COUNTY TAX (1%) 0.20",
+            "Tax Summary 2.50",
+            "Total 22.30"
+        ]))
+        XCTAssertEqual(draft.tax?.minorUnits, 230)
+        XCTAssertEqual(draft.tax?.needsAttention, false)
+        XCTAssertTrue(draft.reconciles)
+    }
+
+    func testMismatchedSummaryTaxLineWithNoReconcilingReadingIsFlagged() {
+        let draft = parser.parse(RecognizedTextTestBuilder.fromRowTexts([
+            "Gift Box 20.00",
+            "Subtotal 20.00",
+            "STATE TAX (10.5%) 2.10",
+            "COUNTY TAX (1%) 0.20",
+            "Tax Summary 2.50",
+            "Total 30.00"
+        ]))
+        XCTAssertEqual(draft.tax?.needsAttention, true)
+        XCTAssertFalse(draft.reconciles)
+    }
+
     func testHeaderTotalThatAgreesWithBottomTotalIsAccepted() {
         let draft = parser.parse(columnReceipt([
             ("TOTAL", "$11.50"),
