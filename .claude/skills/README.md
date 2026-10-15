@@ -1,6 +1,6 @@
 # Agent skills
 
-Open-source skills that the AI workers building Esplitealo use for SwiftUI and Apple design practice. Claude Code discovers each folder here automatically.
+Open-source skills that AI coding assistants working on Esplitealo use for SwiftUI and Apple design practice. Claude Code discovers each folder here automatically.
 
 | Skill | Source | License | Use it for |
 |---|---|---|---|

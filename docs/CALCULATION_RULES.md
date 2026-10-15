@@ -2,7 +2,7 @@
 
 This is the most important part to get right before polishing the UI. The rules live in a pure `BillCalculator` with unit tests, independent of the interface.
 
-## Worked example (captain)
+## Worked example (project owner)
 
 Receipt: $100.00 item subtotal, $10.00 tax, $20.00 tip. Confirmed total: $130.00.
 
@@ -157,9 +157,9 @@ Every unit assigned to the same set of people; each pool splits equally across t
 
 Tax 100¢ split across three equal subtotals: shares 34¢, 33¢, 33¢ with adjustments on the two 33¢→34¢ steps per participant order among tied remainders.
 
-## Proposals (not captain decisions)
+## Proposals (not product decisions)
 
-These are engine conventions chosen for v1 unless the captain overrides later:
+These are engine conventions chosen for v1 unless the project owner overrides later:
 
 - **Unit price split within a line** uses “first `extra` units get the +1¢” (standard integer division spread), not largest remainder across units.
 - **Split the rest evenly** assigns every participant to each unclaimed unit (equal split), not only participants with no items yet.

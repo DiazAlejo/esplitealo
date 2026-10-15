@@ -1,0 +1,28 @@
+Copyright (c) 2026 DiazAlejo. All rights reserved.
+
+The source code, documentation, design files and other materials in this
+repository (the "Materials") are published for viewing and review only.
+
+No permission is granted to copy, modify, merge, redistribute, sublicense,
+sell, or publish the Materials, or any application or other work derived from
+them (including builds distributed through the App Store or any other
+marketplace), without the prior written permission of the copyright holder.
+Viewing the Materials and quoting short excerpts for review, commentary or
+discussion is permitted.
+
+Trademarks and artwork. The names Esplitealo, Esplitéalo and Chavito, and the
+logo, wordmark and mascot artwork (including the Chavito character and the app
+icon), are not licensed under any circumstances. Nothing here grants any right
+to use them.
+
+Third-party components. Third-party components included in or used by this
+repository keep their own licenses and copyright notices, and this notice does
+not change them. They are listed in THIRD_PARTY_NOTICES.md and include the
+Unkempt font, the skills under .claude/skills, and the swift-snapshot-testing
+test dependency with its own dependencies.
+
+THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE MATERIALS OR THEIR USE.
