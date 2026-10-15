@@ -74,7 +74,7 @@ public struct EspWordmark: View {
         .tracking(0.5)
         .foregroundStyle(Color.esp.ink)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Esplitéalo")
+        .accessibilityLabel(Text(verbatim: "Esplitéalo"))
         .accessibilityAddTraits(.isHeader)
     }
 }

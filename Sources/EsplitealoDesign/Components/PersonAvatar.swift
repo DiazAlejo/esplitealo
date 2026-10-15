@@ -35,7 +35,7 @@ public struct PersonAvatar: View {
             }
             .padding(PersonColorSlot.usesDottedRing(participantIndex: participantIndex) ? 3 : 0)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(showsName ? Text(verbatim: name) : Text(verbatim: ""))
+            .accessibilityLabel(Text(verbatim: name))
             .accessibilityHidden(!showsName)
     }
 }

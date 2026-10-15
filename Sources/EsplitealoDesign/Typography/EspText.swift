@@ -36,24 +36,30 @@ extension View {
 
 private struct EspTextModifier: ViewModifier {
     let style: TypeStyle
-    @ScaledMetric private var size: Double
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// Only the display amount has no system text style of its own size (40 pt), so only it scales by hand.
+    @ScaledMetric private var displayAmountSize: Double
 
     init(style: TypeStyle) {
         self.style = style
-        _size = ScaledMetric(wrappedValue: style.spec.size, relativeTo: style.spec.textStyle.fontTextStyle)
+        _displayAmountSize = ScaledMetric(wrappedValue: style.spec.size, relativeTo: style.spec.textStyle.fontTextStyle)
     }
 
+    /// System styles use the system text style that has the guide's size (title2 = 22, body = 17, subheadline = 15,
+    /// footnote = 13, caption = 12), so they scale exactly like system text. Unkempt scales relative to its style.
     private var font: Font {
         let spec = style.spec
+        let weight = spec.weight.fontWeight
         var font: Font
         switch spec.family {
         case .system:
-            font = .system(size: size, weight: spec.weight.fontWeight)
+            font = .system(spec.textStyle.fontTextStyle, design: .default, weight: weight)
         case .systemRounded:
-            font = .system(size: size, weight: spec.weight.fontWeight, design: .rounded)
-        case let .unkempt(weight):
-            font = .custom(weight.postScriptName, fixedSize: size)
+            font = style == .displayAmount
+                ? .system(size: displayAmountSize, weight: weight, design: .rounded)
+                : .system(spec.textStyle.fontTextStyle, design: .rounded, weight: weight)
+        case let .unkempt(unkemptWeight):
+            font = .custom(unkemptWeight.postScriptName, size: spec.size, relativeTo: spec.textStyle.fontTextStyle)
         }
         if spec.monospacedDigits { font = font.monospacedDigit() }
         return font

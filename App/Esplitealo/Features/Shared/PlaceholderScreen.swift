@@ -34,7 +34,7 @@ struct PlaceholderScreen: View {
         .toolbar {
             if let step = route.step {
                 ToolbarItem(placement: .principal) {
-                    Text(String(format: String(localized: "nav.step"), step))
+                    Text(.navStep(step))
                         .espText(.footnote)
                         .foregroundStyle(Color.esp.inkSecondary)
                 }
