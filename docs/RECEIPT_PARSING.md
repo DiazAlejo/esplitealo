@@ -20,7 +20,13 @@ Parser tests replay committed JSON under `Tests/Fixtures/Receipts/` so CI does n
 4. **Locale vote** (`NumberFormatInference`): infer decimal vs thousands separators once per receipt; ambiguous zero-decimal shapes (e.g. `32.000`) and 4+ digit plain integers are flagged as guessed. USD cents (Puerto Rico) is the default when the vote is inconclusive.
 5. **Classification**: fuzzy keyword match for subtotal, tax (including **IVU**), tip/gratuity/service, total, discount, payment, and suggested-tip tables (not items). Scope is Spanish/English keywords, Puerto Rico, USD only. Discount rows are always stored as negative adjustments, whether or not the receipt prints a sign.
 6. **Items**: lines with both label and amount above the footer boundary; support `2 x` / `2 @` quantity prefixes; name/price on adjacent rows; optional modifier notes (`+ …`); ignore payment and tip-table rows after totals.
-7. **Reconciliation**: never rewrite amounts. `reconciles` is true when net item line totals (including discounts) match the printed subtotal, or—if subtotal is missing—when they match `total − tax − tip`. Mismatches become `ReceiptIssue` entries for the review UI.
+   - **Column headers**: a row made only of table-heading words (`Items Price`, `Artículo Precio`, `Qty`, `Description`, …) is skipped.
+   - **Multi-row names**: the price is read from the right-hand column of the *first* row. Directly following rows that have letters but no amount (modifier/variant rows such as `Negro` or `Marrón`) are appended to the name, so `Sombrero Cowboy $34.50` / `Negro` is one item named `Sombrero Cowboy Negro`. A continuation row must sit one normal line below and roughly under the previous row’s left edge, must not start with `+`/`-` (those stay notes), and must not be a name whose price is on the next row.
+   - **Quantity rows**: a standalone `(N x $price)` / `N x $price` / `N @ $price` row under an item sets the quantity to *N* and the unit price to *price*; the figure on the first row stays the line total and is never rewritten. If *N* × unit price does not equal the line total (or an explicit `2 x` prefix says something different), the item keeps the printed line total and is flagged `quantityMismatch` + `needsReview` instead of guessing. A quantity row with no item above it becomes an `unparsedPriceRow` issue.
+   - **Identifiers are not prices**: a token that mixes letters with a long digit run (card AID `(A0000000031010)`, `MID`-style ids) is never an amount.
+7. **Taxes**: every line classified as tax (`tax`, `impuesto`, `IVU`, `IVA`, `VAT`, including `STATE TAX (10.5%)` + `COUNTY TAX (1%)`) is summed into one `tax` amount. A tax line repeated *after* the total (a tax summary in the payment block) is ignored once a tax is already known, so it is not double counted. The per-line breakdown is not stored in `ReceiptDraft`; adding an optional list of tax labels/amounts would change the persisted draft model and is left for a later change.
+8. **Totals and payment blocks**: a `TOTAL $x` header at the top of the receipt is only a hint; the last `Total` row below the items wins (and `totalsDoNotAddUp` fires if it disagrees with subtotal + tax + tip). Everything after the first subtotal/total row — card terminal blocks (`Transaction Record`, `Visa`, `AUTHORIZED`, AID, `MID`, `TSI`, receipt number, dates) — is ignored for items and never produces price-row issues.
+9. **Reconciliation**: never rewrite amounts. `reconciles` is true when net item line totals (including discounts) match the printed subtotal, or—if subtotal is missing—when they match `total − tax − tip`. Mismatches become `ReceiptIssue` entries for the review UI.
 
 ## Output: `ReceiptDraft`
 
@@ -31,7 +37,7 @@ Conversion to the bill-splitting `Receipt` model (participants, assignments, tip
 ## Tests
 
 - Unit tests in `ReceiptParserTests` and `AmountTokenTests` (synthetic geometry via `RecognizedTextTestBuilder`).
-- Fixture tests load `*.recognized.json` + `*.expected.json` (includes macOS Vision recordings of synthetic receipts and hand-written adversarial geometry).
+- Fixture tests load `*.recognized.json` + `*.expected.json` (includes macOS Vision recordings of synthetic receipts and hand-written adversarial geometry). `pr-party-store-wrapped-names` is the first real receipt scanned with Scanner Lab (store name, phone, card, terminal and transaction ids removed): wrapped item names, a `(3 x $11.50)` row, two tax lines, a header total and a card-terminal block. Its expected file also pins item names, unit prices, flagged-item count and issue count.
 
 Regenerate Vision fixtures locally with the throwaway script in firstmate task data (`record_ocr.swift`); only JSON is committed.
 

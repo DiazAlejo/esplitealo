@@ -301,7 +301,7 @@ final class ReceiptParserTests: XCTestCase {
         XCTAssertEqual(draft.items.map(\.name), ["Party Hat Black", "Party Hat Brown"])
         XCTAssertEqual(draft.items.map(\.quantity), [3, 1])
         XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [3450, 1150])
-        XCTAssertEqual(draft.items.map { $0.unitPrice?.minorUnits }, [1150, 1150])
+        XCTAssertEqual(draft.items.map { $0.unitPrice?.minorUnits }, [1150, nil], "only a printed quantity row sets a unit price")
         XCTAssertTrue(draft.items.allSatisfy { $0.flags.isEmpty })
         XCTAssertEqual(draft.tax?.minorUnits, 530)
         XCTAssertTrue(draft.reconciles)

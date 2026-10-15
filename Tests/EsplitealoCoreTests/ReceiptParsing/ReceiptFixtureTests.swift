@@ -5,7 +5,7 @@ private struct FixtureExpectation: Decodable {
     var itemNames: [String]?
     var itemTotals: [Int]
     var quantities: [Int]?
-    var unitPrices: [Int]?
+    var unitPrices: [Int?]?
     var subtotal: Int?
     var tax: Int?
     var total: Int?
@@ -57,7 +57,7 @@ final class ReceiptFixtureTests: XCTestCase {
             XCTAssertEqual(draft.items.map(\.quantity), quantities, "quantities for \(fixture)")
         }
         if let unitPrices = expected.unitPrices {
-            XCTAssertEqual(draft.items.map { $0.unitPrice?.minorUnits }, unitPrices.map { Optional($0) }, "unit prices for \(fixture)")
+            XCTAssertEqual(draft.items.map { $0.unitPrice?.minorUnits }, unitPrices, "unit prices for \(fixture)")
         }
         if let flagged = expected.itemsNeedingReview {
             XCTAssertEqual(draft.items.filter { !$0.flags.isEmpty }.count, flagged, "flagged items for \(fixture)")
