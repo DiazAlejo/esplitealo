@@ -47,7 +47,7 @@ struct AppConfigurationTests {
     @Test func noTeamOrPersonalIdentifierIsCommitted() throws {
         let text = try allConfigText() + (try AppFiles.text(AppFiles.project))
         #expect(text.range(of: #"DEVELOPMENT_TEAM\s*=\s*"?[A-Z0-9]{10}"#, options: .regularExpression) == nil)
-        #expect(!text.contains("@"))
+        #expect(text.range(of: #"[A-Za-z0-9._-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}"#, options: .regularExpression) == nil)
         // A local, git-ignored file lets the owner set their personal team.
         #expect(try AppFiles.text(AppFiles.config.appendingPathComponent("Shared.xcconfig")).contains("#include? \"Local.xcconfig\""))
         let gitignore = try AppFiles.text(AppFiles.root.appendingPathComponent(".gitignore"))

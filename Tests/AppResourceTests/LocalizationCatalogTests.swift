@@ -65,11 +65,21 @@ struct LocalizationCatalogTests {
     @Test func bothLanguagesTakeTheSameArguments() throws {
         for entry in try catalog().entries {
             guard let es = entry.localizations["es"], let en = entry.localizations["en"] else { continue }
-            let spanish = es.values.values.map(StringCatalog.placeholders(in:))
-            let english = en.values.values.map(StringCatalog.placeholders(in:))
-            let reference = spanish.first ?? []
-            #expect(spanish.allSatisfy { $0 == reference }, "\(entry.key): Spanish variants differ in arguments")
-            #expect(english.allSatisfy { $0 == reference }, "\(entry.key): English arguments differ from Spanish")
+            let reference = StringCatalog.placeholders(in: es.values["other"] ?? "")
+            #expect(StringCatalog.placeholders(in: en.values["other"] ?? "") == reference,
+                    "\(entry.key): English arguments differ from Spanish")
+            // A singular form may leave the number out ("1 item" can say "the item"), but never add arguments.
+            for localization in [es, en] {
+                guard let one = localization.values["one"] else { continue }
+                var remaining = reference
+                for placeholder in StringCatalog.placeholders(in: one) {
+                    guard let index = remaining.firstIndex(of: placeholder) else {
+                        Issue.record("\(entry.key): the singular form takes arguments the plural form does not")
+                        break
+                    }
+                    remaining.remove(at: index)
+                }
+            }
         }
     }
 
@@ -83,7 +93,7 @@ struct LocalizationCatalogTests {
         // tú register; "marcar" for assigning; never "monto"; "añadir", not "agregar".
         let forbidden = ["monto", "asign", "agreg", "usted", "ustedes", "seleccion"]
         for entry in try catalog().entries {
-            for text in entry.localizations["es"]?.values.values ?? [] {
+            for text in Array(entry.localizations["es"]?.values.values ?? [:].values) {
                 let lowercased = text.lowercased()
                 for word in forbidden {
                     #expect(!lowercased.contains(word), "\(entry.key): Spanish text uses \"\(word)\"")
