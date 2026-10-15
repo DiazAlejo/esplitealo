@@ -5,11 +5,30 @@ import SwiftUI
 @main
 struct EsplitealoApp: App {
     @State private var store: BillStore
-    @State private var router = AppRouter()
+    @State private var router: AppRouter
+    @State private var scanFlow: ScanFlow
 
     init() {
         DesignFonts.registerAll()
-        _store = State(initialValue: BillStore.live())
+        let store = BillStore.live()
+        let router = AppRouter()
+        _store = State(initialValue: store)
+        _router = State(initialValue: router)
+        _scanFlow = State(initialValue: ScanFlow(store: store, router: router, services: Self.scanServices()))
+    }
+
+    /// The real camera and Vision. Debug builds can swap in a fixture receipt for UI tests (see `ScanLaunchConfiguration`).
+    private static func scanServices() -> ScanFlow.Services {
+        #if DEBUG
+        if let configuration = ScanLaunchConfiguration() {
+            do {
+                return try configuration.services()
+            } catch {
+                fatalError("Could not set up the UI-test scan services: \(error)")
+            }
+        }
+        #endif
+        return .live
     }
 
     var body: some Scene {
@@ -17,6 +36,7 @@ struct EsplitealoApp: App {
             RootView()
                 .environment(store)
                 .environment(router)
+                .environment(scanFlow)
                 .espScreenBackground()
         }
     }

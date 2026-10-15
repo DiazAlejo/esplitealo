@@ -269,9 +269,10 @@ struct ScanFlowTests {
     @Test func closingThePhotoPickerAfterAPhotoWasPickedDoesNothing() async {
         let flow = makeFlow(scanner: FakeScanner(.success(scanned), gated: true))
         await open(flow, .photoLibrary)
-        flow.photoFinished(.success(image()))
+        flow.photoSelected()
         flow.photoPickerClosedWithoutSelection()
         #expect(flow.phase == .processing)
+        flow.photoFinished(.success(image()))
         #expect(router.path == [.capture])
     }
 
@@ -399,6 +400,7 @@ struct ScanFlowTests {
         #expect(!flow.offersManualEntry)
         clock.advance(by: .seconds(1))
         await clock.waitForSleepers(count: 1)
+        for _ in 0 ..< 50 { await Task.yield() } // let the woken task finish
         #expect(flow.offersManualEntry)
         #expect(ScanFlow.manualEntryDelay == .seconds(8))
     }

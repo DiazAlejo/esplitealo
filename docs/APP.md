@@ -58,6 +58,7 @@ The contrast tests (`ContrastTests`) check every documented pair of the colour p
 - **`AppRouter`** (`@Observable`) owns the path: `push`, `advance`, `back`, `popToRoot`, `show`.
 - **`BillStore`** (`@MainActor @Observable`) owns the `BillSession` of the bill in progress. Read `store.session`; change it only through `store.update { $0.addParticipant(name: "Ana") }`. Every change is autosaved through the `BillDraftStore` after 0.5 s of quiet (and at once when the app goes to the background). A blank bill is never written. `store.finishBill()` deletes the draft and clears the session: call it when the bill is done. On launch `RootView` calls `loadSavedDraft()` and, if a draft exists, asks "¿Seguimos con tu cuenta?"; `AppRoute.path(resuming:)` puts the user back at the right screen. A draft that cannot be read is deleted, not offered. The draft file lives in `Application Support/Draft`, excluded from backups. The receipt image is not stored yet.
 - Inject with `@Environment(BillStore.self)` and `@Environment(AppRouter.self)`.
+- **`ScanFlow`** (`@Observable`, `@Environment(ScanFlow.self)`) runs the capture flow behind Home's two buttons and the capture route: camera permission, the VisionKit document camera or `PhotosPicker`, reading on the device, typed failures (`ScanFailure`), then `store.startNewBill(draft:)` and Review. Going back from Review to the capture route starts a new capture.
 
 ## Strings
 
@@ -136,7 +137,7 @@ Every new screen ships with a snapshot of its states: build the screen view with
 
 ### UI tests
 
-`--uitesting` as a launch argument makes the app keep its draft in a throwaway directory, so a saved bill never interrupts a test. Use accessibility identifiers (`screen.home`, `home.scan`, `screen.next`), not labels, except where the test is about the language. The simulator has no camera: later tests will pass a fixture receipt with a launch argument instead of opening the document camera.
+`--uitesting` as a launch argument makes the app keep its draft in a throwaway directory, so a saved bill never interrupts a test. Use accessibility identifiers (`screen.home`, `home.scan`, `screen.next`), not labels, except where the test is about the language. The simulator has no camera, so Debug builds take launch arguments that replace the system camera and photo picker (`App/Esplitealo/Features/Capture/ScanLaunchConfiguration.swift`, compiled out of Release): `--uitesting-recognized-text <path>` reads a committed `RecognizedText` fixture (for example `Tests/Fixtures/Receipts/pr-ivu-bistro.recognized.json`) through the real parser and opens Review; `--uitesting-camera authorized|denied|restricted|notDetermined|unsupported` sets the permission state; `--uitesting-scan-failure unreadable|tooManyPages|tooLong|photoNotLoaded|cameraFailed` fails the first attempt; `--uitesting-scan-delay <seconds>` slows reading so the processing screen can be seen. `CaptureFlowUITests` shows how to use them.
 
 ### Where things are tested
 

@@ -771,6 +771,40 @@
         }
       }
     },
+    "capture.unavailableBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This phone doesn’t let Esplitéalo use the camera. Pick a photo you already took."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este celular no deja que Esplitéalo use la cámara. Elige una foto que ya tengas."
+          }
+        }
+      }
+    },
+    "capture.unavailableTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera isn’t available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cámara no está disponible"
+          }
+        }
+      }
+    },
     "capture.use" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1808,6 +1842,40 @@
         }
       }
     },
+    "processing.cameraFailed.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong with the camera. Try again, pick a photo you already took, or type the items in yourself. Nothing is lost."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo falló con la cámara. Trátalo otra vez, elige una foto que ya tengas o añade los artículos a mano. No se perdió nada."
+          }
+        }
+      }
+    },
+    "processing.cameraFailed.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I couldn’t use the camera"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pude usar la cámara"
+          }
+        }
+      }
+    },
     "processing.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1944,6 +2012,40 @@
         }
       }
     },
+    "processing.photoFailed.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The photo may not have downloaded, or it may not be an image. Pick another one, or type the items in yourself. Nothing is lost."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede que la foto no se haya descargado o que no sea una imagen. Elige otra o añade los artículos a mano. No se perdió nada."
+          }
+        }
+      }
+    },
+    "processing.photoFailed.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I couldn’t open that photo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pude abrir esa foto"
+          }
+        }
+      }
+    },
     "processing.retry" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1957,6 +2059,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tratar otra vez"
+          }
+        }
+      }
+    },
+    "processing.tooLong.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It won’t fit in one photo. Fold it so the items and total show together, or type the items in yourself. Nothing is lost."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cabe en una sola foto. Dóblalo para que se vean los artículos y el total juntos, o añade los artículos a mano. No se perdió nada."
+          }
+        }
+      }
+    },
+    "processing.tooLong.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That receipt is too long"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ese recibo es muy largo"
+          }
+        }
+      }
+    },
+    "processing.tooManyPages.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I can only read one receipt at a time. Scan it again as a single page, or type the items in yourself. Nothing is lost."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo puedo leer un recibo a la vez. Escanéalo otra vez en una sola página o añade los artículos a mano. No se perdió nada."
+          }
+        }
+      }
+    },
+    "processing.tooManyPages.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That was more than one page"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ay, eso fueron varias páginas"
           }
         }
       }
