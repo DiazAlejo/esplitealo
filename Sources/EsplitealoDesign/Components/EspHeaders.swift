@@ -1,3 +1,4 @@
+import CoreText
 import SwiftUI
 
 /// A screen title in Unkempt, with the pink ÷ before it. Wraps at large Dynamic Type sizes.
@@ -44,25 +45,36 @@ public struct EspSectionHeader: View {
 }
 
 /// The ESPLITÉALO wordmark in Unkempt Bold: ink letters and a pink acute on the É. Titles and the wordmark are the
-/// only places Unkempt is used.
+/// only places Unkempt is used. The acute is drawn as its own pink mark over a plain E, because a text run cannot
+/// colour half of one letter.
 public struct EspWordmark: View {
+    @ScaledMetric(relativeTo: .title) private var size: CGFloat = TypeStyle.wordmark.spec.size
+
     public init() {}
 
-    private var text: AttributedString {
-        var base = AttributedString("ESPLITE")
-        base.foregroundColor = Color.esp.ink
-        var acute = AttributedString("\u{0301}")
-        acute.foregroundColor = Color.esp.pink
-        var rest = AttributedString("ALO")
-        rest.foregroundColor = Color.esp.ink
-        return base + acute + rest
+    /// Height of the strip above the capital letters, which is where the acute of the É lives.
+    private var accentBand: CGFloat {
+        let font = CTFontCreateWithName(UnkemptWeight.bold.postScriptName as CFString, size, nil)
+        return CTFontGetAscent(font) - CTFontGetCapHeight(font)
     }
 
     public var body: some View {
-        Text(text)
-            .espText(.wordmark)
-            .tracking(0.5)
-            .accessibilityLabel("Esplitéalo")
-            .accessibilityAddTraits(.isHeader)
+        HStack(spacing: 0) {
+            Text(verbatim: "ESPLIT")
+            ZStack(alignment: .top) {
+                Text(verbatim: "E")
+                // The real É in pink, cut down to the strip above the capitals, so only its acute shows.
+                Text(verbatim: "É")
+                    .foregroundStyle(Color.esp.pink)
+                    .mask(alignment: .top) { Rectangle().frame(height: accentBand) }
+            }
+            Text(verbatim: "ALO")
+        }
+        .espText(.wordmark)
+        .tracking(0.5)
+        .foregroundStyle(Color.esp.ink)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Esplitéalo")
+        .accessibilityAddTraits(.isHeader)
     }
 }

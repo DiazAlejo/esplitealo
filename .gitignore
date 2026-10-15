@@ -3,6 +3,8 @@
 *.xcodeproj
 !Tools/ScannerLab/ScannerLab.xcodeproj
 !Tools/ScannerLab/ScannerLab.xcodeproj/**
+!App/Esplitealo.xcodeproj
+!App/Esplitealo.xcodeproj/**
 Tools/ScannerLab/ScannerLab.xcodeproj/project.xcworkspace/
 DerivedData/
 
@@ -13,3 +15,10 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 build/
+
+# The owner's personal signing team (see App/Config/Shared.xcconfig). Never committed.
+App/Config/Local.xcconfig
+
+# Re-ignore per-user Xcode state inside the project files that are tracked above.
+xcuserdata/
+*.xcuserstate

@@ -7,6 +7,7 @@ final class SmokeTests: XCTestCase {
         continueAfterFailure = false
     }
 
+    @MainActor
     private func launch(language: String = "es", region: String = "PR") -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += ["--uitesting", "-AppleLanguages", "(\(language))", "-AppleLocale", "\(language)_\(region)"]
@@ -14,6 +15,7 @@ final class SmokeTests: XCTestCase {
         return app
     }
 
+    @MainActor
     func testLaunchesToHomeInSpanish() {
         let app = launch()
         XCTAssertTrue(app.descendants(matching: .any)["screen.home"].waitForExistence(timeout: 15))
@@ -22,12 +24,14 @@ final class SmokeTests: XCTestCase {
         XCTAssertEqual(scan.label, "Escanear recibo")
     }
 
+    @MainActor
     func testLaunchesToHomeInEnglish() {
         let app = launch(language: "en", region: "US")
         XCTAssertTrue(app.descendants(matching: .any)["screen.home"].waitForExistence(timeout: 15))
         XCTAssertEqual(app.buttons["home.scan"].label, "Scan receipt")
     }
 
+    @MainActor
     func testWalksThroughTheSixScreens() {
         let app = launch()
         XCTAssertTrue(app.descendants(matching: .any)["screen.home"].waitForExistence(timeout: 15))

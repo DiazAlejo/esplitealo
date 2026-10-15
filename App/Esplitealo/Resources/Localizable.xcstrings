@@ -492,44 +492,36 @@
         }
       }
     },
-    "assign.warn.body" : {
-      "comment" : "Argument: how many items are unassigned.",
+    "assign.warn.bodyMany" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Assign it to move on. Nothing is split until every item has a person."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Assign them to move on. Nothing is split until every item has a person."
-                }
-              }
-            }
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign them to move on. Nothing is split until every item has a person."
           }
         },
         "es" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Márcalo para continuar. No se divide nada hasta que cada artículo tenga una persona."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Márcalos para continuar. No se divide nada hasta que cada artículo tenga una persona."
-                }
-              }
-            }
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Márcalos para continuar. No se divide nada hasta que cada artículo tenga una persona."
+          }
+        }
+      }
+    },
+    "assign.warn.bodyOne" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign it to move on. Nothing is split until every item has a person."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Márcalo para continuar. No se divide nada hasta que cada artículo tenga una persona."
           }
         }
       }
@@ -1608,44 +1600,38 @@
         }
       }
     },
-    "people.remove.orphans" : {
-      "comment" : "Arguments: how many items go back to unassigned, then their names joined.",
+    "people.remove.orphansMany" : {
+      "comment" : "Several items go back to unassigned. Argument: their names joined.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%2$@ will go back to Unassigned."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%2$@ will go back to Unassigned."
-                }
-              }
-            }
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ will go back to Unassigned."
           }
         },
         "es" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%2$@ volverá a quedar sin marcar."
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%2$@ volverán a quedar sin marcar."
-                }
-              }
-            }
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ volverán a quedar sin marcar."
+          }
+        }
+      }
+    },
+    "people.remove.orphansOne" : {
+      "comment" : "One item goes back to unassigned. Argument: its name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ will go back to Unassigned."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ volverá a quedar sin marcar."
           }
         }
       }
@@ -1736,19 +1722,18 @@
       }
     },
     "placeholder.body" : {
-      "comment" : "Argument: the step name.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This screen is not ready yet. This is where the “%@” step goes."
+            "value" : "This screen is not ready yet."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta pantalla todavía no está lista. Aquí va el paso «%@»."
+            "value" : "Esta pantalla todavía no está lista."
           }
         }
       }

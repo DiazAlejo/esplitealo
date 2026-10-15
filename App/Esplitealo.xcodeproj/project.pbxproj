@@ -1,0 +1,476 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		86D35C5B1FB71C74A1E8C2C3 /* EsplitealoCapture in Frameworks */ = {isa = PBXBuildFile; productRef = F642CD9C4824C2741E639B29 /* EsplitealoCapture */; };
+		4E6AC7030ED5F8BF109CDCF8 /* EsplitealoCore in Frameworks */ = {isa = PBXBuildFile; productRef = FF8F5CE73740F8071699B140 /* EsplitealoCore */; };
+		0D5CFAC711FFF86195AD7EE8 /* EsplitealoDesign in Frameworks */ = {isa = PBXBuildFile; productRef = B5A107B47F8E39C71BA8F278 /* EsplitealoDesign */; };
+		F27F600389EA43C074D94A47 /* EsplitealoScanning in Frameworks */ = {isa = PBXBuildFile; productRef = A6C52A1D2EFBE22CE77067C1 /* EsplitealoScanning */; };
+		35FEB42F4258C2745D7CF0FE /* EsplitealoCore in Frameworks */ = {isa = PBXBuildFile; productRef = C0A02A34FF72C357C44E541E /* EsplitealoCore */; };
+		5F45F80129B8F73787F2ED84 /* EsplitealoDesign in Frameworks */ = {isa = PBXBuildFile; productRef = 9AFCB4565508D9951352A6C8 /* EsplitealoDesign */; };
+		F41E3FC79DEEE86E92C04D72 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 1DC9C5B63B3C04D18AF025C8 /* SnapshotTesting */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F95F4953040F5964B215FC47 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1BB2BB1A6733C7E189A529A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6791DEF527434D102CB85CA3;
+			remoteInfo = Esplitealo;
+		};
+		0D247A778F02354C561A43FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F1BB2BB1A6733C7E189A529A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6791DEF527434D102CB85CA3;
+			remoteInfo = Esplitealo;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		665D157E5D84F0DDED5CDF5A /* Esplitealo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Esplitealo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		68E2B816B7C9F914BAAAFC60 /* EsplitealoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EsplitealoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA14A21A7FDDFF1264768F3C /* EsplitealoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EsplitealoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF61A1B8D8D64E7A23145AC3 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		134E0DF890A5A8EB58DAEAD0 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		00EF0EA31A495E917A99C587 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		E76F49409E502AE8F297EB35 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
+		BB1B239E38C5557708B32AFE /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
+		67C5F257D37066A978CFB7AC /* UITests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = UITests.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		AEABFB06D838003F8A6C5E31 /* Esplitealo */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Esplitealo;
+			sourceTree = "<group>";
+		};
+		BF07DD6D1925DE77FA2CA877 /* EsplitealoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = EsplitealoTests;
+			sourceTree = "<group>";
+		};
+		73B22552C7188543FD58C913 /* EsplitealoUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = EsplitealoUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		74B4B1B8010023F8F783E4D0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86D35C5B1FB71C74A1E8C2C3 /* EsplitealoCapture in Frameworks */,
+				4E6AC7030ED5F8BF109CDCF8 /* EsplitealoCore in Frameworks */,
+				0D5CFAC711FFF86195AD7EE8 /* EsplitealoDesign in Frameworks */,
+				F27F600389EA43C074D94A47 /* EsplitealoScanning in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		89AFEE8B014599EB8F491468 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				35FEB42F4258C2745D7CF0FE /* EsplitealoCore in Frameworks */,
+				5F45F80129B8F73787F2ED84 /* EsplitealoDesign in Frameworks */,
+				F41E3FC79DEEE86E92C04D72 /* SnapshotTesting in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		954A62BE450DC171E413D645 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6D75057C63C4DCF17424C8C4 = {
+			isa = PBXGroup;
+			children = (
+				B82F7C2247B9B019EE1F7965 /* Config */,
+				AEABFB06D838003F8A6C5E31 /* Esplitealo */,
+				BF07DD6D1925DE77FA2CA877 /* EsplitealoTests */,
+				73B22552C7188543FD58C913 /* EsplitealoUITests */,
+				AE57E6CA25488ECFEA0E5837 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B82F7C2247B9B019EE1F7965 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				AF61A1B8D8D64E7A23145AC3 /* Shared.xcconfig */,
+				134E0DF890A5A8EB58DAEAD0 /* Debug.xcconfig */,
+				00EF0EA31A495E917A99C587 /* Release.xcconfig */,
+				E76F49409E502AE8F297EB35 /* App.xcconfig */,
+				BB1B239E38C5557708B32AFE /* Tests.xcconfig */,
+				67C5F257D37066A978CFB7AC /* UITests.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		AE57E6CA25488ECFEA0E5837 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				665D157E5D84F0DDED5CDF5A /* Esplitealo */,
+				68E2B816B7C9F914BAAAFC60 /* EsplitealoTests */,
+				DA14A21A7FDDFF1264768F3C /* EsplitealoUITests */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6791DEF527434D102CB85CA3 /* Esplitealo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2B81175D58A408BC6C6D8B43 /* Build configuration list for PBXNativeTarget "Esplitealo" */;
+			buildPhases = (
+				92DC9BC990B53097DC61D95F /* Sources */,
+				74B4B1B8010023F8F783E4D0 /* Frameworks */,
+				F097FD821482AE8265207C34 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AEABFB06D838003F8A6C5E31 /* Esplitealo */,
+			);
+			name = Esplitealo;
+			packageProductDependencies = (
+				F642CD9C4824C2741E639B29 /* EsplitealoCapture */,
+				FF8F5CE73740F8071699B140 /* EsplitealoCore */,
+				B5A107B47F8E39C71BA8F278 /* EsplitealoDesign */,
+				A6C52A1D2EFBE22CE77067C1 /* EsplitealoScanning */,
+			);
+			productName = Esplitealo;
+			productReference = 665D157E5D84F0DDED5CDF5A /* Esplitealo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		29567DA93356C71A8568E56D /* EsplitealoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4FC93179086BA33801B9209 /* Build configuration list for PBXNativeTarget "EsplitealoTests" */;
+			buildPhases = (
+				739C4ED585E09B8891F01721 /* Sources */,
+				89AFEE8B014599EB8F491468 /* Frameworks */,
+				C99EB292E36A744F2C43AFC7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				31FCA470E328426FC56B8A51 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BF07DD6D1925DE77FA2CA877 /* EsplitealoTests */,
+			);
+			name = EsplitealoTests;
+			packageProductDependencies = (
+				C0A02A34FF72C357C44E541E /* EsplitealoCore */,
+				9AFCB4565508D9951352A6C8 /* EsplitealoDesign */,
+				1DC9C5B63B3C04D18AF025C8 /* SnapshotTesting */,
+			);
+			productName = EsplitealoTests;
+			productReference = 68E2B816B7C9F914BAAAFC60 /* EsplitealoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		353E9AA0A5D59F4EB8D39A9A /* EsplitealoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2291877F718FAAC7417F3995 /* Build configuration list for PBXNativeTarget "EsplitealoUITests" */;
+			buildPhases = (
+				374C3495DF3D97F1D6541841 /* Sources */,
+				954A62BE450DC171E413D645 /* Frameworks */,
+				0A355027BDA499B77BC22078 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				30655211014DBC7CE7AE9989 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				73B22552C7188543FD58C913 /* EsplitealoUITests */,
+			);
+			name = EsplitealoUITests;
+			packageProductDependencies = (
+			);
+			productName = EsplitealoUITests;
+			productReference = DA14A21A7FDDFF1264768F3C /* EsplitealoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F1BB2BB1A6733C7E189A529A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					6791DEF527434D102CB85CA3 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					29567DA93356C71A8568E56D = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 6791DEF527434D102CB85CA3;
+					};
+					353E9AA0A5D59F4EB8D39A9A = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 6791DEF527434D102CB85CA3;
+					};
+				};
+			};
+			buildConfigurationList = CC4C1F16A935C4970F28B9BC /* Build configuration list for PBXProject "Esplitealo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = es;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				es,
+				en,
+				Base,
+			);
+			mainGroup = 6D75057C63C4DCF17424C8C4;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */,
+				4ADE077D4545942F08F625E5 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = AE57E6CA25488ECFEA0E5837 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6791DEF527434D102CB85CA3 /* Esplitealo */,
+				29567DA93356C71A8568E56D /* EsplitealoTests */,
+				353E9AA0A5D59F4EB8D39A9A /* EsplitealoUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F097FD821482AE8265207C34 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C99EB292E36A744F2C43AFC7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0A355027BDA499B77BC22078 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		92DC9BC990B53097DC61D95F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		739C4ED585E09B8891F01721 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		374C3495DF3D97F1D6541841 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		31FCA470E328426FC56B8A51 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6791DEF527434D102CB85CA3 /* Esplitealo */;
+			targetProxy = F95F4953040F5964B215FC47 /* PBXContainerItemProxy */;
+		};
+		30655211014DBC7CE7AE9989 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6791DEF527434D102CB85CA3 /* Esplitealo */;
+			targetProxy = 0D247A778F02354C561A43FB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1DD1922D50652297CBBA28CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E76F49409E502AE8F297EB35 /* App.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		BD469649CC4B98F181E474B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E76F49409E502AE8F297EB35 /* App.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		5C0132239CD0850ABFDC0257 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BB1B239E38C5557708B32AFE /* Tests.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		D82D3D59B7230624D9AD0B67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BB1B239E38C5557708B32AFE /* Tests.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		2C92ECFBFC2C8366070DF8DD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 67C5F257D37066A978CFB7AC /* UITests.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		7DAB5E180BFBAFB3DD2F70AB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 67C5F257D37066A978CFB7AC /* UITests.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		295B75A6B58563FE4AD6A776 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 134E0DF890A5A8EB58DAEAD0 /* Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		8EB8349D33DAEDF96A68D718 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 00EF0EA31A495E917A99C587 /* Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2B81175D58A408BC6C6D8B43 /* Build configuration list for PBXNativeTarget "Esplitealo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DD1922D50652297CBBA28CC /* Debug */,
+				BD469649CC4B98F181E474B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A4FC93179086BA33801B9209 /* Build configuration list for PBXNativeTarget "EsplitealoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C0132239CD0850ABFDC0257 /* Debug */,
+				D82D3D59B7230624D9AD0B67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2291877F718FAAC7417F3995 /* Build configuration list for PBXNativeTarget "EsplitealoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C92ECFBFC2C8366070DF8DD /* Debug */,
+				7DAB5E180BFBAFB3DD2F70AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC4C1F16A935C4970F28B9BC /* Build configuration list for PBXProject "Esplitealo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				295B75A6B58563FE4AD6A776 /* Debug */,
+				8EB8349D33DAEDF96A68D718 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4ADE077D4545942F08F625E5 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = exactVersion;
+				version = 1.19.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F642CD9C4824C2741E639B29 /* EsplitealoCapture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */;
+			productName = EsplitealoCapture;
+		};
+		FF8F5CE73740F8071699B140 /* EsplitealoCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */;
+			productName = EsplitealoCore;
+		};
+		B5A107B47F8E39C71BA8F278 /* EsplitealoDesign */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */;
+			productName = EsplitealoDesign;
+		};
+		A6C52A1D2EFBE22CE77067C1 /* EsplitealoScanning */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */;
+			productName = EsplitealoScanning;
+		};
+		C0A02A34FF72C357C44E541E /* EsplitealoCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */;
+			productName = EsplitealoCore;
+		};
+		9AFCB4565508D9951352A6C8 /* EsplitealoDesign */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDD768A1656291FB2290551D /* XCLocalSwiftPackageReference ".." */;
+			productName = EsplitealoDesign;
+		};
+		1DC9C5B63B3C04D18AF025C8 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4ADE077D4545942F08F625E5 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = F1BB2BB1A6733C7E189A529A /* Project object */;
+}

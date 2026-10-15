@@ -1,0 +1,12 @@
+// Unit and snapshot tests, hosted inside the app so they can `@testable import Esplitealo`.
+
+PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER).tests
+PRODUCT_NAME = $(TARGET_NAME)
+GENERATE_INFOPLIST_FILE = YES
+
+SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
+SWIFT_APPROACHABLE_CONCURRENCY = YES
+
+TEST_HOST = $(BUILT_PRODUCTS_DIR)/Esplitealo.app/Esplitealo
+BUNDLE_LOADER = $(TEST_HOST)
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks

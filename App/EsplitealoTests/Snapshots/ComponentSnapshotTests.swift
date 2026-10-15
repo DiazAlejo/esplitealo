@@ -33,9 +33,9 @@ struct ComponentSnapshotTests {
     @Test func card() {
         assertDesignSnapshot(
             EspCard {
-                HStack { Text("Jugo de parcha").espText(.body); Spacer(); MoneyText(cents: 400, style: .amount) }
-                HStack { Text("Mofongo de camarones").espText(.body); Spacer(); MoneyText(cents: 2200, style: .amount) }
-                HStack { Text("Flan para compartir").espText(.body); Spacer(); MoneyText(cents: 900, style: .amount) }
+                AmountRow(verbatim: "Jugo de parcha", cents: 400)
+                AmountRow(verbatim: "Mofongo de camarones", cents: 2200)
+                AmountRow(verbatim: "Flan para compartir", cents: 900)
             }
             .padding(Spacing.screenMargin),
             named: "card-rows"
@@ -135,9 +135,11 @@ private struct PaletteSpecimen: View {
         VStack(alignment: .leading, spacing: Spacing.sm) {
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: Spacing.xs), count: 4), spacing: Spacing.xs) {
                 ForEach(roles, id: \.0) { name, color in
-                    RoundedRectangle(cornerRadius: 8).fill(color).frame(height: 44)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.esp.line))
-                        .overlay(Text(name).font(.system(size: 10, design: .monospaced)).foregroundStyle(Color.esp.inkSecondary))
+                    VStack(spacing: 2) {
+                        RoundedRectangle(cornerRadius: 8).fill(color).frame(height: 40)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.esp.line))
+                        Text(name).font(.system(size: 10, design: .monospaced))
+                    }
                 }
             }
             HStack(spacing: Spacing.xs) {
