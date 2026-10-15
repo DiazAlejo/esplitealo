@@ -1,0 +1,12 @@
+{
+  "itemNames": ["Sombrero Cowboy Negro", "Sombrero Cowboy Marrón"],
+  "itemTotals": [3450, 1150],
+  "quantities": [3, 1],
+  "unitPrices": [1150, 1150],
+  "subtotal": 4600,
+  "tax": 530,
+  "total": 5130,
+  "reconciles": true,
+  "itemsNeedingReview": 0,
+  "issueCount": 0
+}

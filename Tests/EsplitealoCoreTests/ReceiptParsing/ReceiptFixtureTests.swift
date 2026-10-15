@@ -2,12 +2,16 @@ import XCTest
 @testable import EsplitealoCore
 
 private struct FixtureExpectation: Decodable {
+    var itemNames: [String]?
     var itemTotals: [Int]
     var quantities: [Int]?
+    var unitPrices: [Int]?
     var subtotal: Int?
     var tax: Int?
     var total: Int?
     var reconciles: Bool
+    var itemsNeedingReview: Int?
+    var issueCount: Int?
 }
 
 final class ReceiptFixtureTests: XCTestCase {
@@ -19,7 +23,8 @@ final class ReceiptFixtureTests: XCTestCase {
         .appendingPathComponent("Fixtures/Receipts", isDirectory: true)
 
     func testVisionRecordedFixtures() throws {
-        let names = ["pr-ivu-bistro", "english-diner", "comma-decimal-cafe", "mismatch-adversarial"]
+        let names = ["pr-ivu-bistro", "english-diner", "comma-decimal-cafe", "mismatch-adversarial",
+                     "pr-party-store-wrapped-names"]
         for name in names {
             let recognizedURL = fixturesURL.appendingPathComponent("\(name).recognized.json")
             let expectedURL = fixturesURL.appendingPathComponent("\(name).expected.json")
@@ -40,6 +45,9 @@ final class ReceiptFixtureTests: XCTestCase {
     }
 
     private func assertDraft(_ draft: ReceiptDraft, matches expected: FixtureExpectation, fixture: String) {
+        if let names = expected.itemNames {
+            XCTAssertEqual(draft.items.map(\.name), names, "item names for \(fixture)")
+        }
         XCTAssertEqual(
             draft.items.map(\.lineTotal.minorUnits),
             expected.itemTotals,
@@ -47,6 +55,15 @@ final class ReceiptFixtureTests: XCTestCase {
         )
         if let quantities = expected.quantities {
             XCTAssertEqual(draft.items.map(\.quantity), quantities, "quantities for \(fixture)")
+        }
+        if let unitPrices = expected.unitPrices {
+            XCTAssertEqual(draft.items.map { $0.unitPrice?.minorUnits }, unitPrices.map { Optional($0) }, "unit prices for \(fixture)")
+        }
+        if let flagged = expected.itemsNeedingReview {
+            XCTAssertEqual(draft.items.filter { !$0.flags.isEmpty }.count, flagged, "flagged items for \(fixture)")
+        }
+        if let issueCount = expected.issueCount {
+            XCTAssertEqual(draft.issues.count, issueCount, "issues for \(fixture): \(draft.issues)")
         }
         if let subtotal = expected.subtotal {
             XCTAssertEqual(draft.subtotal?.minorUnits, subtotal, "subtotal for \(fixture)")
