@@ -53,4 +53,27 @@ struct LocalizationRuntimeTests {
         #expect(info("NSCameraUsageDescription", "es").contains("cámara"))
         #expect(info("NSCameraUsageDescription", "en").contains("camera"))
     }
+
+    // The typed symbols Xcode generates from the catalog (`STRING_CATALOG_GENERATE_SYMBOLS`): `Text(.navStep(2))`.
+    // Screens use these for every string with arguments, instead of `String(format:)`.
+
+    func resolve(_ resource: LocalizedStringResource, _ language: String) -> String {
+        var resource = resource
+        resource.locale = Locale(identifier: language)
+        return String(localized: resource)
+    }
+
+    @Test func generatedSymbolsResolveStaticStrings() {
+        #expect(resolve(.homeScan, "es") == "Escanear recibo")
+        #expect(resolve(.homeScan, "en") == "Scan receipt")
+    }
+
+    @Test func generatedSymbolsTakeTypedArgumentsAndPickPlurals() {
+        #expect(resolve(.navStep(2), "es") == "Paso 2 de 5")
+        #expect(resolve(.navStep(2), "en") == "Step 2 of 5")
+        #expect(resolve(.assignProgress(3, 8), "en") == "3 of 8")
+        #expect(resolve(.peopleAssigned(1), "es") == "1 artículo marcado")
+        #expect(resolve(.peopleAssigned(3), "en") == "3 items assigned")
+        #expect(resolve(.reviewDiff("$1.00"), "es") == "Diferencia: $1.00.")
+    }
 }
