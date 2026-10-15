@@ -253,4 +253,209 @@ final class ReceiptParserTests: XCTestCase {
         XCTAssertEqual(draft.tax?.minorUnits, 408)
         XCTAssertEqual(draft.total?.minorUnits, 4668)
     }
+
+    // MARK: - Multi-row names, quantity rows, multiple taxes, payment blocks
+
+    /// Column-aligned receipt: names on the left, prices in a right-hand column on the same row.
+    private func columnReceipt(_ rows: [(left: String, right: String?)]) -> RecognizedText {
+        let lineHeight = 60.0
+        var lines: [RecognizedLine] = []
+        for (index, row) in rows.enumerated() {
+            let y = Double(index) * lineHeight + 20
+            func line(_ text: String, x: Double) -> RecognizedLine {
+                var cursor = x
+                var words: [RecognizedWord] = []
+                for word in text.split(separator: " ") {
+                    let width = Double(word.count) * 20
+                    words.append(RecognizedWord(
+                        text: String(word),
+                        rect: PixelRect(x: cursor, y: y, width: width, height: 40)
+                    ))
+                    cursor += width + 14
+                }
+                let rect = words.dropFirst().reduce(words[0].rect) { $0.union($1.rect) }
+                return RecognizedLine(text: text, confidence: 1, rect: rect, baselineAngle: 0, words: words)
+            }
+            lines.append(line(row.left, x: 40))
+            if let right = row.right { lines.append(line(right, x: 1000)) }
+        }
+        return RecognizedText(
+            imageSize: ImageSize(width: 1300, height: Double(rows.count) * lineHeight + 40),
+            lines: lines
+        )
+    }
+
+    func testWrappedNameWithModifierAndQuantityRowIsOneItem() {
+        let draft = parser.parse(columnReceipt([
+            ("Items", "Price"),
+            ("Party Hat", "$34.50"),
+            ("Black", nil),
+            ("(3 x $11.50)", nil),
+            ("Party Hat", "$11.50"),
+            ("Brown", nil),
+            ("Subtotal", "$46.00"),
+            ("State Tax (10.5%)", "$4.83"),
+            ("County Tax (1%)", "$0.47"),
+            ("Total", "$51.30")
+        ]))
+        XCTAssertEqual(draft.items.map(\.name), ["Party Hat Black", "Party Hat Brown"])
+        XCTAssertEqual(draft.items.map(\.quantity), [3, 1])
+        XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [3450, 1150])
+        XCTAssertEqual(draft.items.map { $0.unitPrice?.minorUnits }, [1150, nil], "only a printed quantity row sets a unit price")
+        XCTAssertTrue(draft.items.allSatisfy { $0.flags.isEmpty })
+        XCTAssertEqual(draft.tax?.minorUnits, 530)
+        XCTAssertTrue(draft.reconciles)
+        XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
+    }
+
+    func testSpanishHeadersAndQuantityRowWithoutParentheses() {
+        let draft = parser.parse(columnReceipt([
+            ("Artículo", "Precio"),
+            ("Camisa de lino", "$30.00"),
+            ("Azul", nil),
+            ("2 x $15.00", nil),
+            ("Subtotal", "$30.00"),
+            ("IVU Estatal (10.5%)", "$3.15"),
+            ("IVU Municipal (1%)", "$0.30"),
+            ("Total", "$33.45")
+        ]))
+        XCTAssertEqual(draft.items.map(\.name), ["Camisa de lino Azul"])
+        XCTAssertEqual(draft.items.map(\.quantity), [2])
+        XCTAssertEqual(draft.items.first?.unitPrice?.minorUnits, 1500)
+        XCTAssertEqual(draft.tax?.minorUnits, 345)
+        XCTAssertEqual(draft.total?.minorUnits, 3345)
+        XCTAssertTrue(draft.reconciles)
+        XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
+    }
+
+    func testQuantityRowWithoutModifierRow() {
+        let draft = parser.parse(columnReceipt([
+            ("Balloon Pack", "$9.00"),
+            ("(3 x $3.00)", nil),
+            ("Subtotal", "$9.00"),
+            ("Total", "$9.00")
+        ]))
+        XCTAssertEqual(draft.items.map(\.name), ["Balloon Pack"])
+        XCTAssertEqual(draft.items.map(\.quantity), [3])
+        XCTAssertEqual(draft.items.first?.unitPrice?.minorUnits, 300)
+        XCTAssertTrue(draft.items.allSatisfy { $0.flags.isEmpty })
+    }
+
+    func testQuantityRowThatDisagreesWithLineTotalStaysFlagged() {
+        let draft = parser.parse(columnReceipt([
+            ("Party Hat", "$30.00"),
+            ("Black", nil),
+            ("(3 x $11.50)", nil),
+            ("Subtotal", "$30.00"),
+            ("Total", "$30.00")
+        ]))
+        XCTAssertEqual(draft.items.count, 1)
+        let item = draft.items[0]
+        XCTAssertEqual(item.lineTotal.minorUnits, 3000, "the printed line total is never rewritten")
+        XCTAssertTrue(item.flags.contains(.quantityMismatch))
+        XCTAssertTrue(item.flags.contains(.needsReview))
+    }
+
+    func testAllTaxLinesAreSummed() {
+        let draft = parser.parse(RecognizedTextTestBuilder.fromRowTexts([
+            "Gift Box 20.00",
+            "Subtotal 20.00",
+            "STATE TAX (10.5%) 2.10",
+            "COUNTY TAX (1%) 0.20",
+            "Total 22.30"
+        ]))
+        XCTAssertEqual(draft.tax?.minorUnits, 230)
+        XCTAssertTrue(draft.reconciles)
+        XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
+    }
+
+    func testCombinedTaxLineEqualToSumOfOthersIsNotDoubleCounted() {
+        let draft = parser.parse(RecognizedTextTestBuilder.fromRowTexts([
+            "Gift Box 20.00",
+            "Subtotal 20.00",
+            "STATE TAX (10.5%) 2.10",
+            "COUNTY TAX (1%) 0.20",
+            "Total Tax 2.30",
+            "Total 22.30"
+        ]))
+        XCTAssertEqual(draft.tax?.minorUnits, 230)
+        XCTAssertTrue(draft.reconciles)
+        XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
+    }
+
+    func testMismatchedSummaryTaxLineIsDroppedWhenOnlyThatReadingReconciles() {
+        let draft = parser.parse(RecognizedTextTestBuilder.fromRowTexts([
+            "Gift Box 20.00",
+            "Subtotal 20.00",
+            "STATE TAX (10.5%) 2.10",
+            "COUNTY TAX (1%) 0.20",
+            "Tax Summary 2.50",
+            "Total 22.30"
+        ]))
+        XCTAssertEqual(draft.tax?.minorUnits, 230)
+        XCTAssertEqual(draft.tax?.needsAttention, false)
+        XCTAssertTrue(draft.reconciles)
+    }
+
+    func testMismatchedSummaryTaxLineWithNoReconcilingReadingIsFlagged() {
+        let draft = parser.parse(RecognizedTextTestBuilder.fromRowTexts([
+            "Gift Box 20.00",
+            "Subtotal 20.00",
+            "STATE TAX (10.5%) 2.10",
+            "COUNTY TAX (1%) 0.20",
+            "Tax Summary 2.50",
+            "Total 30.00"
+        ]))
+        XCTAssertEqual(draft.tax?.needsAttention, true)
+        XCTAssertFalse(draft.reconciles)
+    }
+
+    func testHeaderTotalThatAgreesWithBottomTotalIsAccepted() {
+        let draft = parser.parse(columnReceipt([
+            ("TOTAL", "$11.50"),
+            ("Items", "Price"),
+            ("Party Hat", "$10.00"),
+            ("Subtotal", "$10.00"),
+            ("Tax (15%)", "$1.50"),
+            ("Total", "$11.50")
+        ]))
+        XCTAssertEqual(draft.total?.minorUnits, 1150)
+        XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [1000])
+        XCTAssertTrue(draft.reconciles)
+        XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
+    }
+
+    func testHeaderTotalNeverOverridesBottomTotal() {
+        let draft = parser.parse(columnReceipt([
+            ("TOTAL", "$9.99"),
+            ("Items", "Price"),
+            ("Party Hat", "$10.00"),
+            ("Subtotal", "$10.00"),
+            ("Tax (15%)", "$1.50"),
+            ("Total", "$11.50")
+        ]))
+        XCTAssertEqual(draft.total?.minorUnits, 1150)
+    }
+
+    func testPaymentBlockAfterTotalNeverCreatesIssues() {
+        let draft = parser.parse(columnReceipt([
+            ("Party Hat", "$11.50"),
+            ("Subtotal", "$11.50"),
+            ("Total", "$11.50"),
+            ("Transaction Record", nil),
+            ("Visa Purchase", nil),
+            ("AUTHORIZED", "$11.50"),
+            ("Jun 17, 2026, 02:03PM", nil),
+            ("VISA DEBIT", nil),
+            ("(A0000000031010)", nil),
+            ("AID: A0000000031010", nil),
+            ("MID: 000012345678", nil),
+            ("TSI: 0000", nil),
+            ("Receipt: #1-00000", nil),
+            ("Verification not required", nil)
+        ]))
+        XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [1150])
+        XCTAssertTrue(draft.reconciles)
+        XCTAssertTrue(draft.issues.isEmpty, "\(draft.issues)")
+    }
 }

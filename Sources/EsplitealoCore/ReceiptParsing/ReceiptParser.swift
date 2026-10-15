@@ -104,7 +104,7 @@ public struct ReceiptParser: Sendable {
             }
         }.min()
 
-        let allTokens = classified.flatMap { $0.line.amounts }
+        let allTokens = classified.flatMap { $0.line.amounts + [$0.line.quantityDetail?.unit].compactMap { $0 } }
         let numberFormat = NumberFormatInference.infer(from: allTokens, preferred: preferredFormat)
         var issues: [ReceiptIssue] = []
         if numberFormat.isGuessed {
@@ -113,10 +113,11 @@ public struct ReceiptParser: Sendable {
 
         var items: [DraftItem] = []
         var subtotal: DraftAmount?
-        var tax: DraftAmount?
+        var taxLines: [(label: String, amount: DraftAmount)] = []
         var tip: DraftAmount?
         var total: DraftAmount?
         var adjustments: [DraftAdjustment] = []
+        var totalSeenAfterItems = false
         var priceBelowName = false
         var priceOrientationFixed = false
 
@@ -154,6 +155,28 @@ public struct ReceiptParser: Sendable {
             )
         }
 
+        func rowRect(_ row: ReceiptRow?) -> PixelRect? {
+            row?.words.map(\.rect).reduce(nil as PixelRect?) { acc, r in acc?.union(r) ?? r }
+        }
+
+        func applyQuantityDetail(_ detail: QuantityDetail, toItemAt index: Int) {
+            guard let unitMinor = NumberFormatInference.minorUnits(detail.unit, format: numberFormat) else {
+                items[index].flags.insert(.needsReview)
+                return
+            }
+            let lineTotal = items[index].lineTotal.minorUnits
+            let previousQuantity = items[index].quantity
+            items[index].quantity = detail.quantity
+            items[index].unitPrice = DraftAmount(minorUnits: unitMinor, needsAttention: numberFormat.isGuessed)
+            // The right-hand figure is the line total; it is never rewritten. A quantity row that does
+            // not multiply out to it, or that contradicts an explicit quantity, is left for review.
+            let multipliesOut = detail.quantity * unitMinor == lineTotal
+            let agreesWithPrefix = previousQuantity == 1 || previousQuantity == detail.quantity
+            if !multipliesOut || !agreesWithPrefix {
+                items[index].flags.formUnion([.quantityMismatch, .needsReview])
+            }
+        }
+
         var pendingName: (String, PixelRect?)?
         var i = 0
         while i < classified.count {
@@ -179,13 +202,21 @@ public struct ReceiptParser: Sendable {
                 if let a = amount(from: line.amounts, rect: rect) { subtotal = a }
 
             case .tax:
-                if let a = amount(from: line.amounts, rect: rect) { tax = a }
+                // Every tax line counts (state + county, IVU + municipal). A tax line repeated after the
+                // total is a summary of the same tax, not another one.
+                guard !(totalSeenAfterItems && !taxLines.isEmpty) else { break }
+                if let a = amount(from: line.amounts, rect: rect) {
+                    taxLines.append((line.label, a))
+                }
 
             case .tip:
                 if let a = amount(from: line.amounts, rect: rect) { tip = a }
 
             case .total:
-                if let a = amount(from: line.amounts, rect: rect) { total = a }
+                if let a = amount(from: line.amounts, rect: rect) {
+                    total = a
+                    if !items.isEmpty { totalSeenAfterItems = true }
+                }
 
             case .discount:
                 if var a = amount(from: line.amounts, rect: rect) {
@@ -203,7 +234,37 @@ public struct ReceiptParser: Sendable {
                 } else if let leadingQty = line.leadingQty {
                     name = stripLeadingQuantityPrefix(name, quantity: leadingQty)
                 }
+                let countBefore = items.count
                 addItem(name: name, qty: qty, tokens: line.amounts, rect: rect, entryIndex: i)
+                guard items.count > countBefore else { break }
+
+                // A name that wraps over several rows stays one item: modifier rows ("Negro") and an
+                // optional "(3 x $11.50)" quantity row follow the row that carries the price.
+                var last = i
+                var wrapped: [String] = []
+                var wrappedRect = rect
+                while last + 1 < classified.count,
+                      isNameContinuation(classified, at: last + 1, after: last) {
+                    wrapped.append(classified[last + 1].line.label.trimmingCharacters(in: .whitespaces))
+                    wrappedRect = wrappedRect.flatMap { r in rowRect(classified[last + 1].row).map { r.union($0) } }
+                    last += 1
+                }
+                if !wrapped.isEmpty {
+                    items[items.count - 1].name += " " + wrapped.joined(separator: " ")
+                    items[items.count - 1].sourceRect = wrappedRect
+                }
+                if last + 1 < classified.count,
+                   classified[last + 1].kind == .quantityDetail,
+                   let detail = classified[last + 1].line.quantityDetail,
+                   isRowAdjacent(classified, at: last + 1, after: last) {
+                    applyQuantityDetail(detail, toItemAt: items.count - 1)
+                    last += 1
+                }
+                i = last
+
+            case .quantityDetail:
+                guard !isPastTotalsSection(i) else { break }
+                issues.append(.unparsedPriceRow(line.quantityDetail?.raw ?? ""))
 
             case .nameOnly:
                 guard !isPastTotalsSection(i) else { break }
@@ -264,6 +325,46 @@ public struct ReceiptParser: Sendable {
                 }
             }
             i += 1
+        }
+
+        func isSummaryTaxLabel(_ label: String) -> Bool {
+            let lowered = label.lowercased()
+            return lowered.contains("total") || lowered.contains("summary")
+        }
+
+        func combinedTax(_ lines: [(label: String, amount: DraftAmount)]) -> DraftAmount? {
+            guard var running = lines.first?.amount else { return nil }
+            for line in lines.dropFirst() {
+                running.minorUnits += line.amount.minorUnits
+                running.needsAttention = running.needsAttention || line.amount.needsAttention
+                running.sourceRect = running.sourceRect.flatMap { r in line.amount.sourceRect.map { r.union($0) } } ?? line.amount.sourceRect
+            }
+            return running
+        }
+
+        var tax: DraftAmount?
+        if taxLines.count >= 3,
+           let combined = taxLines.indices.first(where: { k in
+               taxLines[k].amount.minorUnits == taxLines.enumerated().reduce(0) { $0 + ($1.offset == k ? 0 : $1.element.amount.minorUnits) }
+           }) {
+            var individual = taxLines
+            individual.remove(at: combined)
+            tax = combinedTax(individual)
+        } else if taxLines.count >= 2, taxLines.contains(where: { isSummaryTaxLabel($0.label) }) {
+            let withoutSummary = taxLines.filter { !isSummaryTaxLabel($0.label) }
+            let readings = [combinedTax(taxLines), combinedTax(withoutSummary)].compactMap { $0 }
+            let reconciling = readings.filter { reading in
+                guard let sub = subtotal, let tot = total else { return false }
+                return sub.minorUnits + reading.minorUnits + (tip?.minorUnits ?? 0) == tot.minorUnits
+            }
+            if reconciling.count == 1 {
+                tax = reconciling[0]
+            } else {
+                tax = readings.first
+                tax?.needsAttention = true
+            }
+        } else {
+            tax = combinedTax(taxLines)
         }
 
         if items.isEmpty {
@@ -331,14 +432,25 @@ private struct LineFields {
     var label: String
     var amounts: [AmountToken]
     var leadingQty: Int?
+    var quantityDetail: QuantityDetail?
     var row: ReceiptRow?
 }
 
+/// A standalone `(3 x $11.50)` row under an item: quantity and unit price, no line total of its own.
+private struct QuantityDetail {
+    var quantity: Int
+    var unit: AmountToken
+    var raw: String
+}
+
 private enum RowKind {
-    case item, nameOnly, amountOnly, subtotal, tax, tip, total, discount, payment, tipTable, other
+    case item, nameOnly, amountOnly, quantityDetail, subtotal, tax, tip, total, discount, payment, tipTable, other
 }
 
 private func splitLine(_ row: ReceiptRow) -> LineFields {
+    if let detail = parseQuantityDetail(row.words.map(\.text).joined(separator: " ")) {
+        return LineFields(label: "", amounts: [], leadingQty: nil, quantityDetail: detail, row: row)
+    }
     var words = repairWords(row.words.map(\.text))
     dropCurrencyWords(&words)
     var amounts: [AmountToken] = []
@@ -411,8 +523,10 @@ private func dropCurrencyWords(_ words: inout [String]) {
 }
 
 private func classify(_ line: LineFields) -> RowKind {
+    if line.quantityDetail != nil { return .quantityDetail }
     let lower = canonicalKeywords(line.label)
     let tokens = lower.split(separator: " ")
+    if line.amounts.isEmpty, isColumnHeader(tokens) { return .other }
     if tokens.contains(where: { $0.hasPrefix("(qty") }) || tokens.first == "qty" { return .other }
     if lower.contains("change due") { return .payment }
     if tokens.contains("no:") && !line.amounts.isEmpty { return .payment }
@@ -431,6 +545,56 @@ private func classify(_ line: LineFields) -> RowKind {
     case (true, true): return .nameOnly
     default: return .other
     }
+}
+
+private let columnHeaderWords: Set<String> = [
+    "item", "items", "description", "descripcion", "descripción", "product", "products", "producto", "productos",
+    "articulo", "articulos", "artículo", "artículos", "qty", "quantity", "cant", "cantidad", "price", "precio",
+    "amount", "unit", "each"
+]
+
+/// `Items  Price` / `Artículo  Precio` column headings of an items table.
+private func isColumnHeader(_ tokens: [Substring]) -> Bool {
+    guard !tokens.isEmpty else { return false }
+    return tokens.allSatisfy { columnHeaderWords.contains($0.trimmingCharacters(in: CharacterSet.letters.inverted)) }
+}
+
+private func parseQuantityDetail(_ text: String) -> QuantityDetail? {
+    let trimmed = text.trimmingCharacters(in: .whitespaces)
+    let pattern = #"^\(?\s*(\d{1,3})\s*[xX×@]\s*(?:USD|\$)?\s*(\d[\d.,]*)\s*\)?$"#
+    guard let regex = try? NSRegularExpression(pattern: pattern),
+          let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+          let qRange = Range(match.range(at: 1), in: trimmed),
+          let priceRange = Range(match.range(at: 2), in: trimmed),
+          let quantity = Int(trimmed[qRange]), quantity > 0,
+          let unit = AmountToken.parse(String(trimmed[priceRange]))
+    else { return nil }
+    return QuantityDetail(quantity: quantity, unit: unit, raw: trimmed)
+}
+
+private func rowHeight(_ row: ReceiptRow?) -> Double? {
+    guard let heights = row?.words.map(\.rect.height).sorted(), !heights.isEmpty else { return nil }
+    return heights[heights.count / 2]
+}
+
+/// True when the row at `index` sits directly under the row at `previous`: a normal line gap and roughly
+/// the same left edge, so a wrapped name continues instead of starting a new block of text.
+private func isRowAdjacent(_ lines: [ParsedLine], at index: Int, after previous: Int) -> Bool {
+    guard let row = lines[index].row, let prevRow = lines[previous].row,
+          let h = rowHeight(row), let prevH = rowHeight(prevRow),
+          let left = row.words.map(\.rect.minX).min(), let prevLeft = prevRow.words.map(\.rect.minX).min()
+    else { return false }
+    let height = max(h, prevH)
+    return row.centerY - prevRow.centerY <= 2 * height && abs(left - prevLeft) <= 4 * height
+}
+
+private func isNameContinuation(_ lines: [ParsedLine], at index: Int, after previous: Int) -> Bool {
+    let entry = lines[index]
+    guard entry.kind == .nameOnly, hasLetters(entry.line.label) else { return false }
+    let label = entry.line.label.trimmingCharacters(in: .whitespaces)
+    if label.hasPrefix("+") || label.hasPrefix("-") { return false }
+    if index + 1 < lines.count, lines[index + 1].kind == .amountOnly { return false }
+    return isRowAdjacent(lines, at: index, after: previous)
 }
 
 private func isKeywordWithoutAmount(_ kind: RowKind) -> Bool {

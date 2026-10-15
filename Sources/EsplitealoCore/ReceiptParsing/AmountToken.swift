@@ -41,6 +41,8 @@ struct AmountToken: Equatable {
 
         guard !s.isEmpty else { return nil }
         if looksLikeDateOrPhone(s) { return nil }
+        // Card-terminal ids such as the AID `(A0000000031010)` are letters wrapped around a long digit run.
+        if s.contains(where: \.isLetter), s.filter(\.isNumber).count >= 6 { return nil }
 
         let cleaned = s.filter { $0.isNumber || $0 == "." || $0 == "," }
         guard !cleaned.isEmpty else { return nil }
