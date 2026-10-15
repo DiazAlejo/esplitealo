@@ -67,6 +67,8 @@ let package = Package(
             name: "ScannerLabKitTests",
             dependencies: ["ScannerLabKit"]
         ),
+        // Static checks of the Xcode app's text resources: string catalogs, xcconfig files, privacy manifest.
+        .testTarget(name: "AppResourceTests"),
         .testTarget(
             name: "EsplitealoDesignTests",
             dependencies: ["EsplitealoDesign"]
