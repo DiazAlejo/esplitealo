@@ -124,7 +124,10 @@ final class ScanFlow {
         }
     }
 
-    func photoFinished(_ result: Result<CGImage, PhotoImportError>) {
+    /// `loadToken` is what `photoSelected()` returned: a photo that finishes loading after the user cancelled or
+    /// started over is thrown away.
+    func photoFinished(_ result: Result<CGImage, PhotoImportError>, loadToken: Int? = nil) {
+        if let loadToken, loadToken != generation { return }
         switch result {
         case .success(let image): startReading(image)
         case .failure(let error): fail(ScanFailure(error))
@@ -132,12 +135,14 @@ final class ScanFlow {
     }
 
     /// A photo was picked and is being loaded: the reading screen shows while it comes in (it can be slow from iCloud).
-    func photoSelected() {
+    @discardableResult
+    func photoSelected() -> Int {
         stopWork()
         phase = .processing
         messageIndex = 0
         offersManualEntry = false
         startTimeline()
+        return generation
     }
 
     /// The photo picker went away and no photo came back (the user closed it).

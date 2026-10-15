@@ -276,6 +276,20 @@ struct ScanFlowTests {
         #expect(router.path == [.capture])
     }
 
+    @Test func cancellingWhileAPhotoLoadsDiscardsTheLatePhoto() async {
+        let flow = makeFlow()
+        await open(flow, .photoLibrary)
+        let token = flow.photoSelected()
+        flow.cancel()
+        flow.photoFinished(.success(image()), loadToken: token)
+        #expect(flow.scanTask == nil)
+        #expect(flow.phase == .idle)
+        #expect(store.session == nil)
+        #expect(router.path.isEmpty)
+        flow.photoFinished(.failure(.loadFailed), loadToken: token)
+        #expect(flow.phase == .idle)
+    }
+
     @Test func cancellingWhileReadingDiscardsTheLateResult() async {
         let scanner = FakeScanner(.success(scanned), gated: true)
         let flow = makeFlow(scanner: scanner)

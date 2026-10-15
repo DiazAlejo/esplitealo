@@ -22,11 +22,11 @@ struct CaptureView: View {
             .photosPicker(isPresented: photoPickerBinding, selection: $pickedPhoto, matching: .images)
             .onChange(of: pickedPhoto) { _, item in
                 guard let item else { return }
-                flow.photoSelected()
+                let loadToken = flow.photoSelected()
                 Task {
                     let result = await PhotoImport.loadImage(from: item)
                     pickedPhoto = nil
-                    flow.photoFinished(result)
+                    flow.photoFinished(result, loadToken: loadToken)
                 }
             }
             // `.contain` keeps the children's own identifiers; a bare identifier here would replace them.
