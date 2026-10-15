@@ -8,9 +8,9 @@ final class SmokeTests: XCTestCase {
     }
 
     @MainActor
-    private func launch(language: String = "es", region: String = "PR") -> XCUIApplication {
+    private func launch(language: String = "es", region: String = "PR", extraArguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments += ["--uitesting", "-AppleLanguages", "(\(language))", "-AppleLocale", "\(language)_\(region)"]
+        app.launchArguments += ["--uitesting"] + extraArguments + ["-AppleLanguages", "(\(language))", "-AppleLocale", "\(language)_\(region)"]
         app.launch()
         return app
     }
@@ -33,10 +33,14 @@ final class SmokeTests: XCTestCase {
 
     @MainActor
     func testWalksThroughTheSixScreens() {
-        let app = launch()
+        // The simulator has no camera: the capture screen reads the fixture receipt (see `CaptureFlowUITests`).
+        let fixture = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Tests/Fixtures/Receipts/pr-ivu-bistro.recognized.json").path
+        let app = launch(extraArguments: ["--uitesting-recognized-text", fixture])
         XCTAssertTrue(app.descendants(matching: .any)["screen.home"].waitForExistence(timeout: 15))
         app.buttons["home.scan"].tap()
-        for screen in ["capture", "review", "people", "mark", "totals"] {
+        for screen in ["review", "people", "mark", "totals"] {
             XCTAssertTrue(app.descendants(matching: .any)["screen.\(screen)"].waitForExistence(timeout: 10), "screen.\(screen)")
             if screen != "totals" { app.buttons["screen.next"].tap() }
         }

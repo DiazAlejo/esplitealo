@@ -8,9 +8,18 @@ struct HomeSnapshotTests {
     @Test func home() {
         assertDesignSnapshot(
             NavigationStack { HomeView(animatesMascot: false) }
-                .environment(AppRouter()),
+                .environment(AppRouter())
+                .environment(ScanFlow.preview()),
             named: "home",
             fixedHeight: 844
+        )
+    }
+
+    @Test func howItWorksSheet() {
+        assertDesignSnapshot(
+            HowItWorksSheet(onDone: {}),
+            named: "how-it-works",
+            fixedHeight: 700
         )
     }
 }
