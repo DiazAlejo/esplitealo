@@ -1,0 +1,1073 @@
+{
+ "imageSize": {
+  "width": 3024,
+  "height": 4032
+ },
+ "lines": [
+  {
+   "text": "TOTAL",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1523.72,
+    "y": 791.16,
+    "width": 164.09,
+    "height": 52.74
+   },
+   "words": [
+    {
+     "text": "TOTAL",
+     "rect": {
+      "x": 1523.72,
+      "y": 791.16,
+      "width": 164.09,
+      "height": 52.74
+     }
+    }
+   ]
+  },
+  {
+   "text": "$51.30",
+   "confidence": 1.0,
+   "baselineAngle": -0.003553,
+   "rect": {
+    "x": 1441.51,
+    "y": 860.88,
+    "width": 340.24,
+    "height": 94.97
+   },
+   "words": [
+    {
+     "text": "$51.30",
+     "rect": {
+      "x": 1441.51,
+      "y": 860.88,
+      "width": 340.24,
+      "height": 94.97
+     }
+    }
+   ]
+  },
+  {
+   "text": "Items",
+   "confidence": 0.5,
+   "baselineAngle": -0.001839,
+   "rect": {
+    "x": 1007.96,
+    "y": 1125.07,
+    "width": 146.59,
+    "height": 41.29
+   },
+   "words": [
+    {
+     "text": "Items",
+     "rect": {
+      "x": 1007.96,
+      "y": 1125.07,
+      "width": 146.59,
+      "height": 41.29
+     }
+    }
+   ]
+  },
+  {
+   "text": "Sombrero Cowboy",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1013.86,
+    "y": 1242.0,
+    "width": 457.12,
+    "height": 47.3
+   },
+   "words": [
+    {
+     "text": "Sombrero",
+     "rect": {
+      "x": 1013.86,
+      "y": 1242.0,
+      "width": 243.8,
+      "height": 47.3
+     }
+    },
+    {
+     "text": "Cowboy",
+     "rect": {
+      "x": 1288.13,
+      "y": 1242.0,
+      "width": 182.85,
+      "height": 47.3
+     }
+    }
+   ]
+  },
+  {
+   "text": "Negro",
+   "confidence": 1.0,
+   "baselineAngle": -0.004501,
+   "rect": {
+    "x": 1007.87,
+    "y": 1300.69,
+    "width": 146.77,
+    "height": 59.26
+   },
+   "words": [
+    {
+     "text": "Negro",
+     "rect": {
+      "x": 1007.87,
+      "y": 1300.69,
+      "width": 146.77,
+      "height": 59.26
+     }
+    }
+   ]
+  },
+  {
+   "text": "(3 x $11.50)",
+   "confidence": 0.5,
+   "baselineAngle": 0.00724,
+   "rect": {
+    "x": 1001.95,
+    "y": 1364.45,
+    "width": 287.54,
+    "height": 54.82
+   },
+   "words": [
+    {
+     "text": "(3",
+     "rect": {
+      "x": 1001.95,
+      "y": 1364.45,
+      "width": 47.92,
+      "height": 54.82
+     }
+    },
+    {
+     "text": "x",
+     "rect": {
+      "x": 1073.84,
+      "y": 1364.45,
+      "width": 23.96,
+      "height": 54.82
+     }
+    },
+    {
+     "text": "$11.50)",
+     "rect": {
+      "x": 1121.76,
+      "y": 1364.45,
+      "width": 167.73,
+      "height": 54.82
+     }
+    }
+   ]
+  },
+  {
+   "text": "Price",
+   "confidence": 0.5,
+   "baselineAngle": -0.025991,
+   "rect": {
+    "x": 2068.16,
+    "y": 1129.33,
+    "width": 135.96,
+    "height": 50.37
+   },
+   "words": [
+    {
+     "text": "Price",
+     "rect": {
+      "x": 2068.16,
+      "y": 1129.33,
+      "width": 135.96,
+      "height": 50.37
+     }
+    }
+   ]
+  },
+  {
+   "text": "$34.50",
+   "confidence": 1.0,
+   "baselineAngle": 0.003719,
+   "rect": {
+    "x": 2015.92,
+    "y": 1242.09,
+    "width": 175.97,
+    "height": 41.68
+   },
+   "words": [
+    {
+     "text": "$34.50",
+     "rect": {
+      "x": 2015.92,
+      "y": 1242.09,
+      "width": 175.97,
+      "height": 41.68
+     }
+    }
+   ]
+  },
+  {
+   "text": "Sombrero Cowboy",
+   "confidence": 1.0,
+   "baselineAngle": 0.013888,
+   "rect": {
+    "x": 1013.37,
+    "y": 1529.18,
+    "width": 458.17,
+    "height": 53.55
+   },
+   "words": [
+    {
+     "text": "Sombrero",
+     "rect": {
+      "x": 1013.37,
+      "y": 1529.18,
+      "width": 244.36,
+      "height": 53.55
+     }
+    },
+    {
+     "text": "Cowboy",
+     "rect": {
+      "x": 1288.27,
+      "y": 1529.18,
+      "width": 183.27,
+      "height": 53.55
+     }
+    }
+   ]
+  },
+  {
+   "text": "Marrón",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1008.0,
+    "y": 1594.05,
+    "width": 169.95,
+    "height": 46.88
+   },
+   "words": [
+    {
+     "text": "Marrón",
+     "rect": {
+      "x": 1008.0,
+      "y": 1594.05,
+      "width": 169.95,
+      "height": 46.88
+     }
+    }
+   ]
+  },
+  {
+   "text": "$11.50",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 2027.72,
+    "y": 1529.58,
+    "width": 164.09,
+    "height": 52.74
+   },
+   "words": [
+    {
+     "text": "$11.50",
+     "rect": {
+      "x": 2027.72,
+      "y": 1529.58,
+      "width": 164.09,
+      "height": 52.74
+     }
+    }
+   ]
+  },
+  {
+   "text": "Subtotal",
+   "confidence": 0.5,
+   "baselineAngle": 0.001902,
+   "rect": {
+    "x": 1019.68,
+    "y": 1757.96,
+    "width": 193.47,
+    "height": 41.39
+   },
+   "words": [
+    {
+     "text": "Subtotal",
+     "rect": {
+      "x": 1019.68,
+      "y": 1757.96,
+      "width": 193.47,
+      "height": 41.39
+     }
+    }
+   ]
+  },
+  {
+   "text": "PUERTO RICO STATE TAX (10.5%)",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1013.86,
+    "y": 1869.0,
+    "width": 785.3,
+    "height": 53.23
+   },
+   "words": [
+    {
+     "text": "PUERTO",
+     "rect": {
+      "x": 1013.86,
+      "y": 1869.0,
+      "width": 162.48,
+      "height": 53.23
+     }
+    },
+    {
+     "text": "RICO",
+     "rect": {
+      "x": 1203.42,
+      "y": 1869.0,
+      "width": 108.32,
+      "height": 53.23
+     }
+    },
+    {
+     "text": "STATE",
+     "rect": {
+      "x": 1338.81,
+      "y": 1869.0,
+      "width": 135.4,
+      "height": 53.23
+     }
+    },
+    {
+     "text": "TAX",
+     "rect": {
+      "x": 1501.29,
+      "y": 1869.0,
+      "width": 81.24,
+      "height": 53.23
+     }
+    },
+    {
+     "text": "(10.5%)",
+     "rect": {
+      "x": 1609.6,
+      "y": 1869.0,
+      "width": 189.56,
+      "height": 53.23
+     }
+    }
+   ]
+  },
+  {
+   "text": "PONCE COUNTY TAX (1%)",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1013.86,
+    "y": 1986.7,
+    "width": 627.07,
+    "height": 52.74
+   },
+   "words": [
+    {
+     "text": "PONCE",
+     "rect": {
+      "x": 1013.86,
+      "y": 1986.7,
+      "width": 149.3,
+      "height": 52.74
+     }
+    },
+    {
+     "text": "COUNTY",
+     "rect": {
+      "x": 1193.02,
+      "y": 1986.7,
+      "width": 179.16,
+      "height": 52.74
+     }
+    },
+    {
+     "text": "TAX",
+     "rect": {
+      "x": 1402.05,
+      "y": 1986.7,
+      "width": 89.58,
+      "height": 52.74
+     }
+    },
+    {
+     "text": "(1%)",
+     "rect": {
+      "x": 1521.49,
+      "y": 1986.7,
+      "width": 119.44,
+      "height": 52.74
+     }
+    }
+   ]
+  },
+  {
+   "text": "Total",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1019.72,
+    "y": 2109.77,
+    "width": 128.93,
+    "height": 41.02
+   },
+   "words": [
+    {
+     "text": "Total",
+     "rect": {
+      "x": 1019.72,
+      "y": 2109.77,
+      "width": 128.93,
+      "height": 41.02
+     }
+    }
+   ]
+  },
+  {
+   "text": "$46.00",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 2033.58,
+    "y": 1752.28,
+    "width": 175.81,
+    "height": 46.88
+   },
+   "words": [
+    {
+     "text": "$46.00",
+     "rect": {
+      "x": 2033.58,
+      "y": 1752.28,
+      "width": 175.81,
+      "height": 46.88
+     }
+    }
+   ]
+  },
+  {
+   "text": "$4.83",
+   "confidence": 1.0,
+   "baselineAngle": -0.029917,
+   "rect": {
+    "x": 2062.22,
+    "y": 1867.31,
+    "width": 147.85,
+    "height": 51.25
+   },
+   "words": [
+    {
+     "text": "$4.83",
+     "rect": {
+      "x": 2062.22,
+      "y": 1867.31,
+      "width": 147.85,
+      "height": 51.25
+     }
+    }
+   ]
+  },
+  {
+   "text": "$0.47",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 2068.74,
+    "y": 1980.84,
+    "width": 140.65,
+    "height": 46.88
+   },
+   "words": [
+    {
+     "text": "$0.47",
+     "rect": {
+      "x": 2068.74,
+      "y": 1980.84,
+      "width": 140.65,
+      "height": 46.88
+     }
+    }
+   ]
+  },
+  {
+   "text": "$51.30",
+   "confidence": 1.0,
+   "baselineAngle": 0.012564,
+   "rect": {
+    "x": 2021.57,
+    "y": 2096.94,
+    "width": 176.39,
+    "height": 49.09
+   },
+   "words": [
+    {
+     "text": "$51.30",
+     "rect": {
+      "x": 2021.57,
+      "y": 2096.94,
+      "width": 176.39,
+      "height": 49.09
+     }
+    }
+   ]
+  },
+  {
+   "text": "Transaction Record",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1019.72,
+    "y": 2273.86,
+    "width": 480.56,
+    "height": 47.14
+   },
+   "words": [
+    {
+     "text": "Transaction",
+     "rect": {
+      "x": 1019.72,
+      "y": 2273.86,
+      "width": 293.68,
+      "height": 47.14
+     }
+    },
+    {
+     "text": "Record",
+     "rect": {
+      "x": 1340.09,
+      "y": 2273.86,
+      "width": 160.19,
+      "height": 47.14
+     }
+    }
+   ]
+  },
+  {
+   "text": "Visa Puronase",
+   "confidence": 0.5,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1019.72,
+    "y": 2361.77,
+    "width": 322.33,
+    "height": 41.23
+   },
+   "words": [
+    {
+     "text": "Visa",
+     "rect": {
+      "x": 1019.72,
+      "y": 2361.77,
+      "width": 99.18,
+      "height": 41.23
+     }
+    },
+    {
+     "text": "Puronase",
+     "rect": {
+      "x": 1143.69,
+      "y": 2361.77,
+      "width": 198.36,
+      "height": 41.23
+     }
+    }
+   ]
+  },
+  {
+   "text": "AUTHORIZED",
+   "confidence": 0.5,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1013.86,
+    "y": 2420.37,
+    "width": 345.77,
+    "height": 52.74
+   },
+   "words": [
+    {
+     "text": "AUTHORIZED",
+     "rect": {
+      "x": 1013.86,
+      "y": 2420.37,
+      "width": 345.77,
+      "height": 52.74
+     }
+    }
+   ]
+  },
+  {
+   "text": "$51.30",
+   "confidence": 1.0,
+   "baselineAngle": -0.007644,
+   "rect": {
+    "x": 2039.24,
+    "y": 2343.54,
+    "width": 170.35,
+    "height": 54.04
+   },
+   "words": [
+    {
+     "text": "$51.30",
+     "rect": {
+      "x": 2039.24,
+      "y": 2343.54,
+      "width": 170.35,
+      "height": 54.04
+     }
+    }
+   ]
+  },
+  {
+   "text": "Jun 17, 2026, 02:03PM",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1013.86,
+    "y": 2666.51,
+    "width": 539.16,
+    "height": 58.6
+   },
+   "words": [
+    {
+     "text": "Jun",
+     "rect": {
+      "x": 1013.86,
+      "y": 2666.51,
+      "width": 77.02,
+      "height": 58.6
+     }
+    },
+    {
+     "text": "17,",
+     "rect": {
+      "x": 1116.56,
+      "y": 2666.51,
+      "width": 77.02,
+      "height": 58.6
+     }
+    },
+    {
+     "text": "2026,",
+     "rect": {
+      "x": 1219.25,
+      "y": 2666.51,
+      "width": 128.37,
+      "height": 58.6
+     }
+    },
+    {
+     "text": "02:03PM",
+     "rect": {
+      "x": 1373.3,
+      "y": 2666.51,
+      "width": 179.72,
+      "height": 58.6
+     }
+    }
+   ]
+  },
+  {
+   "text": "VISA DEBIT",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1013.86,
+    "y": 2924.0,
+    "width": 275.44,
+    "height": 47.26
+   },
+   "words": [
+    {
+     "text": "VISA",
+     "rect": {
+      "x": 1013.86,
+      "y": 2924.0,
+      "width": 110.18,
+      "height": 47.26
+     }
+    },
+    {
+     "text": "DEBIT",
+     "rect": {
+      "x": 1151.58,
+      "y": 2924.0,
+      "width": 137.72,
+      "height": 47.26
+     }
+    }
+   ]
+  },
+  {
+   "text": "(A0000000031010)",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1013.86,
+    "y": 2982.98,
+    "width": 486.42,
+    "height": 58.6
+   },
+   "words": [
+    {
+     "text": "(A0000000031010)",
+     "rect": {
+      "x": 1013.86,
+      "y": 2982.98,
+      "width": 486.42,
+      "height": 58.6
+     }
+    }
+   ]
+  },
+  {
+   "text": "Verification not required",
+   "confidence": 1.0,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1025.58,
+    "y": 3047.0,
+    "width": 533.3,
+    "height": 47.33
+   },
+   "words": [
+    {
+     "text": "Verification",
+     "rect": {
+      "x": 1025.58,
+      "y": 3047.0,
+      "width": 255.98,
+      "height": 47.33
+     }
+    },
+    {
+     "text": "not",
+     "rect": {
+      "x": 1302.9,
+      "y": 3047.0,
+      "width": 64.0,
+      "height": 47.33
+     }
+    },
+    {
+     "text": "required",
+     "rect": {
+      "x": 1388.22,
+      "y": 3047.0,
+      "width": 170.66,
+      "height": 47.33
+     }
+    }
+   ]
+  },
+  {
+   "text": "Receipt: #1-00000",
+   "confidence": 0.5,
+   "baselineAngle": 0.0,
+   "rect": {
+    "x": 1406.51,
+    "y": 3281.86,
+    "width": 433.67,
+    "height": 64.47
+   },
+   "words": [
+    {
+     "text": "Receipt:",
+     "rect": {
+      "x": 1406.51,
+      "y": 3281.86,
+      "width": 204.08,
+      "height": 64.47
+     }
+    },
+    {
+     "text": "#1-00000",
+     "rect": {
+      "x": 1636.1,
+      "y": 3281.86,
+      "width": 204.08,
+      "height": 64.47
+     }
+    }
+   ]
+  },
+  {
+   "text": "¡Muchas gracias por visitarnos!",
+   "confidence": 1.0,
+   "baselineAngle": -0.027266,
+   "rect": {
+    "x": 1270.47,
+    "y": 3339.83,
+    "width": 705.92,
+    "height": 71.65
+   },
+   "words": [
+    {
+     "text": "¡Muchas",
+     "rect": {
+      "x": 1270.47,
+      "y": 3339.83,
+      "width": 159.4,
+      "height": 71.65
+     }
+    },
+    {
+     "text": "gracias",
+     "rect": {
+      "x": 1452.64,
+      "y": 3339.83,
+      "width": 159.4,
+      "height": 71.65
+     }
+    },
+    {
+     "text": "por",
+     "rect": {
+      "x": 1634.82,
+      "y": 3339.83,
+      "width": 68.31,
+      "height": 71.65
+     }
+    },
+    {
+     "text": "visitarnos!",
+     "rect": {
+      "x": 1725.9,
+      "y": 3339.83,
+      "width": 250.49,
+      "height": 71.65
+     }
+    }
+   ]
+  },
+  {
+   "text": "\"GLOBOS NO TIENEN CAMBIO NI DEVOLUCION\"",
+   "confidence": 1.0,
+   "baselineAngle": -0.033885,
+   "rect": {
+    "x": 1047.83,
+    "y": 3448.44,
+    "width": 1139.97,
+    "height": 96.62
+   },
+   "words": [
+    {
+     "text": "\"GLOBOS",
+     "rect": {
+      "x": 1047.83,
+      "y": 3448.44,
+      "width": 204.61,
+      "height": 96.62
+     }
+    },
+    {
+     "text": "NO",
+     "rect": {
+      "x": 1281.67,
+      "y": 3448.44,
+      "width": 58.46,
+      "height": 96.62
+     }
+    },
+    {
+     "text": "TIENEN",
+     "rect": {
+      "x": 1369.36,
+      "y": 3448.44,
+      "width": 175.38,
+      "height": 96.62
+     }
+    },
+    {
+     "text": "CAMBIO",
+     "rect": {
+      "x": 1573.97,
+      "y": 3448.44,
+      "width": 175.38,
+      "height": 96.62
+     }
+    },
+    {
+     "text": "NI",
+     "rect": {
+      "x": 1778.58,
+      "y": 3448.44,
+      "width": 58.46,
+      "height": 96.62
+     }
+    },
+    {
+     "text": "DEVOLUCION\"",
+     "rect": {
+      "x": 1866.27,
+      "y": 3448.44,
+      "width": 321.53,
+      "height": 96.62
+     }
+    }
+   ]
+  },
+  {
+   "text": "Recomendación: Mantener los paquetes de globos en",
+   "confidence": 1.0,
+   "baselineAngle": -0.025968,
+   "rect": {
+    "x": 1018.6,
+    "y": 3512.48,
+    "width": 1197.85,
+    "height": 86.98
+   },
+   "words": [
+    {
+     "text": "Recomendación:",
+     "rect": {
+      "x": 1018.6,
+      "y": 3512.48,
+      "width": 342.24,
+      "height": 86.98
+     }
+    },
+    {
+     "text": "Mantener",
+     "rect": {
+      "x": 1385.29,
+      "y": 3512.48,
+      "width": 195.57,
+      "height": 86.98
+     }
+    },
+    {
+     "text": "los",
+     "rect": {
+      "x": 1605.3,
+      "y": 3512.48,
+      "width": 73.34,
+      "height": 86.98
+     }
+    },
+    {
+     "text": "paquetes",
+     "rect": {
+      "x": 1703.09,
+      "y": 3512.48,
+      "width": 195.57,
+      "height": 86.98
+     }
+    },
+    {
+     "text": "de",
+     "rect": {
+      "x": 1923.1,
+      "y": 3512.48,
+      "width": 48.89,
+      "height": 86.98
+     }
+    },
+    {
+     "text": "globos",
+     "rect": {
+      "x": 1996.44,
+      "y": 3512.48,
+      "width": 146.68,
+      "height": 86.98
+     }
+    },
+    {
+     "text": "en",
+     "rect": {
+      "x": 2167.56,
+      "y": 3512.48,
+      "width": 48.89,
+      "height": 86.98
+     }
+    }
+   ]
+  },
+  {
+   "text": "temperatura fresca para que no se dañen.",
+   "confidence": 1.0,
+   "baselineAngle": -0.042228,
+   "rect": {
+    "x": 1153.04,
+    "y": 3577.06,
+    "width": 928.84,
+    "height": 87.94
+   },
+   "words": [
+    {
+     "text": "temperatura",
+     "rect": {
+      "x": 1153.04,
+      "y": 3577.06,
+      "width": 255.43,
+      "height": 87.94
+     }
+    },
+    {
+     "text": "fresca",
+     "rect": {
+      "x": 1431.69,
+      "y": 3577.06,
+      "width": 139.33,
+      "height": 87.94
+     }
+    },
+    {
+     "text": "para",
+     "rect": {
+      "x": 1594.24,
+      "y": 3577.06,
+      "width": 92.88,
+      "height": 87.94
+     }
+    },
+    {
+     "text": "que",
+     "rect": {
+      "x": 1710.34,
+      "y": 3577.06,
+      "width": 69.66,
+      "height": 87.94
+     }
+    },
+    {
+     "text": "no",
+     "rect": {
+      "x": 1803.23,
+      "y": 3577.06,
+      "width": 46.44,
+      "height": 87.94
+     }
+    },
+    {
+     "text": "se",
+     "rect": {
+      "x": 1872.89,
+      "y": 3577.06,
+      "width": 46.44,
+      "height": 87.94
+     }
+    },
+    {
+     "text": "dañen.",
+     "rect": {
+      "x": 1942.55,
+      "y": 3577.06,
+      "width": 139.33,
+      "height": 87.94
+     }
+    }
+   ]
+  }
+ ],
+ "engine": "scanner-lab-vision-accurate"
+}
