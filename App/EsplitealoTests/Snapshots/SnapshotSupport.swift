@@ -36,6 +36,8 @@ private func referencesDirectory(forTestFile file: StaticString) -> String {
         .path
 }
 
+/// Pass `fixedHeight` for content that wraps over several lines: `.sizeThatFits` measures such content at the default
+/// text size and clips it in the large-Dynamic-Type variant, although the real layout is fine.
 @MainActor
 func assertDesignSnapshot(
     _ content: some View,

@@ -130,6 +130,8 @@ The first `xcodebuild` run resolves swift-snapshot-testing (network). Use `-deri
 
 `assertDesignSnapshot(view, named:)` renders a SwiftUI view in four variants (light/Spanish, dark/Spanish, light/English, light/Spanish at the largest accessibility Dynamic Type size) and compares it with a PNG in `App/SnapshotReferences/<test file>/`. A missing reference is recorded on the first run and that run fails: run again to compare. After an intended visual change, delete the matching PNGs, run once, **look at the new images**, and commit them. References are recorded on **iPhone 16, iOS 18.6** (`Scripts/ios-simulator-udid.sh 18`); comparisons use `precision: 0.99, perceptualPrecision: 0.97`, so rendering noise passes and a changed colour, string or layout fails. Record on that same runtime.
 
+Pass `fixedHeight:` (for example a full phone height, 844) for screens and for content that wraps over several lines: the default `.sizeThatFits` layout measures wrapped text at the default size and clips it in the large-text variant.
+
 Every new screen ships with a snapshot of its states: build the screen view with `SampleBill`, an in-memory `BillStore` and a router, then call `assertDesignSnapshot`.
 
 ### UI tests

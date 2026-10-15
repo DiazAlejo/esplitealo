@@ -38,7 +38,8 @@ struct ComponentSnapshotTests {
                 AmountRow(verbatim: "Flan para compartir", cents: 900)
             }
             .padding(Spacing.screenMargin),
-            named: "card-rows"
+            named: "card-rows",
+            fixedHeight: 520
         )
     }
 
@@ -47,7 +48,7 @@ struct ComponentSnapshotTests {
         assertDesignSnapshot(
             VStack(alignment: .leading, spacing: Spacing.sm) {
                 HStack(spacing: Spacing.xs) {
-                    ForEach(Array(names.enumerated()), id: \.offset) { index, name in
+                    ForEach(Array(names.enumerated()), id: \.element) { index, name in
                         PersonAvatar(name: name, participantIndex: index, size: 28)
                     }
                 }

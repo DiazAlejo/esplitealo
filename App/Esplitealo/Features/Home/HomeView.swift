@@ -47,6 +47,8 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .espScreenBackground()
         .navigationBarHidden(true)
+        // `.contain` keeps the children's own identifiers; a bare identifier here would replace them.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AppRoute.home.accessibilityIdentifier)
     }
 }

@@ -40,6 +40,8 @@ struct PlaceholderScreen: View {
                 }
             }
         }
+        // `.contain` keeps the children's own identifiers; a bare identifier here would replace them.
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier(route.accessibilityIdentifier)
     }
 }
