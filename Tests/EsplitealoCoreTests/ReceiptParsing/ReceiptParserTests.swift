@@ -1,5 +1,6 @@
 import XCTest
 @testable import EsplitealoCore
+import EsplitealoTestSupport
 
 final class ReceiptParserTests: XCTestCase {
     private let parser = ReceiptParser()

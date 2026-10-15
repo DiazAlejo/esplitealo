@@ -1,16 +1,16 @@
 import Foundation
 
-public enum TipBasis: Equatable, Sendable {
+public enum TipBasis: Equatable, Sendable, Codable {
     case preTaxSubtotal
     case postTaxTotal
 }
 
-public enum TipConfiguration: Equatable, Sendable {
+public enum TipConfiguration: Equatable, Sendable, Codable {
     case percentage(percent: Int, basis: TipBasis)
     case custom(cents: Int)
 }
 
-public struct Receipt: Equatable, Sendable {
+public struct Receipt: Equatable, Sendable, Codable {
     public let items: [ReceiptItem]
     public let taxCents: Int
     public let tip: TipConfiguration

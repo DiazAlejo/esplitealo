@@ -1,5 +1,6 @@
 import CoreGraphics
 import EsplitealoCore
+import EsplitealoScanning
 import Foundation
 import ImageIO
 

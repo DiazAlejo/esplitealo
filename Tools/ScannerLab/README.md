@@ -4,7 +4,7 @@ Developer-only iOS utility to exercise Esplitealo’s on-device receipt OCR and 
 
 ## Open and run on your iPhone
 
-1. Open `Tools/ScannerLab/ScannerLab.xcodeproj` in Xcode 16.4 or newer.
+1. Open `Tools/ScannerLab/ScannerLab.xcodeproj` in Xcode 26.3 or newer.
 2. Select the **ScannerLab** scheme and your connected iPhone (or a simulator).
 3. In the **ScannerLab** target → **Signing & Capabilities**:
    - Choose your **Team** (leave the repository without a team ID).
@@ -88,7 +88,7 @@ If signing still fails, copy the **full** `xcodebuild` output from the first `er
 
 ### Deployment target
 
-The app target uses **iOS 17.0** (`IPHONEOS_DEPLOYMENT_TARGET`). Your phone must run iOS 17 or newer (typical current devices do).
+The app target uses **iOS 18.0** (`IPHONEOS_DEPLOYMENT_TARGET`), the same minimum as the package. Your phone must run iOS 18 or newer (every iPhone that runs iOS 17 can run iOS 18).
 
 ### Package plugins
 

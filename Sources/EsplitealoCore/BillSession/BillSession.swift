@@ -1,10 +1,13 @@
 import Foundation
 
-public struct BillSession: Sendable {
+public struct BillSession: Sendable, Equatable {
+    /// Version of the JSON written by `BillSessionCoding`. Bump it (and add a fixture) when the stored shape changes.
+    public static let currentSchemaVersion = 1
+
     public var draft: ReceiptDraft
     public var merchantName: String
-    public var dateLabel: String
-    public var dateLabelEnglish: String
+    /// When the bill was made; formatted for display (and sharing) by the caller's calendar.
+    public var date: Date?
     /// Gratuity printed on the receipt (distinct from session tip settings).
     public var serviceChargeCents: Int
     public var participants: [Participant]
@@ -15,8 +18,7 @@ public struct BillSession: Sendable {
     public init(
         draft: ReceiptDraft,
         merchantName: String = "",
-        dateLabel: String = "",
-        dateLabelEnglish: String = "",
+        date: Date? = nil,
         serviceChargeCents: Int = 0,
         participants: [Participant] = [],
         assignments: [ItemAssignment] = [],
@@ -25,8 +27,7 @@ public struct BillSession: Sendable {
     ) {
         self.draft = ReceiptDraftEditing.reconcile(draft)
         self.merchantName = merchantName
-        self.dateLabel = dateLabel
-        self.dateLabelEnglish = dateLabelEnglish
+        self.date = date
         self.serviceChargeCents = serviceChargeCents
         self.participants = participants
         self.assignments = assignments
