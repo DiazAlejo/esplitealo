@@ -1,6 +1,6 @@
 # The iOS app
 
-How the Esplitéalo app is put together, how to add a screen, and how to run its tests. Read this before you build a screen. It is written for people and for AI workers: every rule here is checked by a test or a build, not by trust.
+How the Esplitéalo app is put together, how to add a screen, and how to run its tests. Read this before you build a screen. It is written for people and for coding assistants: every rule here is checked by a test or a build, not by trust.
 
 ## Layout
 
