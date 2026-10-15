@@ -13,7 +13,7 @@ GitHub Actions workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml
 | **CI / Vision integration** | No (`continue-on-error`) | Same toolchain; runs `ReceiptScannerVisionTests` (real Vision OCR on synthetic receipt images). May flake on hosted runners; failures do not block merge. |
 | **CI / iOS Capture compile** | No (`continue-on-error`) | `xcodebuild build` for the `EsplitealoCapture` scheme (generic iOS Simulator destination) and for the Scanner Lab app project (generic iOS destination), both with no code signing. Informational compile check for the UIKit/VisionKit capture code and the lab app. |
 
-The required **macOS** job also runs `Tests/AppResourceTests`, which read the app's string catalogs, xcconfig files, privacy manifest and icon as text: a missing Spanish or English translation, a committed team id, or a photo-library permission fails the required check in seconds, without a simulator.
+The required **macOS** job also runs `Tests/AppResourceTests`, which parse the app's string catalogs, Xcode project, xcconfig files, privacy manifest and icon: a missing Spanish or English translation, a committed team id, or a photo-library permission fails the required check in seconds, without a simulator.
 
 Superseded workflow runs for the same branch are cancelled via a concurrency group.
 
