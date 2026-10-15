@@ -23,7 +23,7 @@ The flow is linear, but you can go back and edit the receipt, assignments, or ti
 
 ## Status
 
-In development. The calculation engine (`BillCalculator`, a Swift package with unit tests) is implemented. Next is the assignment screen, driven by a hardcoded sample receipt, before any camera or text recognition work.
+In development. The calculation engine, receipt parser, scanning pipeline, bill session with autosaved draft, and the design system (tokens, components, Chavito) are implemented and tested. The app skeleton (Xcode project, navigation shell with placeholder screens, string catalogs in Spanish and English) is in place; the six screens are built next, one worker each.
 
 ## Documentation
 
@@ -32,6 +32,7 @@ In development. The calculation engine (`BillCalculator`, a Swift package with u
 - [Calculation rules](docs/CALCULATION_RULES.md): how items, tax, tip, and rounding are allocated.
 - [Calculator proof](docs/CALCULATOR_PROOF.md): property tests and an independent reference calculator that check every split to the cent.
 - [Architecture](docs/ARCHITECTURE.md): technology and code layout.
+- [The iOS app](docs/APP.md): app structure, design system, strings, how to add a screen, how to run the tests.
 - [Roadmap](docs/ROADMAP.md): milestones and what is explicitly out of scope for launch.
 - [Design guide](docs/DESIGN_GUIDE.md): principles, starter palette, type scale, and screen-by-screen visual guidance.
 - [Brand assets](design/brand/README.md): Dos paredes logo, app icon package, and terminal icon build notes.

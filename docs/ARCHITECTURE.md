@@ -13,7 +13,7 @@ The logic lives in a Swift package at the repository root, so `swift test` runs 
 | `EsplitealoCapture` | UIKit, VisionKit, PhotosUI, AVFoundation | Document camera, photo import, camera permission bridges (iOS only). |
 | `OCRBenchmarkKit` + `EsplitealoOCRBenchmark` | CoreGraphics, AppKit (synthetic images) | Developer-only OCR benchmark library and its command-line executable. The app never links them. |
 | `ScannerLabKit` | Core, Scanning | Logic for the Scanner Lab developer app. |
-| `EsplitealoDesign` | SwiftUI | The Chavito mascot (`ChavitoView`, expressions, pink disc, motion, accessibility labels) and its SVG/PDF export code. Depends on no other target; reference exports live in `design/brand/chavito/`. |
+| `EsplitealoDesign` | SwiftUI, CoreText | The design system: colour tokens, person colours, type scale, money formatter, buttons, cards, avatars, headers, the bundled Unkempt font; and the Chavito mascot (`ChavitoView`, expressions, pink disc, motion, accessibility labels) with its SVG/PDF export code. Depends on no other target; reference exports live in `design/brand/chavito/`. See [APP.md](APP.md). |
 | `EsplitealoTestSupport` | Core | Test helpers shared by test targets (not a product). |
 
 Dependencies point one way: `EsplitealoCore` ← `EsplitealoScanning` ← `OCRBenchmarkKit` / `ScannerLabKit`. Nothing in `EsplitealoCore` may import a scanning, capture or benchmark target.
@@ -31,10 +31,10 @@ Dependencies point one way: `EsplitealoCore` ← `EsplitealoScanning` ← `OCRBe
 │   ├── EsplitealoCapture/         # UIKit / VisionKit / PhotosUI bridges
 │   ├── OCRBenchmarkKit/           # benchmark library
 │   ├── EsplitealoOCRBenchmark/    # benchmark executable (EsplitealoOCRBenchmarkCLI.swift)
-│   ├── EsplitealoDesign/          # Chavito mascot in SwiftUI (no dependencies); exports in design/brand/chavito
+│   ├── EsplitealoDesign/          # design system and Chavito in SwiftUI (no dependencies); exports in design/brand/chavito
 │   └── ScannerLabKit/
 ├── Tests/
-│   ├── EsplitealoCoreTests/  EsplitealoScanningTests/  EsplitealoCaptureTests/  EsplitealoDesignTests/
+│   ├── EsplitealoCoreTests/  EsplitealoScanningTests/  EsplitealoCaptureTests/  EsplitealoDesignTests/  AppResourceTests/
 │   ├── OCRBenchmarkKitTests/  ScannerLabKitTests/  EsplitealoTestSupport/
 │   └── Fixtures/                  # Receipts/ (parser) and BillSessions/ (stored JSON format)
 └── Tools/ScannerLab/              # Scanner Lab Xcode project; see its README
@@ -42,23 +42,29 @@ Dependencies point one way: `EsplitealoCore` ← `EsplitealoScanning` ← `OCRBe
 
 Tests run with `swift test` on the Mac and with `xcodebuild test -scheme EsplitealoCore-Package` on an iOS 18 simulator (see [CI](CI.md)). The executable's entry file is named `EsplitealoOCRBenchmarkCLI.swift`, not `main.swift`: a file called `main.swift` that also uses `@main` breaks `xcodebuild` for iOS destinations.
 
-The Xcode app will embed these libraries (`EsplitealoCore`, `EsplitealoScanning`, `EsplitealoCapture`) later.
+The Xcode app embeds `EsplitealoCore`, `EsplitealoDesign`, `EsplitealoScanning` and `EsplitealoCapture`.
 
-## Planned app layout
+## The app
 
-The app is not created yet. It will be a thin hand-kept Xcode project that depends on the package above and keeps all screens and glue code in the app target:
+The app is a thin hand-kept Xcode project (`App/Esplitealo.xcodeproj`, synchronized folders, all build settings in `App/Config/*.xcconfig`) that depends on the package above and keeps all screens and glue code in the app target:
 
 ```
 App/
-├── Esplitealo.xcodeproj          # one app target and one UI test target, synchronized folders
-├── Config/*.xcconfig             # build settings as text (bundle id, versions, Swift settings)
+├── Esplitealo.xcodeproj          # app, unit/snapshot test and UI test targets
+├── Config/*.xcconfig             # build settings as text (bundle id, iOS 18, Swift 6, actor isolation)
 ├── Esplitealo/
-│   ├── App/                      # EsplitealoApp, the observable bill store (autosaves via BillDraftStore)
+│   ├── EsplitealoApp.swift       # entry point
+│   ├── Navigation/               # AppRoute (six screens), AppRouter, RootView
+│   ├── Store/                    # BillStore (autosaves via BillDraftStore), DraftLocation
 │   ├── Features/                 # Home, Capture, ReceiptReview, Participants, Assignment, Summary
-│   ├── DesignSystem/
-│   └── Resources/                # string catalogs, assets, privacy manifest
-└── EsplitealoUITests/
+│   ├── Support/                  # SampleBill for previews and tests
+│   └── Resources/                # string catalogs, assets, privacy manifest, layered icon
+├── EsplitealoTests/              # unit and snapshot tests (Swift Testing, swift-snapshot-testing)
+├── EsplitealoUITests/            # XCUITest smoke tests
+└── SnapshotReferences/           # recorded snapshot PNGs
 ```
+
+[APP.md](APP.md) is the guide for building a screen: design system, state, strings, tests, signing.
 
 ## Technology
 

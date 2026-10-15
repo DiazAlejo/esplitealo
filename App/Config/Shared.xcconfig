@@ -1,0 +1,30 @@
+// Build settings shared by every target. All settings live in text files like this one, so a change is a diff
+// and the project file never needs hand edits for them.
+
+// The only place the bundle identifier is defined. It is a placeholder until the App Store Connect record exists.
+APP_BUNDLE_IDENTIFIER = com.esplitealo.app
+
+IPHONEOS_DEPLOYMENT_TARGET = 18.0
+ALWAYS_SEARCH_USER_PATHS = NO
+SDKROOT = iphoneos
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator
+TARGETED_DEVICE_FAMILY = 1
+
+SWIFT_VERSION = 6.0
+SWIFT_STRICT_CONCURRENCY = complete
+SWIFT_EMIT_LOC_STRINGS = YES
+
+// Spanish (Puerto Rico) is the development language; English is the second. Strings live in String Catalogs.
+DEVELOPMENT_LANGUAGE = es
+LOCALIZATION_PREFERS_STRING_CATALOGS = YES
+STRING_CATALOG_GENERATE_SYMBOLS = YES
+
+MARKETING_VERSION = 0.1.0
+CURRENT_PROJECT_VERSION = 1
+
+// Signing. No team id is committed: builds for the simulator need none, and a real device build uses the personal
+// team that the owner puts in Config/Local.xcconfig (git-ignored).
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"
