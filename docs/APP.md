@@ -102,34 +102,38 @@ Files added under `App/Esplitealo` join the app target by themselves; do not edi
 
 ## Running the tests
 
-Requires Xcode 26.3 and an **iOS 18.x simulator runtime** (this Mac has iOS 18.6, 26.0 and 26.3). Pick the simulator with the script CI uses:
+**The supported workflow is: write the tests, run `swift test` locally, push, and read CI.** CI runs the whole app test plan (unit, snapshot, UI smoke and flow tests) on a GitHub-hosted iOS 18 simulator, free because the repository is public; see [CI.md](CI.md#the-supported-workflow).
 
 ```bash
-UDID=$(Scripts/ios-simulator-udid.sh 18)          # an iPhone on an iOS 18.x runtime
+swift test                                              # fast, no simulator: Core, Design, resources (string catalogs, xcconfig, manifest), scanning logic
+git push                                                # CI builds the app and runs EsplitealoTests and EsplitealoUITests
+Scripts/ci-logs.sh                                      # why the latest CI run of this branch failed (or: gh run view --log-failed -R DiazAlejo/esplitealo)
+gh workflow run record-snapshots.yml -R DiazAlejo/esplitealo --ref main -f branch=<branch> -f commit=true   # record snapshots on CI
+```
 
-# Fast, no simulator: Core, Design, resources (string catalogs, xcconfig, manifest), scanning logic
-swift test
+Running the app's tests on a **local simulator is optional and discouraged**: simulators and DerivedData fill the owner's Mac disk. If you must (for example to watch a UI test), pick the simulator with the script CI uses and keep the build output outside the repository, then delete it:
 
-# Build the app for the simulator, no signing
-xcodebuild build -project App/Esplitealo.xcodeproj -scheme Esplitealo \
-  -destination "platform=iOS Simulator,id=$UDID" CODE_SIGNING_ALLOWED=NO
+```bash
+UDID=$(Scripts/ios-simulator-udid.sh 18)          # an iPhone on an iOS 18.x runtime (this Mac has 18.6, 26.0 and 26.3)
 
 # Unit and snapshot tests of the app (BillStore, routes, strings, design components)
 xcodebuild test -project App/Esplitealo.xcodeproj -scheme Esplitealo \
-  -only-testing:EsplitealoTests \
+  -only-testing:EsplitealoTests -derivedDataPath /tmp/esplitealo-dd \
   -destination "platform=iOS Simulator,id=$UDID" CODE_SIGNING_ALLOWED=NO
 
-# UI smoke tests (launch to Home in Spanish and English, walk the six screens)
+# UI smoke and flow tests (launch to Home in Spanish and English, walk the screens)
 xcodebuild test -project App/Esplitealo.xcodeproj -scheme Esplitealo \
-  -only-testing:EsplitealoUITests \
+  -only-testing:EsplitealoUITests -derivedDataPath /tmp/esplitealo-dd \
   -destination "platform=iOS Simulator,id=$UDID" CODE_SIGNING_ALLOWED=NO
+
+rm -rf /tmp/esplitealo-dd
 ```
 
-The first `xcodebuild` run resolves swift-snapshot-testing (network). Use `-derivedDataPath <dir>` to keep build output outside the repository.
+The first `xcodebuild` run resolves swift-snapshot-testing (network).
 
 ### Snapshot tests
 
-`assertDesignSnapshot(view, named:)` renders a SwiftUI view in four variants (light/Spanish, dark/Spanish, light/English, light/Spanish at the largest accessibility Dynamic Type size) and compares it with a PNG in `App/SnapshotReferences/<test file>/`. A missing reference is recorded on the first run and that run fails: run again to compare. After an intended visual change, delete the matching PNGs, run once, **look at the new images**, and commit them. References are recorded on **iPhone 16, iOS 18.6** (`Scripts/ios-simulator-udid.sh 18`); comparisons use `precision: 0.99, perceptualPrecision: 0.97`, so rendering noise passes and a changed colour, string or layout fails. Record on that same runtime.
+`assertDesignSnapshot(view, named:)` renders a SwiftUI view in four variants (light/Spanish, dark/Spanish, light/English, light/Spanish at the largest accessibility Dynamic Type size) and compares it with a PNG in `App/SnapshotReferences/<test file>/`. A missing reference fails the test. **Record references on CI, never on a Mac**: they only match CI's rendering if CI rendered them. Run the [Record snapshots](CI.md#record-snapshots) workflow (`gh workflow run record-snapshots.yml -R DiazAlejo/esplitealo --ref main -f branch=<branch> -f commit=true`): it records on the runner and simulator CI uses (**iPhone 16, iOS 18.6**), checks that the recorded images pass, and commits them to the branch (or uploads them as an artifact). Use `mode=missing` for new tests and `mode=failed` after an intended visual change, then **look at the new images** before you merge. Comparisons use `precision: 0.99, perceptualPrecision: 0.97`, so rendering noise passes and a changed colour, string or layout fails.
 
 Pass `fixedHeight:` (for example a full phone height, 844) for screens and for content that wraps over several lines: the default `.sizeThatFits` layout measures wrapped text at the default size and clips it in the large-text variant.
 
@@ -146,8 +150,8 @@ Every new screen ships with a snapshot of its states: build the screen view with
 | Bill logic, parsing, calculator, draft storage | `Tests/EsplitealoCoreTests` | `swift test` |
 | Colour tokens, contrast, type scale, money, person colours | `Tests/EsplitealoDesignTests` | `swift test` |
 | String catalogs (es/en parity), xcconfig, privacy manifest, icon | `Tests/AppResourceTests` | `swift test` (required CI check) |
-| `BillStore`, routes, compiled strings | `App/EsplitealoTests` | simulator |
-| Component snapshots | `App/EsplitealoTests/Snapshots` | simulator |
-| Launch and flow smoke | `App/EsplitealoUITests` | simulator |
+| `BillStore`, routes, compiled strings | `App/EsplitealoTests` | CI simulator (`iOS App`) |
+| Component and screen snapshots | `App/EsplitealoTests/Snapshots` | CI simulator (`iOS App`) |
+| Launch and flow smoke | `App/EsplitealoUITests` | CI simulator (`iOS App`) |
 
 CI: see [CI.md](CI.md).
