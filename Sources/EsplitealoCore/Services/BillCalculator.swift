@@ -5,6 +5,10 @@ public struct RoundingAdjustment: Equatable, Sendable {
         case itemUnit(itemID: UUID, unitIndex: Int)
         case tax
         case tip
+        /// The receipt's service charge, shared by `BillSession` in proportion to the items.
+        case serviceCharge
+        /// A tip printed on the receipt (with no service charge), shared the same way.
+        case printedTip
     }
 
     public let participantID: UUID

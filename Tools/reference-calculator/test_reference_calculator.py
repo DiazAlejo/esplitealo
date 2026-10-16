@@ -254,7 +254,8 @@ class NobodyCarriesChargesTests(unittest.TestCase):
         self.assertEqual([p["totalOwedCents"] for p in result["people"]], [0, 0])
 
     def test_free_items_with_a_service_charge_or_a_custom_tip_are_flagged(self):
-        service = calculate(self.free_items(serviceChargeCents=50, printedSubtotalCents=0, printedTotalCents=50))
+        # A service charge is the receipt's tip line, so the printed total includes it.
+        service = calculate(self.free_items(serviceChargeCents=50, printedTipCents=50, printedSubtotalCents=0, printedTotalCents=50))
         tip = calculate(self.free_items(sessionTip={"kind": "custom", "cents": 300}, printedSubtotalCents=0, printedTotalCents=0))
         self.assertTrue(service["nobodyCarriesCharges"])
         self.assertTrue(tip["nobodyCarriesCharges"])

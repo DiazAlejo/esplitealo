@@ -6,7 +6,7 @@ It was written from the documents, not ported from `BillCalculator.swift`. It us
 
 | File | Purpose |
 | ---- | ------- |
-| `reference_calculator.py` | `calculate(bill)`: per-person items, tax, service charge, printed tip, session tip, total and rounding adjustments, plus settlement and `canShare` |
+| `reference_calculator.py` | `calculate(bill)`: per-person items, tax, service charge, printed tip, session tip, total and rounding adjustments (items, tax, tip, service charge, printed tip), plus settlement, `canShare` and `nobodyCarriesCharges` |
 | `test_reference_calculator.py` | Checks the reference against the worked examples in the documents |
 | `generate_corpus.py` | Writes a seeded corpus of bills with the reference results as JSON |
 

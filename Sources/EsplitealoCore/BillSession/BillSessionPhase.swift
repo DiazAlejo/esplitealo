@@ -14,6 +14,9 @@ public enum ShareBlockReason: Equatable, Sendable {
     case receiptMismatch
     case unassignedItems
     case discountNeedsManualAdjustment
+    /// The items all cost nothing (or there are none) but the bill has tax, tip or a service charge: there is nothing
+    /// to share those by.
+    case noItemsToCarryCharges
 }
 
 public enum AddParticipantResult: Equatable, Sendable {
