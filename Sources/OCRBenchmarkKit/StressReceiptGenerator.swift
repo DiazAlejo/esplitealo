@@ -133,7 +133,10 @@ private struct Catalog {
 
     static func make(venue: StressVenue, language: StressLanguage) -> Catalog {
         let es = language == .spanish
-        let streets = ["Calle Luna 123", "Ave. Central 45", "Carr. 2 Km 14", "Calle del Sol 7", "Plaza Las Flores Local 12"]
+        let streets = [
+            "Calle Luna 123", "Carr. 2 Km 14", "Ave. Central #45", "Calle del Sol #7", "123 Calle Sol",
+            "Plaza Las Flores, Local 12A", "Urb. Los Pinos, Calle 4 B-2", "Esquina Calle Mar y Calle Sol",
+        ]
         let modifiers = es
             ? ["Término medio", "Sin cebolla", "Extra queso", "Grande", "Pequeño", "Negro", "Marrón", "Con hielo",
                "Sin hielo", "Bien cocido", "Salsa aparte", "Sin sal"]
