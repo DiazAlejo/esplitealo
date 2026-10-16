@@ -126,8 +126,13 @@ public struct ReceiptDraft: Equatable, Sendable, Codable {
     public var total: DraftAmount?
     public var adjustments: [DraftAdjustment]
     public var numberFormat: NumberFormat
+    /// What the parser was unsure about, for the Review screen. Dismissed ones are kept; see `activeWarnings`.
+    public var warnings: [ReceiptWarning]
     public var issues: [ReceiptIssue]
     public var reconciles: Bool
+
+    /// The warnings the user has not yet fixed or accepted.
+    public var activeWarnings: [ReceiptWarning] { warnings.filter { !$0.isDismissed } }
 
     public init(
         items: [DraftItem] = [],
@@ -137,6 +142,7 @@ public struct ReceiptDraft: Equatable, Sendable, Codable {
         total: DraftAmount? = nil,
         adjustments: [DraftAdjustment] = [],
         numberFormat: NumberFormat = .usdCents,
+        warnings: [ReceiptWarning] = [],
         issues: [ReceiptIssue] = [],
         reconciles: Bool = false
     ) {
@@ -147,7 +153,27 @@ public struct ReceiptDraft: Equatable, Sendable, Codable {
         self.total = total
         self.adjustments = adjustments
         self.numberFormat = numberFormat
+        self.warnings = warnings
         self.issues = issues
         self.reconciles = reconciles
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case items, subtotal, tax, tip, total, adjustments, numberFormat, warnings, issues, reconciles
+    }
+
+    /// `warnings` arrived with bill schema 2; a draft written before has none.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = try container.decode([DraftItem].self, forKey: .items)
+        subtotal = try container.decodeIfPresent(DraftAmount.self, forKey: .subtotal)
+        tax = try container.decodeIfPresent(DraftAmount.self, forKey: .tax)
+        tip = try container.decodeIfPresent(DraftAmount.self, forKey: .tip)
+        total = try container.decodeIfPresent(DraftAmount.self, forKey: .total)
+        adjustments = try container.decode([DraftAdjustment].self, forKey: .adjustments)
+        numberFormat = try container.decode(NumberFormat.self, forKey: .numberFormat)
+        warnings = try container.decodeIfPresent([ReceiptWarning].self, forKey: .warnings) ?? []
+        issues = try container.decode([ReceiptIssue].self, forKey: .issues)
+        reconciles = try container.decode(Bool.self, forKey: .reconciles)
     }
 }

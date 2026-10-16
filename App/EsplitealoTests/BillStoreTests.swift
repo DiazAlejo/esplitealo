@@ -34,6 +34,21 @@ struct BillStoreTests {
         #expect(store.session?.participants.isEmpty == true)
     }
 
+    @Test func startingANewBillSetsTheBillDateToToday() {
+        let store = makeStore()
+        let before = Date()
+        store.startNewBill()
+        let date = store.session?.date
+        #expect(date != nil)
+        #expect(date.map { $0 >= before && $0 <= Date() } == true)
+    }
+
+    @Test func aScannedDraftAlsoGetsTheBillDate() {
+        let store = makeStore()
+        store.startNewBill(draft: SampleBill.scannedDraft())
+        #expect(store.session?.date != nil)
+    }
+
     @Test func aBlankBillIsNeverWorthSaving() async {
         let store = makeStore()
         store.startNewBill()
@@ -357,6 +372,34 @@ struct BillStoreTests {
         #expect(store.hasBillInProgress)
         await advance(store, by: .milliseconds(500))
         #expect(recording.stored == store.session)
+    }
+
+    // MARK: Warnings from the scan
+
+    @Test func warningsFromTheScanAreSavedAndComeBackOnResume() async {
+        let store = makeStore()
+        store.startNewBill(draft: ReviewSamples.unsureSession().draft)
+        #expect(store.session?.draft.warnings.count == 2, "starting a bill from a scan keeps what the scan was unsure about")
+        await advance(store, by: .milliseconds(500))
+        #expect(drafts.stored?.draft.warnings == store.session?.draft.warnings)
+
+        let resumed = makeStore(drafts: drafts)
+        resumed.loadSavedDraft()
+        resumed.resumeSavedDraft()
+        #expect(resumed.session?.draft.warnings == store.session?.draft.warnings)
+    }
+
+    @Test func aWarningDismissedBeforeTheAppWasClosedStaysDismissed() async {
+        let store = makeStore()
+        store.startNewBill(draft: ReviewSamples.unsureSession().draft)
+        let id = store.session!.draft.warnings[0].id
+        store.update { $0.applyDraft(ReceiptDraftEditing.dismissWarning(in: $0.draft, id: id)) }
+        await advance(store, by: .milliseconds(500))
+
+        let resumed = makeStore(drafts: drafts)
+        resumed.loadSavedDraft()
+        resumed.resumeSavedDraft()
+        #expect(resumed.session?.draft.activeWarnings.map(\.id) == [store.session!.draft.warnings[1].id])
     }
 
     // MARK: Draft location

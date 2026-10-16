@@ -198,11 +198,10 @@ final class TotalsViewModel {
         let session = session
         let breakdowns = session.personBreakdowns
         let total = breakdowns.map(\.totalOwedCents).reduce(0, +)
-        let serviceStrays = Self.serviceStrays(in: session)
         return breakdowns.map { breakdown in
             let person = session.participants.first { $0.id == breakdown.participantID }
             let service = breakdown.serviceShareCents + breakdown.receiptTipShareCents
-            let strays = breakdown.adjustments.map(\.cents).reduce(0, +) + (serviceStrays[breakdown.participantID] ?? 0)
+            let strays = breakdown.adjustments.map(\.cents).reduce(0, +)
             return PersonRow(
                 id: breakdown.participantID,
                 name: person?.name ?? "",
@@ -279,38 +278,19 @@ final class TotalsViewModel {
             }
         }
 
-        for (pool, label) in [(RoundingAdjustment.Pool.tax, RoundingNote.Pool.tax), (.tip, .tip)] {
-            let paid = adjustments.filter { $0.pool == pool }
-            guard !paid.isEmpty else { continue }
+        // The service charge and a tip printed on the receipt are shown together as "Servicio", and a receipt has
+        // one or the other.
+        let poolAdjustments = session.personBreakdowns.flatMap(\.adjustments)
+        let pools: [(RoundingNote.Pool, [RoundingAdjustment])] = [
+            (.tax, adjustments.filter { $0.pool == .tax }),
+            (.tip, adjustments.filter { $0.pool == .tip }),
+            (.service, poolAdjustments.filter { $0.pool == .serviceCharge || $0.pool == .printedTip }),
+        ]
+        for (label, paid) in pools where !paid.isEmpty {
             let names = ordered.filter { person in paid.contains { $0.participantID == person.id } }.map(\.name)
             notes.append(.pool(label, cents: paid.map(\.cents).reduce(0, +), names: names))
         }
-
-        // The calculator does not report the cents of the service charge; they are the difference between what each
-        // person was given and the exact proportional share.
-        let service = Self.serviceStrays(in: session)
-        if service.values.reduce(0, +) > 0 {
-            notes.append(.pool(.service, cents: service.values.reduce(0, +), names: ordered.filter { (service[$0.id] ?? 0) > 0 }.map(\.name)))
-        }
         return notes
-    }
-
-    /// The cents each person got above the exact proportional floor of the service charge and of a tip printed on the
-    /// receipt (0 or 1 for each).
-    private static func serviceStrays(in session: BillSession) -> [UUID: Int] {
-        let breakdowns = session.personBreakdowns
-        let weightSum = breakdowns.map(\.itemSubtotalCents).reduce(0, +)
-        func stray(share: Int, of amount: Int, weight: Int) -> Int {
-            guard amount > 0, weightSum > 0 else { return 0 }
-            return share - amount * weight / weightSum
-        }
-        return Dictionary(uniqueKeysWithValues: breakdowns.map {
-            (
-                $0.participantID,
-                stray(share: $0.serviceShareCents, of: session.serviceChargeCents, weight: $0.itemSubtotalCents)
-                    + stray(share: $0.receiptTipShareCents, of: session.receiptTipOnBillCents, weight: $0.itemSubtotalCents)
-            )
-        })
     }
 
     // MARK: Gating
@@ -324,6 +304,9 @@ final class TotalsViewModel {
         case missingTotal
         /// Discount rows the app cannot split yet.
         case discountsNotSplit
+        /// Every item is free (or there are none) but the bill has tax, tip or a service charge: nobody has items to
+        /// split them by.
+        case nobodyCarriesCharges
         case reconciled(totalCents: Int)
     }
 
@@ -336,6 +319,8 @@ final class TotalsViewModel {
             return .missingTotal
         case .discountNeedsManualAdjustment:
             return .discountsNotSplit
+        case .noItemsToCarryCharges:
+            return .nobodyCarriesCharges
         case .unassignedItems:
             let itemsTotal = session.draft.items.reduce(0) { $0 + $1.lineTotal.minorUnits }
             let assigned = session.personBreakdowns.map(\.itemSubtotalCents).reduce(0, +)
@@ -360,7 +345,7 @@ final class TotalsViewModel {
     /// The reason sharing is blocked is in the receipt, so editing the receipt is the way out.
     var blockedByReceipt: Bool {
         switch status {
-        case .receiptMismatch, .missingTotal, .discountsNotSplit: true
+        case .receiptMismatch, .missingTotal, .discountsNotSplit, .nobodyCarriesCharges: true
         case .unassigned, .reconciled: false
         }
     }

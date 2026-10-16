@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 2,
+  "merchantName": "Fonda Doña Lola",
+  "date": "2026-10-13T16:45:00Z",
+  "serviceChargeCents": 0,
+  "mismatchAcknowledged": true,
+  "tip": {
+    "percentage": {
+      "percent": 18,
+      "basis": {
+        "postTaxTotal": {}
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "name": "Alex",
+      "orderIndex": 0
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "name": "Sam",
+      "orderIndex": 1
+    }
+  ],
+  "assignments": [
+    {
+      "itemID": "10000000-0000-0000-0000-000000000001",
+      "unitIndex": 0,
+      "participantIDs": [
+        "00000000-0000-0000-0000-000000000001"
+      ]
+    },
+    {
+      "itemID": "10000000-0000-0000-0000-000000000002",
+      "unitIndex": 1,
+      "participantIDs": [
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002"
+      ]
+    }
+  ],
+  "draft": {
+    "items": [
+      {
+        "id": "10000000-0000-0000-0000-000000000001",
+        "name": "Mofongo",
+        "quantity": 1,
+        "lineTotal": {
+          "minorUnits": 1450,
+          "needsAttention": false,
+          "sourceRect": {
+            "x": 120.5,
+            "y": 88,
+            "width": 64,
+            "height": 18
+          }
+        },
+        "notes": [],
+        "flags": []
+      },
+      {
+        "id": "10000000-0000-0000-0000-000000000002",
+        "name": "Tostones",
+        "quantity": 2,
+        "lineTotal": {
+          "minorUnits": 900,
+          "needsAttention": true
+        },
+        "unitPrice": {
+          "minorUnits": 450,
+          "needsAttention": false
+        },
+        "notes": [
+          "sin sal"
+        ],
+        "flags": [
+          "needsReview"
+        ],
+        "sourceRect": {
+          "x": 12,
+          "y": 110,
+          "width": 200,
+          "height": 18
+        }
+      }
+    ],
+    "subtotal": {
+      "minorUnits": 2350,
+      "needsAttention": false
+    },
+    "tax": {
+      "minorUnits": 270,
+      "needsAttention": false
+    },
+    "total": {
+      "minorUnits": 2300,
+      "needsAttention": false
+    },
+    "adjustments": [
+      {
+        "label": "Descuento",
+        "amount": {
+          "minorUnits": -320,
+          "needsAttention": false
+        }
+      }
+    ],
+    "numberFormat": {
+      "decimalSeparator": ".",
+      "groupSeparator": ",",
+      "fractionDigits": 2,
+      "isGuessed": false
+    },
+    "issues": [
+      {
+        "totalsDoNotAddUp": {
+          "expected": 2620,
+          "printed": 2300
+        }
+      },
+      {
+        "unparsedPriceRow": {
+          "_0": "Gracias por su visita 5"
+        }
+      },
+      {
+        "noTotalFound": {}
+      }
+    ],
+    "reconciles": false,
+    "warnings": [
+      {
+        "id": "20000000-0000-0000-0000-000000000001",
+        "issue": {
+          "unparsedPriceRow": {
+            "_0": "3,5"
+          }
+        },
+        "rowLabel": "Soda",
+        "sourceRect": {
+          "x": 12,
+          "y": 66,
+          "width": 288,
+          "height": 18
+        },
+        "isDismissed": false
+      },
+      {
+        "id": "20000000-0000-0000-0000-000000000002",
+        "issue": {
+          "unparsedPriceRow": {
+            "_0": "Gracias por su visita 5"
+          }
+        },
+        "itemID": "10000000-0000-0000-0000-000000000002",
+        "isDismissed": true
+      },
+      {
+        "id": "20000000-0000-0000-0000-000000000003",
+        "issue": {
+          "numberFormatGuessed": {
+            "_0": {
+              "decimalSeparator": ".",
+              "groupSeparator": ",",
+              "fractionDigits": 0,
+              "isGuessed": true
+            }
+          }
+        },
+        "isDismissed": false
+      }
+    ]
+  }
+}

@@ -74,11 +74,71 @@ struct CalculatorProofSessionProperties {
             for position in 0 ..< bill.participantCount {
                 let share = split.shares(for: bill)[position]
                 let breakdown = session.breakdown(of: position)
+                // The session adds the service charge and printed-tip cents after the calculator's own.
+                let calculatorPools = breakdown.adjustments.filter { $0.pool != .serviceCharge && $0.pool != .printedTip }
                 expectProperty(
                     breakdown.itemSubtotalCents == share.itemSubtotalCents && breakdown.taxShareCents == share.taxShareCents
-                        && breakdown.tipShareCents == share.tipShareCents && breakdown.adjustments == share.adjustments,
+                        && breakdown.tipShareCents == share.tipShareCents && calculatorPools == share.adjustments
+                        && breakdown.adjustments.dropFirst(calculatorPools.count).allSatisfy { $0.pool == .serviceCharge || $0.pool == .printedTip },
                     seed: bill.seed, "session and calculator disagree for person \(position)"
                 )
+            }
+        }
+    }
+
+    @Test("every leftover cent of the service charge and of the printed tip is surfaced as an adjustment", arguments: PropertySeeds.batches)
+    func servicePoolsSurfaceTheirRounding(batch: Int) {
+        for seed in PropertySeeds.seeds(inBatch: batch) {
+            let bill = GeneratedBill.random(seed: seed)
+            let session = bill.session()
+            guard session.hasAllocatableWeight else {
+                expectProperty(session.personBreakdowns.allSatisfy { $0.adjustments.allSatisfy { $0.pool != .serviceCharge && $0.pool != .printedTip } },
+                               seed: bill.seed, "adjustments for a pool that nobody carries")
+                continue
+            }
+            let breakdowns = session.personBreakdowns
+            let weights = breakdowns.map(\.itemSubtotalCents)
+            let pools: [(String, Int, [Int], RoundingAdjustment.Pool)] = [
+                ("service charge", session.serviceChargeCents, breakdowns.map(\.serviceShareCents), .serviceCharge),
+                ("printed tip", session.receiptTipOnBillCents, breakdowns.map(\.receiptTipShareCents), .printedTip),
+            ]
+            for (name, amount, shares, pool) in pools {
+                let floors = ProofMath.floorQuotients(amount: amount, weights: weights)
+                let adjusted = breakdowns.map { $0.adjustments.filter { $0.pool == pool } }
+                expectProperty(
+                    adjusted.reduce(0) { $0 + $1.count } == amount - floors.reduce(0, +),
+                    seed: bill.seed, "\(name): \(adjusted.reduce(0) { $0 + $1.count }) adjustments for \(amount - floors.reduce(0, +)) leftover cents"
+                )
+                for position in shares.indices {
+                    expectProperty(
+                        shares[position] == floors[position] + adjusted[position].count && adjusted[position].count <= 1
+                            && adjusted[position].allSatisfy { $0.cents == 1 && $0.participantID == breakdowns[position].participantID },
+                        seed: bill.seed, "\(name): person \(position) has share \(shares[position]) with \(adjusted[position].count) adjustments, floor \(floors[position])"
+                    )
+                }
+            }
+            expectProperty(
+                session.receiptTipOnBillCents == 0 || session.serviceChargeCents == 0,
+                seed: bill.seed, "a service charge and a printed tip were both allocated"
+            )
+        }
+    }
+
+    @Test("a settled bill nobody carries the charges of is blocked with its own reason, never as a mismatch", arguments: PropertySeeds.batches)
+    func chargesNobodyCarriesAreBlockedWithTheirOwnReason(batch: Int) {
+        for seed in PropertySeeds.seeds(inBatch: batch) {
+            let bill = GeneratedBill.random(seed: seed, claims: .full, printed: .consistent)
+            let session = bill.session()
+            guard !session.hasAllocatableWeight else { continue }
+            let charges = bill.taxCents + session.sessionTipCents + session.serviceChargeCents + session.receiptTipOnBillCents
+            if charges > 0 {
+                expectProperty(!session.canShare, seed: bill.seed, "charges with nobody to carry them can be shared")
+                expectProperty(
+                    session.shareBlockReason == .noItemsToCarryCharges, seed: bill.seed,
+                    "reason is \(String(describing: session.shareBlockReason)), not noItemsToCarryCharges"
+                )
+            } else {
+                expectProperty(session.shareBlockReason != .noItemsToCarryCharges, seed: bill.seed, "nothing to carry but the reason is given")
             }
         }
     }

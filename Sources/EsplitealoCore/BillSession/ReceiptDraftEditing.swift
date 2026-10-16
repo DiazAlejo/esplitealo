@@ -63,7 +63,24 @@ public enum ReceiptDraftEditing {
     public static func deleteItem(in draft: ReceiptDraft, itemID: UUID) -> ReceiptDraft {
         var copy = draft
         copy.items.removeAll { $0.id == itemID }
-        return reconcile(copy)
+        return reconcile(dismissWarnings(in: copy, forItem: itemID))
+    }
+
+    /// The user accepted a warning (or fixed what it was about). It stays in the draft, retired.
+    public static func dismissWarning(in draft: ReceiptDraft, id: UUID) -> ReceiptDraft {
+        var copy = draft
+        guard let index = copy.warnings.firstIndex(where: { $0.id == id }) else { return draft }
+        copy.warnings[index].isDismissed = true
+        return copy
+    }
+
+    /// Retires the warnings about one item: the user saved the row, or deleted it.
+    public static func dismissWarnings(in draft: ReceiptDraft, forItem itemID: UUID) -> ReceiptDraft {
+        var copy = draft
+        for index in copy.warnings.indices where copy.warnings[index].itemID == itemID {
+            copy.warnings[index].isDismissed = true
+        }
+        return copy
     }
 
     public static func setSubtotal(_ draft: ReceiptDraft, cents: Int?) -> ReceiptDraft {

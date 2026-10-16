@@ -217,6 +217,32 @@ jobs:
       - name: Vision OCR integration tests
         run: swift test --filter ReceiptScannerVisionTests
 
+  # The Release configuration (Archive, TestFlight, App Store) compiles code that Debug builds skip, for example #Preview
+  # blocks that use DEBUG-only helpers. A device build with no signing keeps it from regressing. Same gating as iOS App.
+  ios-release:
+    name: iOS Release build
+    runs-on: macos-26
+    timeout-minutes: 25
+    needs: macOS
+    env:
+      SOURCE_PACKAGES: ${{ github.workspace }}/.spm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+
+      - name: Build the app in Release for generic iOS (no signing)
+        run: |
+          Scripts/ci-xcodebuild.sh app-release build \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" \
+            CODE_SIGNING_ALLOWED=NO
+
   ios-capture:
     name: iOS Capture compile
     runs-on: macos-26

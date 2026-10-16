@@ -173,6 +173,7 @@ private struct BubbleShape: Shape {
     }
 }
 
+#if DEBUG
 #Preview("Home, Español") {
     NavigationStack { HomeView() }
         .environment(AppRouter())
@@ -189,3 +190,4 @@ private struct BubbleShape: Shape {
         .environment(\.locale, Locale(identifier: "en"))
         .preferredColorScheme(.dark)
 }
+#endif
