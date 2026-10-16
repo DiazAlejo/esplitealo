@@ -58,7 +58,7 @@ public struct ReceiptParser: Sendable {
                 }
             }
 
-            if isKeywordWithoutAmount(kind), index + 1 < rows.count {
+            if isKeywordWithoutAmount(kind), line.amounts.isEmpty, index + 1 < rows.count {
                 let next = splitLine(rows[index + 1])
                 if classify(next, at: index + 1) == .amountOnly, next.label.trimmingCharacters(in: .whitespaces).isEmpty {
                     var merged = line
@@ -135,6 +135,7 @@ public struct ReceiptParser: Sendable {
         var total: DraftAmount?
         var adjustments: [DraftAdjustment] = []
         var totalSeenAfterItems = false
+        var orphanAmounts: [DraftAmount] = []
         var priceBelowName = false
         var priceOrientationFixed = false
 
@@ -186,6 +187,14 @@ public struct ReceiptParser: Sendable {
             let lineTotal = items[index].lineTotal.minorUnits
             let previousQuantity = items[index].quantity
             items[index].quantity = detail.quantity
+            // A misread parenthesis (`13 x $10.72)` for `(3 x $10.72)`) is corrected by the line total.
+            if detail.quantity * unitMinor != lineTotal, unitMinor > 0, lineTotal % unitMinor == 0,
+               (1...99).contains(lineTotal / unitMinor) {
+                items[index].quantity = lineTotal / unitMinor
+                items[index].unitPrice = DraftAmount(minorUnits: unitMinor, needsAttention: numberFormat.isGuessed)
+                items[index].flags.formUnion([.quantityMismatch, .needsReview])
+                return
+            }
             items[index].unitPrice = DraftAmount(minorUnits: unitMinor, needsAttention: numberFormat.isGuessed)
             // The right-hand figure is the line total; it is never rewritten. A quantity row that does
             // not multiply out to it, or that contradicts an explicit quantity, is left for review.
@@ -193,6 +202,33 @@ public struct ReceiptParser: Sendable {
             let agreesWithPrefix = previousQuantity == 1 || previousQuantity == detail.quantity
             if !multipliesOut || !agreesWithPrefix {
                 items[index].flags.formUnion([.quantityMismatch, .needsReview])
+            }
+        }
+
+        // A row with a unit price and a line total (`Pan 3 @ 3.76 11.28`): the quantity is the total divided by the
+        // unit price when it divides evenly, which the printed quantity can then be checked against. Two prices
+        // that do not divide are left for review instead of guessing.
+        func applyUnitPriceColumn(_ amounts: [AmountToken], printedQuantity: Int?, toItemAt index: Int) {
+            guard amounts.count >= 2,
+                  [amounts[amounts.count - 2], amounts[amounts.count - 1]].allSatisfy({ $0.shape == .decimalDot || $0.shape == .decimalComma }),
+                  let unit = NumberFormatInference.minorUnits(amounts[amounts.count - 2], format: numberFormat),
+                  unit > 0
+            else { return }
+            let lineTotal = items[index].lineTotal.minorUnits
+            guard lineTotal > 0, lineTotal % unit == 0, (1...99).contains(lineTotal / unit) else {
+                items[index].flags.insert(.needsReview)
+                return
+            }
+            let derived = lineTotal / unit
+            items[index].unitPrice = DraftAmount(minorUnits: unit, needsAttention: numberFormat.isGuessed)
+            if let printedQuantity, printedQuantity != derived {
+                items[index].flags.insert(.needsReview)
+            }
+            items[index].quantity = derived
+            // A number left in the name where the misread "@" was (`Margarita 4 8 9.19`) is the quantity.
+            let trimmed = items[index].name
+            if derived > 1, trimmed.hasSuffix(" \(derived)") {
+                items[index].name = String(trimmed.dropLast(" \(derived)".count))
             }
         }
 
@@ -278,6 +314,7 @@ public struct ReceiptParser: Sendable {
                 let countBefore = items.count
                 addItem(name: name, qty: qty, tokens: line.amounts, rect: rect, flags: itemFlags, entryIndex: i)
                 guard items.count > countBefore else { break }
+                applyUnitPriceColumn(line.amounts, printedQuantity: line.leadingQty, toItemAt: items.count - 1)
 
                 // A name that wraps over several rows stays one item: modifier rows ("Negro") and an
                 // optional "(3 x $11.50)" quantity row follow the row that carries the price.
@@ -336,8 +373,12 @@ public struct ReceiptParser: Sendable {
                 }
 
             case .amountOnly:
-                guard !isPastTotalsSection(i) else { break }
-                if let pending = pendingName {
+                guard !isPastTotalsSection(i) else {
+                    // A price under the totals with its label dropped; it may be the total (checked after the loop).
+                    if let a = amount(from: line.amounts, rect: rect) { orphanAmounts.append(a) }
+                    break
+                }
+                if let pending = pendingName, pendingNameIndex == i - 1 {
                     addItem(
                         name: pending.0,
                         qty: line.leadingQty ?? 1,
@@ -362,6 +403,19 @@ public struct ReceiptParser: Sendable {
                         entryIndex: i
                     )
                     i += 1
+                } else if let a = amount(from: line.amounts, rect: rect), !items.isEmpty, a.minorUnits > 0 {
+                    let running = items.reduce(0) { $0 + $1.lineTotal.minorUnits } + adjustments.reduce(0) { $0 + $1.amount.minorUnits }
+                    if subtotal == nil, items.count >= 2, a.minorUnits == running {
+                        // The sum of the items above, whose "Subtotal" label was dropped.
+                        var inferred = a
+                        inferred.needsAttention = true
+                        subtotal = inferred
+                    } else {
+                        // A price whose name was dropped is kept, unnamed and flagged, so the bill still adds up.
+                        items.append(
+                            DraftItem(name: "", quantity: 1, lineTotal: a, flags: [.needsReview], sourceRect: rect)
+                        )
+                    }
                 } else {
                     noteUnparsedPrice(line.amounts.map(\.raw).joined(separator: " "), label: nil, rect: rect)
                 }
@@ -409,6 +463,14 @@ public struct ReceiptParser: Sendable {
             tax = combinedTax(taxLines)
         }
 
+        if total == nil, let sub = subtotal {
+            // A lone price under the totals that equals subtotal + tax + tip is the total with its label dropped.
+            let expected = sub.minorUnits + (tax?.minorUnits ?? 0) + (tip?.minorUnits ?? 0)
+            if var match = orphanAmounts.last(where: { $0.minorUnits == expected }) {
+                match.needsAttention = true
+                total = match
+            }
+        }
         if items.isEmpty {
             issues.append(.noItemsFound)
         }
@@ -523,7 +585,13 @@ private func splitLine(_ row: ReceiptRow) -> LineFields {
     )
 }
 
-private func repairWords(_ words: [String]) -> [String] {
+private func repairWords(_ input: [String]) -> [String] {
+    // Vision reads the "@" of `3 @ 6.40` as "€", "©" or "®" next to a quantity and a price.
+    var words = input
+    for index in words.indices where ["€", "©", "®"].contains(words[index]) && index > 0 && index + 1 < words.count
+        && words[index - 1].allSatisfy(\.isNumber) && words[index + 1].contains(where: \.isNumber) {
+        words[index] = "@"
+    }
     var result: [String] = []
     var i = 0
     while i < words.count {
@@ -618,7 +686,7 @@ private func headerNumberRowIndexes(_ rows: [ReceiptRow]) -> Set<Int> {
     else { return [] }
     return Set((0..<firstPriced).filter { index in
         let line = lines[index]
-        return classify(line) == .item && line.amounts.count == 1 && line.amounts[0].shape == .integer
+        return classify(line) == .item && !line.amounts.isEmpty && line.amounts.allSatisfy { $0.shape == .integer }
     })
 }
 
@@ -773,6 +841,10 @@ private func isKnownLookAlike(_ token: String, _ keyword: String) -> Bool {
 
 private func matchesTipTable(_ text: String) -> Bool {
     if text.lowercased().contains("suggested tip") { return true }
+    // A bare `15%` whose amount was split off: one row of a tip table.
+    if text.trimmingCharacters(in: .whitespaces).range(of: #"^\d+(\.\d+)?%$"#, options: .regularExpression) != nil {
+        return true
+    }
     if text.trimmingCharacters(in: .whitespaces).hasSuffix("%") {
         let parts = text.split(separator: " ")
         if parts.count >= 2, parts[0].hasSuffix("%") { return true }
@@ -782,7 +854,7 @@ private func matchesTipTable(_ text: String) -> Bool {
 
 private let subtotalKeywords = ["subtotal", "sub total", "sub-total", "subtot"]
 private let taxKeywords = ["tax", "iva", "vat", "ivu", "impuesto", "sales tax"]
-private let tipKeywords = ["tip", "propina", "gratuity", "service", "servicio"]
+private let tipKeywords = ["tip", "propina", "gratuity", "service", "servicio", "charge"]
 private let totalKeywords = ["total", "importe", "amount due", "grandtotal", "grand total"]
 private let discountKeywords = ["discount", "descuento", "off"]
 private let paymentKeywords = [
