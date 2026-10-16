@@ -30,14 +30,29 @@ Parser tests replay committed JSON under `Tests/Fixtures/Receipts/` so CI does n
 
 ## Output: `ReceiptDraft`
 
-Structured suggestions: `DraftItem` rows (quantity, line total in cents, flags such as `needsReview` / `priceOnNextRow`), optional subtotal/tax/tip/total, discount adjustments, `numberFormat`, `issues`, and `reconciles`.
+Structured suggestions: `DraftItem` rows (quantity, line total in cents, flags such as `needsReview` / `priceOnNextRow`), optional subtotal/tax/tip/total, discount adjustments, `numberFormat`, `warnings`, `issues`, and `reconciles`.
+
+### Warnings: what the scan was unsure about
+
+The scanner never hides what it was unsure about. Besides `issues` (the parser's own list, unchanged), the draft carries `warnings: [ReceiptWarning]`, which is what the Review screen shows (see [SCREENS.md](SCREENS.md#4-review-receipt)). A `ReceiptWarning` is typed (`issue`, a `ReceiptIssue`) and says where it came from when the parser knew: the printed `rowLabel` (`Soda`, `IVU`), the `sourceRect` on the image, and the `itemID` when the unreadable price still produced a row. It has its own `id` and an `isDismissed` flag.
+
+Only two kinds are warnings, because they are facts about the scan that an edit cannot make stale:
+
+| Warning | When the parser raises it |
+| ------- | ------------------------- |
+| `unparsedPriceRow(text)` | A price it could not read (`3,5` on a receipt printed with `.`), a quantity row with no item above it, or a stray price with no name. The row is **not** turned into an item: the warning is the only trace of it, with the printed text. |
+| `numberFormatGuessed(format)` | The separator vote was inconclusive and the format was guessed (`32.000`, `1500`). |
+
+The other `ReceiptIssue`s (`itemsDoNotMatchSubtotal`, `totalsDoNotAddUp`, `noItemsFound`, `noTotalFound`) are not stored as warnings: they are recomputed from the receipt after every edit and the Review screen already shows them (the reconciliation banner, the empty state and the missing-total state).
+
+Warnings only *surface* the parser's decisions: no item, amount or flag changes because of them, and every `unparsedPriceRow` in `issues` has a warning with the same text. `ReceiptDraftEditing.reconcile` recomputes `issues` from the receipt (that is how parser issues used to be lost when a draft became a `BillSession`) and leaves `warnings` alone. A warning is retired by the user (`ReceiptDraftEditing.dismissWarning`, or saving or deleting the row it names) and stays in the draft as `isDismissed`. Drafts saved before warnings existed decode with none (bill schema 2, see [BILL_SESSION.md](BILL_SESSION.md)).
 
 Conversion to the bill-splitting `Receipt` model (participants, assignments, tip configuration) happens only after the user confirms on the review screen.
 
 ## Tests
 
 - Unit tests in `ReceiptParserTests` and `AmountTokenTests` (synthetic geometry via `RecognizedTextTestBuilder`).
-- Fixture tests load `*.recognized.json` + `*.expected.json` (includes macOS Vision recordings of synthetic receipts and hand-written adversarial geometry). `pr-party-store-wrapped-names` is the first real receipt scanned with Scanner Lab (store name, phone, card, terminal and transaction ids removed): wrapped item names, a `(3 x $11.50)` row, two tax lines, a header total and a card-terminal block. Its expected file also pins item names, unit prices, flagged-item count and issue count.
+- Fixture tests load `*.recognized.json` + `*.expected.json` (includes macOS Vision recordings of synthetic receipts and hand-written adversarial geometry). `pr-party-store-wrapped-names` is the first real receipt scanned with Scanner Lab (store name, phone, card, terminal and transaction ids removed): wrapped item names, a `(3 x $11.50)` row, two tax lines, a header total and a card-terminal block. Its expected file also pins item names, unit prices, flagged-item count, issue count and warning count (none: its card-terminal block produces no warnings). `unparsed-price-row` is a hand-written receipt with one price the parser cannot read (`Soda 3,5` among `.` prices): it pins one warning, with the row label and the printed text. `ReceiptWarningTests` covers the rest (a guessed format, unreadable tax lines, a quantity row with no item, and that reconciliation issues are not warnings).
 
 Regenerate Vision fixtures locally with the throwaway script in firstmate task data (`record_ocr.swift`); only JSON is committed.
 
