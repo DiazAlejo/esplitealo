@@ -16,7 +16,7 @@ A bill is a plain JSON-able dict (see README.md):
     printedTipCents     int | None                   tip/gratuity line printed on the receipt
     serviceChargeCents  int
     sessionTip          {"kind": "percent", "percent": int, "basis": "preTax" | "postTax"}
-                        | {"kind": "custom", "cents": int}
+                        | {"kind": "custom", "cents": int}      a negative amount or percent is a tip of 0
     printedSubtotalCents, printedTotalCents          int | None
 """
 
@@ -57,11 +57,11 @@ def unit_prices(line_total, quantity):
 
 
 def session_tip_cents(tip, items_subtotal, tax_cents):
-    """Tip in cents: custom as entered, or a percentage of the basis rounded half up."""
+    """Tip in cents: custom as entered, or a percentage of the basis rounded half up. A negative tip or percentage is 0."""
     if tip["kind"] == "custom":
-        return tip["cents"]
+        return max(0, tip["cents"])
     basis = items_subtotal + tax_cents if tip["basis"] == "postTax" else items_subtotal
-    return floor(Fraction(basis * tip["percent"], 100) + Fraction(1, 2))
+    return floor(Fraction(basis * max(0, tip["percent"]), 100) + Fraction(1, 2))
 
 
 def _reconciles(items_sum, subtotal, total, tax, printed_tip):
@@ -113,8 +113,8 @@ def calculate(bill):
 
     tax_shares, tax_adjusted = largest_remainder(tax, item_subtotals, ranks)
     tip_shares, tip_adjusted = largest_remainder(tip, item_subtotals, ranks)
-    service_shares, _ = largest_remainder(service, item_subtotals, ranks)
-    receipt_tip_shares, _ = largest_remainder(receipt_tip, item_subtotals, ranks)
+    service_shares, service_adjusted = largest_remainder(service, item_subtotals, ranks)
+    receipt_tip_shares, receipt_tip_adjusted = largest_remainder(receipt_tip, item_subtotals, ranks)
 
     people = []
     for i in range(count):
@@ -129,6 +129,8 @@ def calculate(bill):
             "itemUnitAdjustments": sorted(unit_adjustments[i]),
             "taxAdjustments": 1 if i in tax_adjusted else 0,
             "tipAdjustments": 1 if i in tip_adjusted else 0,
+            "serviceAdjustments": 1 if i in service_adjusted else 0,
+            "printedTipAdjustments": 1 if i in receipt_tip_adjusted else 0,
         })
 
     derived = line_total_sum + tax + service + receipt_tip + tip
@@ -136,6 +138,16 @@ def calculate(bill):
     subtotal = bill["printedSubtotalCents"]
     total = bill["printedTotalCents"]
     reconciles = _reconciles(line_total_sum, subtotal, total, tax, printed_tip)
+    # Tax, tip or a service charge to share and nobody with an item that costs anything to share it by: every pool is
+    # allocated by item subtotal, so nothing is allocated and the bill stays blocked. A receipt that does not add up
+    # (or has no total) is reported as that first.
+    nobody_carries_charges = (
+        total is not None
+        and settled
+        and reconciles
+        and sum(item_subtotals) == 0
+        and tax + tip + service + receipt_tip > 0
+    )
     can_share = (
         total is not None
         and reconciles
@@ -154,5 +166,6 @@ def calculate(bill):
         "unassignedUnits": unassigned,
         "reconciles": reconciles,
         "canShare": can_share,
+        "nobodyCarriesCharges": nobody_carries_charges,
         "people": people,
     }

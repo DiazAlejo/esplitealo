@@ -20,6 +20,8 @@ struct ReferenceCorpus: Decodable {
         var itemUnitAdjustments: [[Int]]
         var taxAdjustments: Int
         var tipAdjustments: Int
+        var serviceAdjustments: Int
+        var printedTipAdjustments: Int
     }
 
     struct Expectation: Decodable {
@@ -32,6 +34,7 @@ struct ReferenceCorpus: Decodable {
         var unassignedUnits: Int
         var reconciles: Bool
         var canShare: Bool
+        var nobodyCarriesCharges: Bool
         var people: [PersonExpectation]
     }
 
@@ -100,6 +103,7 @@ enum ReferenceComparison {
         compare("unassignedUnits", session.unassignedUnits.count, expected.unassignedUnits)
         compare("reconciles", session.draft.reconciliation.reconciles, expected.reconciles)
         compare("canShare", session.canShare, expected.canShare)
+        compare("nobodyCarriesCharges", session.shareBlockReason == .noItemsToCarryCharges, expected.nobodyCarriesCharges)
         compare("people", breakdowns.count, expected.people.count)
         guard breakdowns.count == expected.people.count, bill.participantCount == expected.people.count else { return differences }
 
@@ -133,6 +137,8 @@ enum ReferenceComparison {
             compare("\(tag) itemUnitAdjustments", unitAdjustments.sorted { $0.lexicographicallyPrecedes($1) }, want.itemUnitAdjustments)
             compare("\(tag) taxAdjustments", share.adjustments.filter { $0.pool == .tax }.count, want.taxAdjustments)
             compare("\(tag) tipAdjustments", share.adjustments.filter { $0.pool == .tip }.count, want.tipAdjustments)
+            compare("\(tag) serviceAdjustments", got.adjustments.filter { $0.pool == .serviceCharge }.count, want.serviceAdjustments)
+            compare("\(tag) printedTipAdjustments", got.adjustments.filter { $0.pool == .printedTip }.count, want.printedTipAdjustments)
         }
         return differences
     }
