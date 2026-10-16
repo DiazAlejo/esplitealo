@@ -1,0 +1,126 @@
+name: Store screenshots
+
+# Makes the App Store screenshots of the five key screens (Home, Review receipt, Mark items, Totals, Share summary)
+# in Spanish (Puerto Rico) light, English light and Spanish dark, at the iPhone sizes App Store Connect asks for, and
+# uploads them as artifacts. Nothing is submitted or published. Start it from the Actions tab or:
+#
+#   gh workflow run store-screenshots.yml -R DiazAlejo/esplitealo --ref main [-f branch=<branch>]
+#   Scripts/fetch-store-screenshots.sh        # downloads the latest successful run into build/store-screenshots
+#
+# See docs/store/README.md.
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to take the screenshots of (the workflow file itself always comes from main).
+        required: true
+        type: string
+        default: main
+  push:
+    branches: [fm/esplitealo-store-material]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: store-screenshots-${{ inputs.branch || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: ${{ matrix.display }} (${{ matrix.size }})
+    runs-on: macos-26
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Apple's accepted portrait sizes for iPhones with the Dynamic Island: 1320x2868 (6.9-inch) and
+          # 1206x2622 (6.3-inch). See docs/store/README.md for the source.
+          - { display: 6.9-inch, device: iPhone 17 Pro Max, size: 1320x2868, slug: iphone-17-pro-max }
+          - { display: 6.3-inch, device: iPhone 17 Pro, size: 1206x2622, slug: iphone-17-pro }
+    env:
+      SOURCE_PACKAGES: ${{ github.workspace }}/.spm
+      BRANCH: ${{ inputs.branch || github.ref_name }}
+    steps:
+      - name: Check the branch name
+        run: |
+          case "$BRANCH" in
+            ''|-*|*[!A-Za-z0-9._/-]*|*..*) echo "::error::Not a usable branch name: $BRANCH"; exit 1 ;;
+          esac
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.branch || github.ref_name }}
+          persist-credentials: false
+
+      - name: Select Xcode 26.3
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Boot ${{ matrix.device }}
+        id: simulator
+        run: echo "udid=$(Scripts/boot-store-simulator.sh '${{ matrix.device }}')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache package checkouts (swift-snapshot-testing)
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .spm
+          key: ${{ runner.os }}-app-spm-${{ hashFiles('App/Esplitealo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      - name: Build the app and its UI tests
+        run: |
+          Scripts/ci-xcodebuild.sh store-build build-for-testing \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" \
+            CODE_SIGNING_ALLOWED=NO
+
+      # TEST_RUNNER_ hands STORE_SCREENSHOTS to the test process; without it the tests skip themselves.
+      - name: Take the screenshots
+        run: |
+          TEST_RUNNER_STORE_SCREENSHOTS=1 Scripts/ci-xcodebuild.sh store-screenshots test-without-building \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            -only-testing:EsplitealoUITests/StoreScreenshotTests \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Export the pictures and check them
+        run: |
+          Scripts/export-store-screenshots.sh "$RUNNER_TEMP/xcresults/store-screenshots.xcresult" \
+            "$RUNNER_TEMP/store-screenshots/${{ matrix.slug }}-${{ matrix.size }}" "${{ matrix.size }}" | tee "$RUNNER_TEMP/export.txt"
+          {
+            echo "### ${{ matrix.device }}, ${{ matrix.size }} (${{ matrix.display }})"
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/export.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the screenshots
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: store-screenshots-${{ matrix.slug }}-${{ matrix.size }}
+          path: ${{ runner.temp }}/store-screenshots/${{ matrix.slug }}-${{ matrix.size }}
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload the test result bundles
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: store-xcresults-${{ matrix.slug }}
+          path: ${{ runner.temp }}/xcresults
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Clean up build output
+        if: ${{ always() }}
+        run: |
+          rm -rf "$RUNNER_TEMP/DerivedData" "$RUNNER_TEMP/xcresults" "$RUNNER_TEMP/store-screenshots"
+          xcrun simctl shutdown all || true
