@@ -359,7 +359,7 @@ struct TotalsViewModelTests {
         let (model, _) = model()
         model.selectPreset(15)
         let text = model.shareText(language: .en)
-        #expect(text.contains("15% tip $15.15"), text)
+        #expect(text.contains("15% tip $15.15"), Comment(rawValue: text))
     }
 
     // MARK: After sharing

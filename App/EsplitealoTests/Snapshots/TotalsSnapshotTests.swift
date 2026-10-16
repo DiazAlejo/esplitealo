@@ -60,7 +60,7 @@ struct TotalsSnapshotTests {
 
     @Test func shareSheetShowsTheSummaryInSpanishAndEnglish() {
         let model = TotalsViewModel(store: store(SampleBill.complete()))
-        assertDesignSnapshot(ShareSheetContent(model: model, onShare: {}, onCancel: {}), named: "share-sheet", fixedHeight: 780)
+        assertDesignSnapshot(ShareSheetContent(model: model, onCancel: {}), named: "share-sheet", fixedHeight: 780)
     }
 
     @Test func successMoment() {
