@@ -12,6 +12,7 @@ struct EsplitealoApp: App {
         DesignFonts.registerAll()
         let store = BillStore.live()
         let router = AppRouter()
+        UITestFixture.apply(arguments: ProcessInfo.processInfo.arguments, store: store, router: router)
         _store = State(initialValue: store)
         _router = State(initialValue: router)
         _scanFlow = State(initialValue: ScanFlow(store: store, router: router, services: Self.scanServices()))

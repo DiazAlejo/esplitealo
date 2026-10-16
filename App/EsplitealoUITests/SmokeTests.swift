@@ -8,9 +8,10 @@ final class SmokeTests: XCTestCase {
     }
 
     @MainActor
-    private func launch(language: String = "es", region: String = "PR", extraArguments: [String] = []) -> XCUIApplication {
+    private func launch(language: String = "es", region: String = "PR", fixture: String? = nil, extraArguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += ["--uitesting"] + extraArguments + ["-AppleLanguages", "(\(language))", "-AppleLocale", "\(language)_\(region)"]
+        if let fixture { app.launchArguments.append("--fixture=\(fixture)") }
         app.launch()
         return app
     }
@@ -42,6 +43,12 @@ final class SmokeTests: XCTestCase {
         app.buttons["home.scan"].tap()
         for screen in ["review", "people", "mark", "totals"] {
             XCTAssertTrue(app.descendants(matching: .any)["screen.\(screen)"].waitForExistence(timeout: 10), "screen.\(screen)")
+            if screen == "people" {
+                let name = app.textFields["people.name"]
+                name.tap()
+                name.typeText("Ana")
+                app.buttons["people.add"].tap()
+            }
             if screen != "totals" { app.buttons["screen.next"].tap() }
         }
         XCTAssertFalse(app.buttons["screen.next"].exists)
