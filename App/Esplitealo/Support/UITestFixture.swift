@@ -6,7 +6,9 @@ import Foundation
 ///
 /// - `--fixture=<name>` starts a bill: `parsed` (a scan with a flagged row whose receipt does not add up),
 ///   `scanned` (the same receipt fixed, nobody at the table), `table` (the same receipt with four people, nothing marked),
-///   `quantities` (lines of several units, three people, nothing marked), `midway` (four people, items marked), `empty`.
+///   `quantities` (lines of several units, three people, nothing marked), `midway` (four people, items marked),
+///   `complete` (all marked, ready to share), `mismatch` (all marked, but the receipt does not add up), `service` (all
+///   marked, the receipt has a service charge), `empty`.
 /// - `--start-at=<screen>` opens that screen (`review`, `people`, `mark`, `totals`) with the earlier ones behind it.
 enum UITestFixture {
     static func apply(arguments: [String], store: BillStore, router: AppRouter) {
@@ -19,6 +21,9 @@ enum UITestFixture {
         case "quantities": AssignSamples.quantities()
         case "midway": SampleBill.midway()
         case "empty": BillSession(draft: ReceiptDraft())
+        case "complete": SampleBill.complete()
+        case "mismatch": TotalsSamples.mismatch()
+        case "service": TotalsSamples.serviceCharge()
         default: nil
         }
         if let session {

@@ -57,6 +57,52 @@ final class ShareSummaryBuilderTests: XCTestCase {
         XCTAssertFalse(text.localizedCaseInsensitiveContains("IVU"))
     }
 
+    /// A tip printed on the receipt (no service charge set) is shared like a service charge. Its share used to be left
+    /// out of the person's lines, so "items + tax + tip" did not add up to what the person owes.
+    func testPrintedReceiptTipIsInEveryPersonsLinesAndTheLinesAddUp() {
+        let session = BillSession.sampleReadyToShareWithPrintedTip()
+        XCTAssertEqual(session.serviceChargeCents, 0)
+        XCTAssertEqual(session.receiptTipOnBillCents, 2000)
+        let text = ShareSummaryBuilder.build(for: session, language: .en, calendar: utc)
+        XCTAssertEqual(text, """
+            Fonda Doña Lola · Oct 13
+            Bill $130.00 + 0% tip $0.00 = $130.00
+
+            Alex owes $78.00
+              items $60.00 · tax $6.00 · service $12.00 · tip $0.00
+
+            Sam owes $52.00
+              items $40.00 · tax $4.00 · service $8.00 · tip $0.00
+
+            Adds up to $130.00. Split with Esplitéalo
+
+            """)
+    }
+
+    func testEveryPersonsLinesAddUpToTheirAmountWithAServiceChargeOrAPrintedTipAndLeftoverCents() throws {
+        for base in [BillSession.sampleWithServiceChargeAssigned(), BillSession.sampleReadyToShareWithPrintedTip()] {
+            var session = base
+            // A third person and a shared item make the tip, tax and service shares come out in uneven cents.
+            _ = session.addParticipant(name: "Chris")
+            let item = session.draft.items[0]
+            session.assignUnit(itemID: item.id, unitIndex: 0, participantIDs: session.participants.map(\.id))
+            session.tip = .percentage(percent: 18, basis: .preTaxSubtotal)
+            for language in [ShareLanguage.es, .en] {
+                let text = ShareSummaryBuilder.build(for: session, language: language, calendar: utc)
+                let blocks = text.components(separatedBy: "\n\n").dropFirst().dropLast()
+                XCTAssertEqual(blocks.count, session.participants.count)
+                var sum = 0
+                for block in blocks {
+                    let amounts = try block.matches(of: /\$([0-9]+)\.([0-9]{2})/).map { Int($0.1)! * 100 + Int($0.2)! }
+                    let (owed, parts) = (try XCTUnwrap(amounts.first), amounts.dropFirst())
+                    XCTAssertEqual(parts.reduce(0, +), owed, "\(block)")
+                    sum += owed
+                }
+                XCTAssertEqual(sum, session.confirmedBillTotalCents)
+            }
+        }
+    }
+
     func testDateHeaderIsFormattedPerLanguage() {
         var session = BillSession.sampleReadyToShare()
         session.date = date(2026, 1, 5, in: utc)

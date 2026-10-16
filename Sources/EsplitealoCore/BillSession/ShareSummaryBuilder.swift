@@ -34,7 +34,10 @@ public enum ShareSummaryBuilder {
         let breakdowns = session.personBreakdowns
         for participant in ordered {
             guard let row = breakdowns.first(where: { $0.participantID == participant.id }) else { continue }
-            let servicePart = row.serviceShareCents > 0 ? MoneyFormatting.usd(cents: row.serviceShareCents) : ""
+            // A tip printed on the receipt is shared like a service charge and named the same way, so the person's
+            // lines add up to what they owe.
+            let gratuityShare = row.serviceShareCents + row.receiptTipShareCents
+            let servicePart = gratuityShare > 0 ? MoneyFormatting.usd(cents: gratuityShare) : ""
             text += strings.person(
                 participant.name,
                 MoneyFormatting.usd(cents: row.totalOwedCents),

@@ -3544,6 +3544,23 @@
         }
       }
     },
+    "shareSheet.native" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next you pick the app in the iOS share sheet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Después escoges la app en la hoja de compartir de iOS."
+          }
+        }
+      }
+    },
     "shareSheet.notes" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3557,6 +3574,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notas"
+          }
+        }
+      }
+    },
+    "shareSheet.send" : {
+      "comment" : "The one green action of the share preview: opens the iOS share sheet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
           }
         }
       }
@@ -4069,6 +4104,23 @@
         }
       }
     },
+    "totals.adjust.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discounts aren’t split yet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hay descuentos sin repartir"
+          }
+        }
+      }
+    },
     "totals.back" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4379,6 +4431,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suma %@"
+          }
+        }
+      }
+    },
+    "totals.person.collapse" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to hide them"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca para esconderlos"
+          }
+        }
+      }
+    },
+    "totals.person.hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to see their items"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca para ver sus artículos"
           }
         }
       }
@@ -4712,6 +4798,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Propina · sobre %@ antes del impuesto"
+          }
+        }
+      }
+    },
+    "totals.tip.labelPostTax" : {
+      "comment" : "Label of the tip buttons when the tip is measured on the total with tax; the argument is that total.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tip · on %@ with tax"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Propina · sobre %@ con impuesto"
+          }
+        }
+      }
+    },
+    "totals.tip.postTax" : {
+      "comment" : "Switch under the tip buttons: the percentage applies to the subtotal plus tax instead of the subtotal alone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Base the tip on the total with tax"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calcular sobre el total con impuesto"
           }
         }
       }
