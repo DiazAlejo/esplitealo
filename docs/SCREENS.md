@@ -17,6 +17,8 @@ Home -> Capture -> Processing -> Review receipt -> Add people -> Assign items ->
 
 **Behavior:** starts a new bill immediately. No account creation, onboarding carousel, or permission request until the user chooses an action that needs it.
 
+**A bill in progress is never lost or replaced silently.** While a bill with items or people exists (and has not been shared), Home shows a **Continue your bill** card (*Continuar con tu cuenta*) with the number of items and the total, a **Continue** button that opens the bill at the step it reached, and **Discard bill** (*Abandonar cuenta*), which asks for confirmation, deletes the bill and its saved draft. Tapping **Scan receipt** or **Choose photo** with such a bill asks first: *Continue my bill* (opens it) or *Start a new one* (the old bill is replaced only once the new scan is handed over, so cancelling the camera keeps it). With no bill, or a blank one, it starts at once.
+
 ## 2. Capture receipt
 
 **Purpose:** obtain a legible image.
@@ -47,6 +49,8 @@ Home -> Capture -> Processing -> Review receipt -> Add people -> Assign items ->
 - Subtotal, tax, and receipt total fields.
 - Original receipt image available for reference.
 - Button: **Continue to people**.
+
+**Back and discard:** Review replaces Capture in the navigation stack, so **Back** from Review goes to Home (the bill stays resumable from Home's card) and never reopens the camera. A quiet **Discard bill** button at the end of the screen asks for confirmation, then deletes the bill and its draft and returns to Home.
 
 **Behavior:** the user confirms or corrects every item and the receipt amounts. Missing or suspicious values are flagged. The receipt total is never silently changed to match the extracted items.
 
@@ -101,3 +105,5 @@ Receipt layouts vary and recognition can confuse quantities, item prices, and to
 - **Edit assignments** and **Edit receipt** actions.
 
 **Behavior:** tax and tip are allocated proportionally to each person's assigned item subtotal. Any rounding adjustment is shown transparently. The sum of amounts owed must equal the confirmed bill total. Sharing opens the native iOS share sheet with a readable text summary. No payment integration.
+
+**After sharing:** when the share completes, the saved draft is deleted (R-32), so a relaunch never offers the finished bill; the success screen's **New bill** and **Back** keep working, and editing after Back saves the bill again.

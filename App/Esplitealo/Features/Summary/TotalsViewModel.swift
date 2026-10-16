@@ -396,6 +396,7 @@ final class TotalsViewModel {
         sharedTotalCents = rows.map(\.totalCents).reduce(0, +)
         isSharing = false
         hasShared = true
+        store.billShared()
     }
 
     func dismissSuccess() {
