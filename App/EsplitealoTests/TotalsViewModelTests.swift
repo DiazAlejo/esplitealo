@@ -388,6 +388,35 @@ struct TotalsViewModelTests {
         #expect(model.isSharing == true, "the preview stays so another app can be tried")
     }
 
+    @Test func completingTheShareDeletesTheDraftFileButKeepsTheBillForTheSuccessScreen() async {
+        let recording = RecordingDraftStore()
+        let clock = ManualClock()
+        let store = BillStore(draftStore: recording, clock: clock)
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.saveNow()
+        #expect(recording.stored != nil)
+        let model = TotalsViewModel(store: store)
+        model.requestShare()
+        model.shareCompleted()
+        #expect(recording.stored == nil, "R-32: the draft goes when the share completes")
+        #expect(store.session != nil, "the success screen and Back still need the bill")
+        #expect(model.hasShared)
+        #expect(model.sharedPeopleCount == 4)
+    }
+
+    @Test func aShareThatWasCancelledKeepsTheDraft() {
+        let recording = RecordingDraftStore()
+        let store = BillStore(draftStore: recording, clock: ManualClock())
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.saveNow()
+        let model = TotalsViewModel(store: store)
+        model.requestShare()
+        model.shareCancelled()
+        #expect(recording.stored != nil)
+    }
+
     @Test func startingANewBillForgetsTheBillAndItsDraft() {
         let recording = RecordingDraftStore()
         let store = BillStore(draftStore: recording, clock: ManualClock())
