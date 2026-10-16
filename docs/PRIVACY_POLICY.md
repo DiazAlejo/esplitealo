@@ -12,7 +12,7 @@ Esplitéalo te ayuda a dividir la cuenta de un restaurante. Esta política expli
 
 ### Lo esencial
 
-- No hay cuentas ni inicio de sesión.
+- No hay cuentas de usuario ni inicio de sesión.
 - No hay servidor: la app no se conecta a internet para funcionar.
 - No hay analíticas, publicidad ni rastreo de ningún tipo.
 - No vendemos ni compartimos datos, porque no los tenemos.
@@ -43,7 +43,7 @@ Si cambiamos esta política, publicaremos la versión nueva en esta misma págin
 
 ### Contacto
 
-Si tienes preguntas sobre esta política, abre un issue en <https://github.com/DiazAlejo/esplitealo/issues>.
+Si tienes preguntas sobre esta política, reporta un problema en GitHub: <https://github.com/DiazAlejo/esplitealo/issues>.
 
 ---
 
