@@ -50,6 +50,7 @@ private struct ReviewScreen: View {
 
                 ReviewBanner(status: model.status, model: model)
 
+                warnings
                 items
                 adjustments
 
@@ -107,6 +108,23 @@ private struct ReviewScreen: View {
     }
 
     // MARK: Sections
+
+    /// What the scan could not read well. Each one stays until the user accepts it; none of them stops the receipt
+    /// from being edited or continued.
+    @ViewBuilder
+    private var warnings: some View {
+        let rows = model.warnings
+        if !rows.isEmpty {
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
+                ReviewSectionHeader(title: "review.unsure.title", count: rows.count, isWarning: true)
+                RowsCard(rows, style: .warn) { row in
+                    ReviewWarningRow(row: row) { model.dismissWarning(id: row.id) }
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("review.warnings")
+        }
+    }
 
     @ViewBuilder
     private var items: some View {
@@ -194,6 +212,13 @@ private struct ReviewScreen: View {
 #Preview("Review, mismatch, Español") {
     NavigationStack { ReviewView() }
         .environment(previewStore(ReviewSamples.parsedSession()))
+        .environment(AppRouter())
+        .environment(\.locale, Locale(identifier: "es"))
+}
+
+#Preview("Review, unreadable prices, Español") {
+    NavigationStack { ReviewView() }
+        .environment(previewStore(ReviewSamples.unsureSession()))
         .environment(AppRouter())
         .environment(\.locale, Locale(identifier: "es"))
 }

@@ -12,6 +12,7 @@ private struct FixtureExpectation: Decodable {
     var reconciles: Bool
     var itemsNeedingReview: Int?
     var issueCount: Int?
+    var warningCount: Int?
 }
 
 final class ReceiptFixtureTests: XCTestCase {
@@ -24,7 +25,7 @@ final class ReceiptFixtureTests: XCTestCase {
 
     func testVisionRecordedFixtures() throws {
         let names = ["pr-ivu-bistro", "english-diner", "comma-decimal-cafe", "mismatch-adversarial",
-                     "pr-party-store-wrapped-names"]
+                     "pr-party-store-wrapped-names", "unparsed-price-row"]
         for name in names {
             let recognizedURL = fixturesURL.appendingPathComponent("\(name).recognized.json")
             let expectedURL = fixturesURL.appendingPathComponent("\(name).expected.json")
@@ -64,6 +65,9 @@ final class ReceiptFixtureTests: XCTestCase {
         }
         if let issueCount = expected.issueCount {
             XCTAssertEqual(draft.issues.count, issueCount, "issues for \(fixture): \(draft.issues)")
+        }
+        if let warningCount = expected.warningCount {
+            XCTAssertEqual(draft.warnings.count, warningCount, "warnings for \(fixture): \(draft.warnings)")
         }
         if let subtotal = expected.subtotal {
             XCTAssertEqual(draft.subtotal?.minorUnits, subtotal, "subtotal for \(fixture)")

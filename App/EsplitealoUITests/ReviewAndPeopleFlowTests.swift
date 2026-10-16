@@ -4,7 +4,8 @@ import XCTest
 /// (`--fixture=<name> --start-at=<screen>`, honoured only with `--uitesting`) because the simulator has no camera.
 ///
 /// Fixtures: `parsed` is a scan with one row the parser flagged and a receipt that does not add up (the flan is
-/// $19.00 instead of $9.00); `scanned` is the same receipt fixed; `midway` is `scanned` with four people and items marked.
+/// $19.00 instead of $9.00); `scanned` is the same receipt fixed; `midway` is `scanned` with four people and items marked;
+/// `unsure` is a scan where the flan's price ("9,00") and a stray "5" could not be read, so the parser left them out.
 final class ReviewAndPeopleFlowTests: XCTestCase {
     private let flan = "review.item.10000000-0000-0000-0000-000000000008"
 
@@ -123,6 +124,88 @@ final class ReviewAndPeopleFlowTests: XCTestCase {
         let banner = element(app, "review.banner")
         waitForLabel(banner, containing: "$112.62")
         XCTAssertTrue(banner.label.contains("$110.00"), banner.label)
+    }
+
+    @MainActor
+    func testWhatTheScanCouldNotReadIsShownAndEachWarningCanBeDismissed() {
+        let app = launch(fixture: "unsure", at: "review")
+        XCTAssertTrue(element(app, "review.warnings").waitForExistence(timeout: 15))
+        let flan = element(app, "review.warning.20000000-0000-0000-0000-000000000001")
+        let stray = element(app, "review.warning.20000000-0000-0000-0000-000000000002")
+        XCTAssertTrue(flan.exists)
+        XCTAssertTrue(flan.label.contains("Flan para compartir"), flan.label)
+        XCTAssertTrue(flan.label.contains("9,00"), flan.label)
+        XCTAssertTrue(stray.exists)
+        XCTAssertTrue(stray.label.contains("«5»"), stray.label)
+
+        XCTAssertTrue(app.buttons["screen.next"].isEnabled, "a warning never blocks the receipt")
+        XCTAssertTrue(app.buttons["review.item.10000000-0000-0000-0000-000000000001"].exists, "the receipt is still editable")
+
+        app.buttons["review.warning.dismiss.20000000-0000-0000-0000-000000000001"].tap()
+        XCTAssertTrue(waitForDisappearance(of: flan))
+        XCTAssertTrue(stray.exists, "dismissing one leaves the others")
+
+        app.buttons["review.warning.dismiss.20000000-0000-0000-0000-000000000002"].tap()
+        XCTAssertTrue(waitForDisappearance(of: element(app, "review.warnings")), "no warnings left, no section")
+        XCTAssertTrue(app.buttons["screen.next"].isEnabled)
+    }
+
+    @MainActor
+    func testWarningsAreInEnglishToo() {
+        let app = launch(fixture: "unsure", at: "review", language: "en", region: "US")
+        let flan = element(app, "review.warning.20000000-0000-0000-0000-000000000001")
+        XCTAssertTrue(flan.waitForExistence(timeout: 15))
+        XCTAssertTrue(flan.label.contains("I couldn’t read the price of Flan para compartir"), flan.label)
+        XCTAssertEqual(app.buttons["review.warning.dismiss.20000000-0000-0000-0000-000000000001"].label, "Got it: Flan para compartir")
+    }
+
+    /// A scan read through the real parser (a committed recognized-text fixture stands in for the camera).
+    @MainActor
+    private func scan(fixture name: String, language: String = "es", region: String = "PR") -> XCUIApplication {
+        let path = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent() // EsplitealoUITests
+            .deletingLastPathComponent() // App
+            .deletingLastPathComponent() // repository
+            .appendingPathComponent("Tests/Fixtures/Receipts/\(name).recognized.json")
+            .path
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--uitesting", "--uitesting-recognized-text", path,
+            "-AppleLanguages", "(\(language))", "-AppleLocale", "\(language)_\(region)",
+        ]
+        app.launch()
+        XCTAssertTrue(app.buttons["home.scan"].waitForExistence(timeout: 15))
+        app.buttons["home.scan"].tap()
+        return app
+    }
+
+    @MainActor
+    func testAPriceTheParserCouldNotReadReachesReviewFromARealScan() {
+        let app = scan(fixture: "unparsed-price-row")
+        XCTAssertTrue(element(app, "review.warnings").waitForExistence(timeout: 15))
+        let warnings = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'review.warning.' AND NOT identifier BEGINSWITH 'review.warning.dismiss.'"))
+        XCTAssertEqual(warnings.count, 1)
+        XCTAssertTrue(warnings.firstMatch.label.contains("Soda"), warnings.firstMatch.label)
+        XCTAssertTrue(warnings.firstMatch.label.contains("«3,5»"), warnings.firstMatch.label)
+        XCTAssertTrue(app.buttons["screen.next"].isEnabled, "the receipt is still editable and can continue")
+
+        let dismiss = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'review.warning.dismiss.'")).firstMatch
+        dismiss.tap()
+        XCTAssertTrue(waitForDisappearance(of: element(app, "review.warnings")))
+    }
+
+    @MainActor
+    func testTheRealReceiptsCardTerminalBlockRaisesNoWarning() {
+        let app = scan(fixture: "pr-party-store-wrapped-names")
+        XCTAssertTrue(element(app, "screen.review").waitForExistence(timeout: 15))
+        XCTAssertTrue(element(app, "review.banner").waitForExistence(timeout: 5))
+        XCTAssertFalse(element(app, "review.warnings").exists, "nothing the scan was unsure about, nothing to show")
+    }
+
+    @MainActor
+    private func waitForDisappearance(of element: XCUIElement, timeout: TimeInterval = 5) -> Bool {
+        let expectation = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: element)
+        return XCTWaiter().wait(for: [expectation], timeout: timeout) == .completed
     }
 
     @MainActor

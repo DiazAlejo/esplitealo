@@ -2,7 +2,7 @@ import Foundation
 
 public struct BillSession: Sendable, Equatable {
     /// Version of the JSON written by `BillSessionCoding`. Bump it (and add a fixture) when the stored shape changes.
-    public static let currentSchemaVersion = 1
+    public static let currentSchemaVersion = 2
 
     public var draft: ReceiptDraft
     public var merchantName: String

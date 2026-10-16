@@ -318,6 +318,101 @@ struct ReceiptReviewModelTests {
         #expect(model.requestContinue() == .confirmMismatch(differenceCents: 1100))
     }
 
+    // MARK: What the parser was unsure about
+
+    private let unreadableFlan = UUID(uuidString: "20000000-0000-0000-0000-000000000001")!
+    private let strayPrice = UUID(uuidString: "20000000-0000-0000-0000-000000000002")!
+
+    @Test func warningsFromTheParserAreListedInTheOrderTheScanFoundThem() {
+        let (model, _) = makeModel(ReviewSamples.unsureSession())
+        #expect(model.warnings.map(\.id) == [unreadableFlan, strayPrice])
+        #expect(model.warnings.map(\.kind) == [.unreadablePrice(text: "9,00"), .unreadablePrice(text: "5")])
+        #expect(model.warnings.map(\.rowLabel) == ["Flan para compartir", nil])
+    }
+
+    @Test func aGuessedNumberFormatIsListedToo() {
+        var draft = SampleBill.scannedDraft()
+        draft.warnings = [ReceiptWarning(issue: .numberFormatGuessed(.usdCents))]
+        let (model, _) = makeModel(BillSession(draft: draft))
+        #expect(model.warnings.map(\.kind) == [.formatGuessed])
+    }
+
+    @Test func aCleanScanListsNoWarnings() {
+        #expect(makeModel(SampleBill.scanned()).model.warnings.isEmpty)
+        #expect(makeModel(ReviewSamples.parsedSession()).model.warnings.isEmpty)
+    }
+
+    @Test func warningsOnlyListWhatTheScanCouldNotReadNotWhatTheScreenAlreadyChecks() {
+        var draft = SampleBill.scannedDraft()
+        draft.warnings = [ReceiptWarning(issue: .noTotalFound), ReceiptWarning(issue: .itemsDoNotMatchSubtotal(itemsSum: 1, printed: 2))]
+        #expect(makeModel(BillSession(draft: draft)).model.warnings.isEmpty)
+    }
+
+    @Test func dismissingAWarningRemovesItFromTheListButKeepsItInTheBill() {
+        let (model, store) = makeModel(ReviewSamples.unsureSession())
+        model.dismissWarning(id: unreadableFlan)
+        #expect(model.warnings.map(\.id) == [strayPrice])
+        #expect(store.session?.draft.warnings.map(\.isDismissed) == [true, false])
+        #expect(store.pendingSave != nil, "dismissing is autosaved")
+    }
+
+    @Test func dismissingTheLastWarningLeavesNone() {
+        let (model, _) = makeModel(ReviewSamples.unsureSession())
+        model.dismissWarning(id: unreadableFlan)
+        model.dismissWarning(id: strayPrice)
+        #expect(model.warnings.isEmpty)
+    }
+
+    @Test func warningsNeverBlockAnEditableReceipt() {
+        let (model, _) = makeModel(ReviewSamples.unsureSession())
+        #expect(!model.warnings.isEmpty)
+        #expect(model.canContinue)
+        #expect(model.items.count == 7)
+        #expect(model.addItem(name: "Flan para compartir", priceText: "9.00", quantity: 1) == nil)
+        #expect(model.warnings.count == 2, "adding the missing row does not decide for the user")
+        #expect(model.status == .balanced)
+        #expect(model.requestContinue() == .proceed, "a balanced receipt continues even with a warning still open")
+    }
+
+    @Test func dismissingDoesNotWithdrawAContinueAnywayTheUserGave() {
+        let (model, store) = makeModel(ReviewSamples.unsureSession())
+        model.confirmMismatch()
+        model.dismissWarning(id: strayPrice)
+        #expect(store.session?.mismatchAcknowledged == true)
+        #expect(model.requestContinue() == .proceed)
+    }
+
+    @Test func savingTheRowAWarningIsAboutRetiresIt() {
+        var draft = SampleBill.scannedDraft()
+        let item = draft.items[0]
+        draft.warnings = [
+            ReceiptWarning(issue: .unparsedPriceRow("4,00"), rowLabel: item.name, itemID: item.id),
+            ReceiptWarning(issue: .unparsedPriceRow("5")),
+        ]
+        let (model, store) = makeModel(BillSession(draft: draft))
+        #expect(model.warnings.count == 2)
+        #expect(model.updateItem(id: item.id, name: item.name, priceText: "4.00", quantity: 1) == nil)
+        #expect(model.warnings.count == 1)
+        #expect(store.session?.draft.warnings.map(\.isDismissed) == [true, false])
+    }
+
+    @Test func deletingTheRowAWarningIsAboutRetiresIt() {
+        var draft = SampleBill.scannedDraft()
+        let item = draft.items[0]
+        draft.warnings = [ReceiptWarning(issue: .unparsedPriceRow("4,00"), rowLabel: item.name, itemID: item.id)]
+        let (model, _) = makeModel(BillSession(draft: draft))
+        model.deleteItem(id: item.id)
+        #expect(model.warnings.isEmpty)
+    }
+
+    @Test func editingAnotherRowKeepsEveryWarning() {
+        let (model, _) = makeModel(ReviewSamples.unsureSession())
+        let first = model.items[0]
+        #expect(model.updateItem(id: first.id, name: first.name, priceText: "5.00", quantity: 1) == nil)
+        #expect(model.setAmount(.tax, text: "10.00") == nil)
+        #expect(model.warnings.count == 2)
+    }
+
     // MARK: Store
 
     @Test func editsGoThroughTheStoreSoTheyAreAutosaved() {

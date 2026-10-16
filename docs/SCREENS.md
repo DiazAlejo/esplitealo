@@ -50,6 +50,8 @@ Home -> Capture -> Processing -> Review receipt -> Add people -> Assign items ->
 
 **Behavior:** the user confirms or corrects every item and the receipt amounts. Missing or suspicious values are flagged. The receipt total is never silently changed to match the extracted items.
 
+**What the scan could not read well:** whatever the parser was unsure about is listed in a card under the banner, "Lo que no pude leer bien · N" / "What I couldn't read well · N", in plain words and never as an error code. A price it could not read says which row and what was printed ("No pude leer el precio de **Flan para compartir**: «9,00»." with a hint to add the item); a guessed number format says the numbers may be off and to check the prices. Each entry has a **Entendido** / **Got it** button that retires it; saving or deleting the row it names retires it too. A retired warning leaves the screen but stays in the saved bill. Warnings only inform: they never disable editing or **Continue**, and a mismatch is still the banner's job. See [receipt parsing](RECEIPT_PARSING.md#warnings-what-the-scan-was-unsure-about).
+
 Receipt layouts vary and recognition can confuse quantities, item prices, and totals, so this screen is essential, not an optional advanced feature.
 
 ## 5. Add people

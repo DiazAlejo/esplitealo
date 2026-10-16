@@ -68,6 +68,16 @@ final class BillSessionCodableTests: XCTestCase {
             total: DraftAmount(minorUnits: 1090),
             adjustments: [DraftAdjustment(label: "Promo", amount: DraftAmount(minorUnits: -50))],
             numberFormat: NumberFormat(decimalSeparator: ",", groupSeparator: ".", fractionDigits: 2, isGuessed: true),
+            warnings: [
+                ReceiptWarning(
+                    issue: .unparsedPriceRow("5,00 ??"),
+                    rowLabel: "Café",
+                    sourceRect: rect,
+                    itemID: UUID(uuidString: "30000000-0000-0000-0000-000000000001"),
+                    isDismissed: true
+                ),
+                ReceiptWarning(issue: .numberFormatGuessed(.usdCents)),
+            ],
             issues: [
                 .itemsDoNotMatchSubtotal(itemsSum: 1, printed: 2),
                 .totalsDoNotAddUp(expected: 3, printed: 4),
@@ -89,7 +99,7 @@ final class BillSessionCodableTests: XCTestCase {
         let data = try BillSessionCoding.encoder().encode(BillSession.sampleReadyToShare())
         let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         XCTAssertEqual(object["schemaVersion"] as? Int, BillSession.currentSchemaVersion)
-        XCTAssertEqual(BillSession.currentSchemaVersion, 1)
+        XCTAssertEqual(BillSession.currentSchemaVersion, 2)
     }
 
     func testEncodedJSONIsDeterministic() throws {
@@ -160,10 +170,69 @@ final class BillSessionCodableTests: XCTestCase {
     }
 
     func testFixturesSurviveReEncoding() throws {
-        for name in ["v1-in-progress", "v1-minimal"] {
+        for name in ["v1-in-progress", "v1-minimal", "v2-with-warnings"] {
             let decoded = try BillSessionCoding.decoder().decode(BillSession.self, from: fixtureData(name))
             XCTAssertEqual(try roundTrip(decoded), decoded, name)
         }
+    }
+
+    // MARK: - Version 2: parser warnings
+
+    func testDecodesVersion2WithWarningsFixture() throws {
+        let session = try BillSessionCoding.decoder().decode(BillSession.self, from: fixtureData("v2-with-warnings"))
+        let warnings = session.draft.warnings
+        XCTAssertEqual(warnings.count, 3)
+        XCTAssertEqual(warnings[0].id, UUID(uuidString: "20000000-0000-0000-0000-000000000001"))
+        XCTAssertEqual(warnings[0].issue, .unparsedPriceRow("3,5"))
+        XCTAssertEqual(warnings[0].rowLabel, "Soda")
+        XCTAssertEqual(warnings[0].sourceRect, PixelRect(x: 12, y: 66, width: 288, height: 18))
+        XCTAssertNil(warnings[0].itemID)
+        XCTAssertFalse(warnings[0].isDismissed)
+        XCTAssertEqual(warnings[1].itemID, UUID(uuidString: "10000000-0000-0000-0000-000000000002"))
+        XCTAssertTrue(warnings[1].isDismissed)
+        XCTAssertEqual(warnings[2].issue, .numberFormatGuessed(NumberFormat(decimalSeparator: ".", groupSeparator: ",", fractionDigits: 0, isGuessed: true)))
+        XCTAssertEqual(session.draft.activeWarnings.map(\.id), [warnings[0].id, warnings[2].id])
+        XCTAssertEqual(session.draft.items.map(\.name), ["Mofongo", "Tostones"], "the rest of the bill reads as before")
+    }
+
+    func testVersion1FilesMigrateWithNoWarnings() throws {
+        for name in ["v1-in-progress", "v1-minimal"] {
+            let old = try BillSessionCoding.decoder().decode(BillSession.self, from: fixtureData(name))
+            XCTAssertTrue(old.draft.warnings.isEmpty, name)
+            XCTAssertTrue(old.draft.activeWarnings.isEmpty, name)
+        }
+    }
+
+    func testAVersion1BillIsWrittenBackAsVersion2() throws {
+        let old = try BillSessionCoding.decoder().decode(BillSession.self, from: fixtureData("v1-in-progress"))
+        let data = try BillSessionCoding.encoder().encode(old)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(object["schemaVersion"] as? Int, 2)
+        let migrated = try BillSessionCoding.decoder().decode(BillSession.self, from: data)
+        XCTAssertEqual(migrated, old, "migrating changes nothing but the version")
+    }
+
+    func testADraftWithoutAWarningsKeyDecodesAsNoWarnings() throws {
+        var object = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: fixtureData("v2-with-warnings")) as? [String: Any]
+        )
+        var draft = try XCTUnwrap(object["draft"] as? [String: Any])
+        draft.removeValue(forKey: "warnings")
+        object["draft"] = draft
+        let data = try JSONSerialization.data(withJSONObject: object)
+        let session = try BillSessionCoding.decoder().decode(BillSession.self, from: data)
+        XCTAssertTrue(session.draft.warnings.isEmpty)
+    }
+
+    func testAVersion1FileOnDiskLoadsThroughTheDraftStore() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("esplitealo-migration-tests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try fixtureData("v1-in-progress").write(to: directory.appendingPathComponent(FileBillDraftStore.fileName))
+        let session = try XCTUnwrap(try FileBillDraftStore(directory: directory).load())
+        XCTAssertEqual(session.merchantName, "Fonda Doña Lola")
+        XCTAssertTrue(session.draft.warnings.isEmpty)
     }
 
     // MARK: - Versioning
