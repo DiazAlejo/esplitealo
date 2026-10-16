@@ -12,7 +12,7 @@ struct RenameSheet: View {
                 SheetTitle("sheet.rename")
 
                 SheetField("sheet.name", error: model.renameMessage?.text) {
-                    TextField(text: $model.renameDraft, prompt: Text("sheet.name")) { Text("sheet.name") }
+                    TextField(text: $model.renameDraft, prompt: Text("sheet.name").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.name") }
                         .focused($focused)
                         .textInputAutocapitalization(.words)
                         .autocorrectionDisabled()

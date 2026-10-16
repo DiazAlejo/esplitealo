@@ -53,6 +53,11 @@ extension BillStore {
             // If Application Support is unreachable the bill still works; it just is not autosaved.
             directory = (try? DraftLocation.defaultDirectory()) ?? DraftLocation.temporaryDirectory()
         }
-        return BillStore(draftStore: FileBillDraftStore(directory: directory))
+        let draftStore = FileBillDraftStore(directory: directory)
+        if arguments.contains("--uitesting"), arguments.contains("--uitesting-resume-prompt") {
+            // A bill left behind by a previous launch, so the "¿Seguimos con tu cuenta?" prompt can be tested.
+            try? draftStore.save(SampleBill.midway())
+        }
+        return BillStore(draftStore: draftStore)
     }
 }

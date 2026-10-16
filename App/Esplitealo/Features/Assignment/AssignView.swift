@@ -19,6 +19,7 @@ struct AssignScreen: View {
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     @State private var model: AssignViewModel
     @State private var shakes: CGFloat = 0
@@ -34,10 +35,10 @@ struct AssignScreen: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.sm) {
-                    if dynamicTypeSize.isAccessibilitySize {
+                    if !pinsHeader {
                         AssignHeader(model: model, people: people)
                     }
-                    if dynamicTypeSize.isAccessibilitySize {
+                    if !pinsExtra {
                         // The bottom bar keeps only the button at the largest sizes, so the list has room.
                         leftLine.padding(.horizontal, Spacing.screenMargin)
                     }
@@ -46,6 +47,7 @@ struct AssignScreen: View {
                             .padding(.horizontal, Spacing.screenMargin)
                     }
                     list(rows)
+                    if !pinsBar { bottomBar(rows: rows, proxy: proxy) }
                     if model.paintingID == nil {
                         Text("assign.footer")
                             .espText(.footnote)
@@ -61,13 +63,13 @@ struct AssignScreen: View {
             }
             .scrollBounceBehavior(.basedOnSize)
             .safeAreaInset(edge: .top, spacing: 0) {
-                if !dynamicTypeSize.isAccessibilitySize {
+                if pinsHeader {
                     AssignHeader(model: model, people: people)
                         .background(Color.esp.paper)
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                bottomBar(rows: rows, proxy: proxy)
+                if pinsBar { bottomBar(rows: rows, proxy: proxy) }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -88,6 +90,12 @@ struct AssignScreen: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AppRoute.mark.accessibilityIdentifier)
     }
+
+    // MARK: Pinned bars
+
+    private var pinsHeader: Bool { ChromePolicy.pinsHeader(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass) }
+    private var pinsExtra: Bool { ChromePolicy.pinsExtraActions(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass) }
+    private var pinsBar: Bool { ChromePolicy.pinsActionBar(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass) }
 
     // MARK: Parts
 
@@ -120,7 +128,7 @@ struct AssignScreen: View {
     private func bottomBar(rows: [AssignViewModel.Row], proxy: ScrollViewProxy) -> some View {
         let left = model.unassignedUnitCount
         return VStack(spacing: Spacing.xs) {
-            if !dynamicTypeSize.isAccessibilitySize { leftLine }
+            if pinsExtra { leftLine }
 
             Button {
                 reviewSplit(rows: rows, proxy: proxy)

@@ -164,7 +164,7 @@ struct AssignSheet: View {
         Circle()
             .fill(mark == .none ? Color.clear : Color.esp.primary)
             .overlay {
-                Circle().strokeBorder(mark == .none ? Color.esp.inkSecondary.opacity(0.7) : Color.esp.primary, lineWidth: 1.5)
+                Circle().strokeBorder(mark == .none ? Color.esp.inkSecondary : Color.esp.primary, lineWidth: 1.5)
             }
             .overlay {
                 switch mark {

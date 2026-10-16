@@ -10,6 +10,8 @@ struct ProcessingContent: View {
     var onManual: () -> Void = {}
     var onCancel: () -> Void = {}
 
+    @Environment(\.locale) private var locale
+
     var body: some View {
         CenteredScroll {
             VStack(spacing: Spacing.sm) {
@@ -25,7 +27,6 @@ struct ProcessingContent: View {
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("processing.bar")
                     .accessibilityValue(messageText)
-                    .accessibilityAddTraits(.updatesFrequently)
                     .accessibilityIdentifier("capture.progress")
                 Text("processing.footer")
                     .espText(.footnote)
@@ -48,6 +49,10 @@ struct ProcessingContent: View {
         }
         .espScreenBackground()
         .captureBackButton("processing.cancel", showsChevron: false, action: onCancel)
+        // Three messages in a few seconds: announced as they change, not as a stream of progress values.
+        .onChange(of: messageIndex) { _, index in
+            AccessibilityAnnouncements.post(AccessibilityAnnouncements.readingProgress(messageIndex: index, locale: locale))
+        }
     }
 
     @ViewBuilder private var message: some View {

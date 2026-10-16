@@ -7,7 +7,7 @@ import Testing
 /// edit, the new total after a tip change, the reading progress, and why a scan or the camera failed. Amounts are
 /// spoken ("9 dollars"), not written ("$9.00"), and everything follows the language of the screen.
 struct AccessibilityAnnouncementTests {
-    static let locales = [Locale(identifier: "es"), Locale(identifier: "en")]
+    nonisolated static let locales = [Locale(identifier: "es"), Locale(identifier: "en")]
 
     // MARK: Review
 

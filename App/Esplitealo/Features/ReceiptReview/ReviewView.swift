@@ -17,6 +17,8 @@ struct ReviewView: View {
 private struct ReviewScreen: View {
     @Environment(AppRouter.self) private var router
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model: ReceiptReviewModel
     @State private var sheet: ReviewSheet?
 
@@ -62,6 +64,8 @@ private struct ReviewScreen: View {
                 .accessibilityIdentifier("review.add")
 
                 amounts
+
+                if !pinsContinue { continueButton.padding(.top, Spacing.xs) }
             }
             .padding(.horizontal, Spacing.screenMargin)
             .padding(.vertical, Spacing.md)
@@ -69,14 +73,12 @@ private struct ReviewScreen: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .safeAreaInset(edge: .bottom) {
-            Button("review.continue", action: continueTapped)
-                .buttonStyle(.espPrimary(showsDivisionCoin: true))
-                .disabled(!model.canContinue)
-                .accessibilityHint(model.canContinue ? Text(verbatim: "") : Text("review.needOne"))
-                .accessibilityIdentifier("screen.next")
-                .padding(.horizontal, Spacing.screenMargin)
-                .padding(.vertical, Spacing.sm)
-                .background(Color.esp.paper)
+            if pinsContinue {
+                continueButton
+                    .padding(.horizontal, Spacing.screenMargin)
+                    .padding(.vertical, Spacing.sm)
+                    .background(Color.esp.paper)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .espScreenBackground()
@@ -104,6 +106,19 @@ private struct ReviewScreen: View {
         // `.contain` keeps the children's own identifiers; a bare identifier here would replace them.
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AppRoute.review.accessibilityIdentifier)
+    }
+
+    /// At the two largest text sizes the button would cover half the screen, so it scrolls with the page.
+    private var pinsContinue: Bool {
+        ChromePolicy.pinsActionBar(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass)
+    }
+
+    private var continueButton: some View {
+        Button("review.continue", action: continueTapped)
+            .buttonStyle(.espPrimary(showsDivisionCoin: true))
+            .disabled(!model.canContinue)
+            .accessibilityHint(model.canContinue ? Text(verbatim: "") : Text("review.needOne"))
+            .accessibilityIdentifier("screen.next")
     }
 
     // MARK: Sections
@@ -179,15 +194,7 @@ private struct ReviewScreen: View {
 
     /// VoiceOver hears the new result after an edit, because nothing moves on screen.
     private func announce(_ status: ReceiptReviewModel.Status) {
-        let resource: LocalizedStringResource? = switch status {
-        case .noItems: nil
-        case .balanced: .reviewOkTitle
-        case .itemsDoNotMatchSubtotal, .totalsDoNotAddUp: .reviewWarnTitle
-        case .missingTotal: .reviewMissingTotalTitle
-        }
-        if let resource {
-            AccessibilityNotification.Announcement(String(localized: resource)).post()
-        }
+        AccessibilityAnnouncements.post(AccessibilityAnnouncements.reviewResult(status, locale: locale))
     }
 }
 

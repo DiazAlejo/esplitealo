@@ -192,7 +192,7 @@ struct TipSettings: View {
                     .disabled(!model.canDecreaseTip)
                 TextField(
                     text: Binding(get: { model.customTipText }, set: { model.customTipText = $0 }),
-                    prompt: Text(verbatim: "0.00")
+                    prompt: Text(verbatim: "0.00").foregroundStyle(Color.esp.inkSecondary)
                 ) {
                     Text("totals.tip.customAria")
                 }
@@ -203,10 +203,7 @@ struct TipSettings: View {
                 .padding(.horizontal, Spacing.sm)
                 .frame(minHeight: TapTarget.primaryButtonHeight)
                 .background(Color.esp.well, in: RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous)
-                        .strokeBorder(Color.esp.warn, lineWidth: model.customTipIsInvalid ? 1.5 : 0)
-                }
+                .espFieldOutline(isInvalid: model.customTipIsInvalid)
                 .accessibilityLabel(Text("totals.tip.customAria"))
                 .accessibilityIdentifier("totals.tip.field")
                 .toolbar {
@@ -354,6 +351,7 @@ struct WhoOwesSection: View {
     let showsService: Bool
 
     @Environment(\.locale) private var locale
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var expanded: Set<UUID> = []
     @ScaledMetric(relativeTo: .footnote) private var markSize: CGFloat = 11
 
@@ -373,7 +371,7 @@ struct WhoOwesSection: View {
 
             RowsCard(rows) { row in
                 PersonCard(row: row, showsService: showsService, isExpanded: expanded.contains(row.id)) {
-                    withAnimation(.snappy(duration: 0.25)) {
+                    withAnimation(reduceMotion ? nil : .snappy(duration: 0.25)) {
                         if expanded.contains(row.id) { expanded.remove(row.id) } else { expanded.insert(row.id) }
                     }
                 }
@@ -415,7 +413,8 @@ struct ShareBar: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), alignment: .leading)], alignment: .leading, spacing: Spacing.xxs) {
                 ForEach(rows) { row in
                     HStack(spacing: 6) {
-                        Circle().fill(PersonColorSlot(participantIndex: row.colorIndex).fillColor).frame(width: 8, height: 8)
+                        // The initial inside the colour, so the bar's segments can be told apart without colour.
+                        PersonAvatar(name: row.name, participantIndex: row.colorIndex, size: 20, announcesName: false)
                         Text(verbatim: "\(row.name) \(row.percent)%")
                     }
                 }
@@ -548,7 +547,7 @@ struct RoundingCard: View {
     var body: some View {
         let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xs)) : AnyLayout(HStackLayout(alignment: .top, spacing: Spacing.sm))
         layout {
-            ChavitoView(expression: .thinking, size: 76, decorative: false, animated: false)
+            ChavitoView(expression: .thinking, size: 76, decorative: true, animated: false)
             VStack(alignment: .leading, spacing: Spacing.xxs) {
                 Text("totals.round.title")
                     .espText(.headline)

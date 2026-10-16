@@ -167,6 +167,7 @@ struct ShareSuccessView: View {
     @Environment(\.locale) private var locale
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var settled = false
+    @AccessibilityFocusState private var titleFocused: Bool
 
     var body: some View {
         GeometryReader { proxy in
@@ -179,6 +180,7 @@ struct ShareSuccessView: View {
                         .espText(.title)
                         .multilineTextAlignment(.center)
                         .accessibilityAddTraits(.isHeader)
+                        .accessibilityFocused($titleFocused)
                         .accessibilityIdentifier("success.title")
                     Text(.successBody(peopleCount, MoneyFormatter(locale: locale).string(cents: totalCents)))
                         .espText(.subhead)
@@ -201,6 +203,8 @@ struct ShareSuccessView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .espScreenBackground()
         .onAppear {
+            // The picture comes first on screen, but the good news is the title: VoiceOver starts there.
+            titleFocused = true
             guard !reduceMotion else { return }
             withAnimation(.easeOut(duration: 0.9)) { settled = true }
         }

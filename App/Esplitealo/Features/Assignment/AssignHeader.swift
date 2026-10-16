@@ -8,6 +8,8 @@ struct AssignHeader: View {
     let people: [AssignViewModel.Person]
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let total = model.totalUnitCount
@@ -41,18 +43,28 @@ struct AssignHeader: View {
                     .foregroundStyle(Color.esp.inkSecondary)
                     .padding(.horizontal, Spacing.screenMargin)
                     .accessibilityAddTraits(.isHeader)
-                ScrollViewReader { proxy in
-                    ScrollView(.horizontal) {
-                        HStack(spacing: Spacing.xxs) {
-                            ForEach(people) { person in
-                                chip(person).id(person.id)
-                            }
+                if dynamicTypeSize.isAccessibilitySize {
+                    // A sideways strip would hide most of the table behind a swipe: the chips stack instead.
+                    VStack(alignment: .leading, spacing: Spacing.xxs) {
+                        ForEach(people) { person in
+                            chip(person)
                         }
-                        .padding(.horizontal, Spacing.xs)
                     }
-                    .scrollIndicators(.hidden)
-                    .onChange(of: model.paintingID) { _, id in
-                        if let id { withAnimation { proxy.scrollTo(id, anchor: .center) } }
+                    .padding(.horizontal, Spacing.xs)
+                } else {
+                    ScrollViewReader { proxy in
+                        ScrollView(.horizontal) {
+                            HStack(spacing: Spacing.xxs) {
+                                ForEach(people) { person in
+                                    chip(person).id(person.id)
+                                }
+                            }
+                            .padding(.horizontal, Spacing.xs)
+                        }
+                        .scrollIndicators(.hidden)
+                        .onChange(of: model.paintingID) { _, id in
+                            if let id { withAnimation(reduceMotion ? nil : .default) { proxy.scrollTo(id, anchor: .center) } }
+                        }
                     }
                 }
             }

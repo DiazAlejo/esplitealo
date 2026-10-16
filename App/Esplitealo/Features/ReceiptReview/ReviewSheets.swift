@@ -43,7 +43,7 @@ struct ItemEditorSheet: View {
                 }
 
                 SheetField("sheet.description", error: error == .missingName ? Text("sheet.errName") : nil) {
-                    TextField(text: $name, prompt: Text("sheet.descriptionPlaceholder")) { Text("sheet.description") }
+                    TextField(text: $name, prompt: Text("sheet.descriptionPlaceholder").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.description") }
                         .focused($focus, equals: .name)
                         .textInputAutocapitalization(.sentences)
                         .submitLabel(.next)
@@ -58,10 +58,11 @@ struct ItemEditorSheet: View {
 
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     SheetField("sheet.unitPrice", error: error == .invalidPrice ? Text("sheet.errPrice") : nil) {
-                        TextField(text: $priceText, prompt: Text(verbatim: "0.00")) { Text("sheet.unitPrice") }
+                        TextField(text: $priceText, prompt: Text(verbatim: "0.00").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.unitPrice") }
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .focused($focus, equals: .price)
+                            .decimalPadDoneButton { focus = nil }
                             .accessibilityIdentifier("sheet.item.price")
                     }
                     if quantity > 1, let lineTotalCents {
@@ -170,10 +171,11 @@ struct AmountEditorSheet: View {
                 }
 
                 SheetField("sheet.amount", error: hasError ? Text("sheet.errAmount") : nil) {
-                    TextField(text: $text, prompt: Text(verbatim: "0.00")) { Text("sheet.amount") }
+                    TextField(text: $text, prompt: Text(verbatim: "0.00").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.amount") }
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .focused($focused)
+                        .decimalPadDoneButton { focused = false }
                         .accessibilityIdentifier("sheet.amount.field")
                 }
 

@@ -12,10 +12,14 @@ struct HomeView: View {
 
     @Environment(ScanFlow.self) private var flow
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var showsHowItWorks = false
 
-    /// At accessibility sizes the buttons would take half the screen if they stayed pinned, so they scroll with the page.
-    private var pinsActions: Bool { !dynamicTypeSize.isAccessibilitySize }
+    /// At accessibility sizes, and in landscape, the buttons would take half the screen if they stayed pinned, so they
+    /// scroll with the page.
+    private var pinsActions: Bool {
+        ChromePolicy.pinsExtraActions(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass)
+    }
 
     var body: some View {
         ScrollView {

@@ -15,6 +15,8 @@ struct PeopleView: View {
 
 private struct PeopleScreen: View {
     @Environment(AppRouter.self) private var router
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model: PeopleViewModel
     @FocusState private var nameFocused: Bool
 
@@ -52,6 +54,8 @@ private struct PeopleScreen: View {
                 } else {
                     table
                 }
+
+                if !pinsNext { nextButton.padding(.top, Spacing.xs) }
             }
             .padding(.horizontal, Spacing.screenMargin)
             .padding(.vertical, Spacing.md)
@@ -60,14 +64,12 @@ private struct PeopleScreen: View {
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom) {
-            Button("people.next") { router.advance() }
-                .buttonStyle(.espPrimary(showsDivisionCoin: true))
-                .disabled(!model.canContinue)
-                .accessibilityHint(model.canContinue ? Text(verbatim: "") : Text("people.needOne"))
-                .accessibilityIdentifier("screen.next")
-                .padding(.horizontal, Spacing.screenMargin)
-                .padding(.vertical, Spacing.sm)
-                .background(Color.esp.paper)
+            if pinsNext {
+                nextButton
+                    .padding(.horizontal, Spacing.screenMargin)
+                    .padding(.vertical, Spacing.sm)
+                    .background(Color.esp.paper)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .espScreenBackground()
@@ -89,6 +91,19 @@ private struct PeopleScreen: View {
         .accessibilityIdentifier(AppRoute.people.accessibilityIdentifier)
     }
 
+    /// At the two largest text sizes the button would cover half the screen, so it scrolls with the page.
+    private var pinsNext: Bool {
+        ChromePolicy.pinsActionBar(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass)
+    }
+
+    private var nextButton: some View {
+        Button("people.next") { router.advance() }
+            .buttonStyle(.espPrimary(showsDivisionCoin: true))
+            .disabled(!model.canContinue)
+            .accessibilityHint(model.canContinue ? Text(verbatim: "") : Text("people.needOne"))
+            .accessibilityIdentifier("screen.next")
+    }
+
     // MARK: Parts
 
     private func addPersonRow(name: Binding<String>) -> some View {
@@ -105,7 +120,7 @@ private struct PeopleScreen: View {
     }
 
     private func nameField(_ name: Binding<String>) -> some View {
-        TextField(text: name, prompt: Text("people.placeholder")) { Text("people.placeholder") }
+        TextField(text: name, prompt: Text("people.placeholder").foregroundStyle(Color.esp.inkSecondary)) { Text("people.placeholder") }
             .focused($nameFocused)
             .textInputAutocapitalization(.words)
             .autocorrectionDisabled()
@@ -115,6 +130,7 @@ private struct PeopleScreen: View {
             .padding(.horizontal, Spacing.sm)
             .frame(minHeight: TapTarget.secondaryButtonHeight)
             .background(Color.esp.well, in: RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous))
+            .espFieldOutline()
             .accessibilityIdentifier("people.name")
     }
 
