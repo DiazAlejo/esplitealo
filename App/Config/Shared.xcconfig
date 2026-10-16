@@ -1,7 +1,8 @@
 // Build settings shared by every target. All settings live in text files like this one, so a change is a diff
 // and the project file never needs hand edits for them.
 
-// The only place the bundle identifier is defined. It is a placeholder until the App Store Connect record exists.
+// The only place the bundle identifier is defined. This is the final id. It cannot change once the app is published
+// on the App Store. The test targets derive theirs from it. (Tools/ScannerLab keeps its own, separate id.)
 APP_BUNDLE_IDENTIFIER = com.esplitealo.app
 
 IPHONEOS_DEPLOYMENT_TARGET = 18.0

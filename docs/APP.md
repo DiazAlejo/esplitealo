@@ -78,10 +78,11 @@ All user-facing text goes through `Localizable.xcstrings`: **Spanish (Puerto Ric
 - `Resources/PrivacyInfo.xcprivacy` declares no tracking and no collected data ("Data Not Collected"); no required-reason APIs are used. Add an entry only if a new API needs one (for example `UserDefaults`: reason `CA92.1`).
 - The only permission is the **camera**, with a Spanish and English usage text. There is no photo-library key: `PhotosPicker` needs none. `ITSAppUsesNonExemptEncryption` is `NO`.
 - `AppResourceTests` checks all of this.
+- The privacy policy is [PRIVACY_POLICY.md](PRIVACY_POLICY.md) (Spanish and English); the App Store questionnaire answers are in [APP_STORE_PRIVACY.md](APP_STORE_PRIVACY.md).
 
 ## Signing and the bundle identifier
 
-- The bundle identifier `com.esplitealo.app` is a placeholder, set once as `APP_BUNDLE_IDENTIFIER` in `Config/Shared.xcconfig`. The test targets derive theirs from it.
+- The bundle identifier `com.esplitealo.app` is final, set once as `APP_BUNDLE_IDENTIFIER` in `Config/Shared.xcconfig`. It cannot change once the app is published on the App Store. The test targets derive theirs from it (`.tests`, `.uitests`). `Tools/ScannerLab` keeps its own separate id. A paid Apple Developer enrollment, needed to register the id and upload builds, comes near launch.
 - No team id is committed. Simulator builds need none. To run on a device with a free personal Apple ID, create `App/Config/Local.xcconfig` (git-ignored) containing `DEVELOPMENT_TEAM = <your team id>`; `Shared.xcconfig` includes it when present.
 
 ## App icon
