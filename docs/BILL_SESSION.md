@@ -76,3 +76,5 @@ iOS can end a backgrounded app without warning (for example while someone checks
 ## Share text
 
 `ShareSummaryBuilder.build(for:language:calendar:)` produces per-person text for `es` or `en`. Wording follows the bilingual HTML mockups (`share` strings): neutral Spanish, Puerto Rican closing line in Spanish, “total” not “monto”, no IVU label, no payment copy. Strings live in `ShareSummaryStrings` for a future localization catalog.
+
+A tip printed on the receipt (`draft.tip`, with no `serviceChargeCents`) is shared like a service charge and appears in each person's lines as `service`, so a person's lines always add up to what they owe; the header still reads `Bill <printed total> + <tip> = <total>`. The Totals screen shows the same amount in its Servicio column.

@@ -1,4 +1,5 @@
 import EsplitealoCore
+import EsplitealoDesign
 import Foundation
 import Testing
 @testable import Esplitealo
@@ -171,6 +172,11 @@ struct TotalsViewModelTests {
             #expect(row.totalCents == row.itemsCents + row.taxCents + row.serviceCents + row.tipCents)
         }
         #expect(model.rows.map(\.totalCents).reduce(0, +) == model.summary.billTotalCents)
+        // The share text names the same amount the card shows, so what is sent matches what is on screen.
+        let text = model.shareText(language: .en)
+        for row in model.rows {
+            #expect(text.contains("service \(MoneyFormatter(locale: Locale(identifier: "en_US")).string(cents: row.serviceCents))"), Comment(rawValue: text))
+        }
     }
 
     @Test func eachPersonListsTheirItemsAndHowManyWaysTheyWereSplit() throws {

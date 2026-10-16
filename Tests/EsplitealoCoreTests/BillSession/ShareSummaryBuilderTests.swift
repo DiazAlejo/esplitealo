@@ -66,7 +66,7 @@ final class ShareSummaryBuilderTests: XCTestCase {
         let text = ShareSummaryBuilder.build(for: session, language: .en, calendar: utc)
         XCTAssertEqual(text, """
             Fonda Doña Lola · Oct 13
-            Bill $130.00 (includes service $20.00) + 0% tip $0.00 = $130.00
+            Bill $130.00 + 0% tip $0.00 = $130.00
 
             Alex owes $78.00
               items $60.00 · tax $6.00 · service $12.00 · tip $0.00
