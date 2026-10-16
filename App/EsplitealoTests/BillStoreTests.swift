@@ -34,6 +34,21 @@ struct BillStoreTests {
         #expect(store.session?.participants.isEmpty == true)
     }
 
+    @Test func startingANewBillSetsTheBillDateToToday() {
+        let store = makeStore()
+        let before = Date()
+        store.startNewBill()
+        let date = store.session?.date
+        #expect(date != nil)
+        #expect(date.map { $0 >= before && $0 <= Date() } == true)
+    }
+
+    @Test func aScannedDraftAlsoGetsTheBillDate() {
+        let store = makeStore()
+        store.startNewBill(draft: SampleBill.scannedDraft())
+        #expect(store.session?.date != nil)
+    }
+
     @Test func aBlankBillIsNeverWorthSaving() async {
         let store = makeStore()
         store.startNewBill()

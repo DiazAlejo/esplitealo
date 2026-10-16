@@ -90,8 +90,8 @@ final class CaptureFlowUITests: XCTestCase {
         XCTAssertTrue(element(app, "screen.home").waitForExistence(timeout: 15))
         app.buttons["home.scan"].tap()
         XCTAssertTrue(element(app, "capture.choosePhoto").waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["La cámara está desactivada"].exists)
-        XCTAssertTrue(app.buttons["capture.openSettings"].exists)
+        XCTAssertTrue(app.staticTexts["La cámara está desactivada"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["capture.openSettings"].waitForExistence(timeout: 10))
         app.buttons["capture.choosePhoto"].tap()
         XCTAssertTrue(element(app, "screen.review").waitForExistence(timeout: 15))
     }
