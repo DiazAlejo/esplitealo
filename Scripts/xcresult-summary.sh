@@ -30,6 +30,9 @@ except ValueError:
     sys.exit(0)
 
 failures = summary.get("testFailures", [])
+if summary.get("result", "unknown") == "unknown" and not summary.get("totalTestCount"):
+    print("No tests ran in this step (it only built).")
+    sys.exit(0)
 print("Result: {}  (passed {}, failed {}, skipped {}, expected failures {}, total {})".format(
     summary.get("result", "unknown"),
     summary.get("passedTests", 0),

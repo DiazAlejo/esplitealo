@@ -117,6 +117,12 @@ export STUB_SUMMARY_JSON="$fixtures/passed-summary.json"
 out="$(PATH="$work/bin:$PATH" "$root/Scripts/xcresult-summary.sh" "$work/Passed.xcresult" 2>&1)"
 check "summary: a passed run lists no failures" "$(contains "$out" 'Result: Passed  (passed 55' && ! contains "$out" 'Failed tests' && echo 0 || echo 1)"
 
+echo '{"result":"unknown","totalTestCount":0,"testFailures":[]}' > "$work/build-only.json"
+export STUB_SUMMARY_JSON="$work/build-only.json"
+out="$(PATH="$work/bin:$PATH" "$root/Scripts/xcresult-summary.sh" "$work/Passed.xcresult" 2>&1)"
+check "summary: a build-only bundle says no tests ran" "$(contains "$out" 'No tests ran in this step' && ! contains "$out" 'Result:' && echo 0 || echo 1)"
+export STUB_SUMMARY_JSON="$fixtures/passed-summary.json"
+
 out="$(PATH="$work/bin:$PATH" "$root/Scripts/xcresult-summary.sh" "$work/missing.xcresult" 2>&1)"; code=$?
 check "summary: a missing bundle is explained, exit 0" "$([ $code -eq 0 ] && contains "$out" 'no result bundle' && echo 0 || echo 1)"
 
