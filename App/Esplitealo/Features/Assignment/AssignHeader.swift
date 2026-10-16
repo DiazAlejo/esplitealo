@@ -146,8 +146,14 @@ struct AssignWarningBanner: View {
     let count: Int
     let onSplitRest: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
-        HStack(alignment: .top, spacing: Spacing.sm) {
+        // At accessibility sizes the icon goes above the words instead of taking a quarter of the width.
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xs))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: Spacing.sm))
+        layout {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(Color.esp.warn)
                 .accessibilityHidden(true)

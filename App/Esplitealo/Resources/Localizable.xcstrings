@@ -3909,6 +3909,40 @@
         }
       }
     },
+    "sheet.quantityDecrease" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decrease quantity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bajar cantidad"
+          }
+        }
+      }
+    },
+    "sheet.quantityIncrease" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Increase quantity"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subir cantidad"
+          }
+        }
+      }
+    },
     "sheet.quantityValue" : {
       "extractionState" : "manual",
       "localizations" : {

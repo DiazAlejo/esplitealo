@@ -7,9 +7,10 @@ public enum ChromePolicy {
         verticalSizeClass == .compact
     }
 
-    /// A header with a title, a meter and chips (Mark items): pinned in portrait up to xxxLarge.
+    /// A header with a title, a meter and chips (Mark items): pinned in portrait up to xxLarge. From xxxLarge on, an
+    /// iPhone SE (667 pt tall) would have less than half the screen left for the list.
     public static func pinsHeader(dynamicTypeSize: DynamicTypeSize, verticalSizeClass: UserInterfaceSizeClass?) -> Bool {
-        !dynamicTypeSize.isAccessibilitySize && !isCompact(verticalSizeClass)
+        dynamicTypeSize <= .xxLarge && !isCompact(verticalSizeClass)
     }
 
     /// A bar that holds one button (56 pt): pinned until AX4, because up to AX3 it still leaves most of the screen.
@@ -17,8 +18,8 @@ public enum ChromePolicy {
         dynamicTypeSize < .accessibility4
     }
 
-    /// Secondary buttons and notes next to the main button: pinned in portrait up to xxxLarge, otherwise inline.
+    /// Secondary buttons and notes next to the main button: pinned in portrait up to xxLarge, otherwise inline.
     public static func pinsExtraActions(dynamicTypeSize: DynamicTypeSize, verticalSizeClass: UserInterfaceSizeClass?) -> Bool {
-        !dynamicTypeSize.isAccessibilitySize && !isCompact(verticalSizeClass)
+        dynamicTypeSize <= .xxLarge && !isCompact(verticalSizeClass)
     }
 }

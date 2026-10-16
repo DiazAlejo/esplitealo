@@ -51,10 +51,7 @@ struct ItemEditorSheet: View {
                         .accessibilityIdentifier("sheet.item.name")
                 }
 
-                Stepper(value: $quantity, in: ReceiptReviewModel.quantityRange) {
-                    Text(.sheetQuantityValue(quantity)).espText(.body)
-                }
-                .accessibilityIdentifier("sheet.item.quantity")
+                quantityRow
 
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     SheetField("sheet.unitPrice", error: error == .invalidPrice ? Text("sheet.errPrice") : nil) {
@@ -76,24 +73,62 @@ struct ItemEditorSheet: View {
                     .buttonStyle(.espPrimary)
                     .accessibilityIdentifier("sheet.save")
 
-                HStack(spacing: Spacing.xs) {
-                    if let itemID {
-                        Button("sheet.delete") {
-                            model.deleteItem(id: itemID)
-                            onClose()
-                        }
-                        .buttonStyle(.espWarn)
-                        .accessibilityIdentifier("sheet.delete")
-                    }
-                    Button("sheet.cancel", action: onClose)
-                        .buttonStyle(.espQuiet)
-                        .accessibilityIdentifier("sheet.cancel")
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: Spacing.xs) { deleteButton; cancelButton }
+                    VStack(spacing: Spacing.xs) { deleteButton; cancelButton }
                 }
             }
         }
         .onChange(of: name) { error = error == .missingName ? nil : error }
         .onChange(of: priceText) { error = error == .invalidPrice ? nil : error }
         .onAppear { if itemID == nil { focus = .name } }
+    }
+
+    /// "Cantidad: 2" with two 44 pt buttons. The system stepper is 32 pt tall, too small to hit with a shaky hand.
+    private var quantityRow: some View {
+        HStack(spacing: Spacing.xs) {
+            Text(.sheetQuantityValue(quantity))
+                .espText(.body)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("sheet.item.quantity")
+            quantityButton("minus", label: "sheet.quantityDecrease", delta: -1, identifier: "sheet.item.quantity.decrease")
+                .disabled(quantity <= ReceiptReviewModel.quantityRange.lowerBound)
+            quantityButton("plus", label: "sheet.quantityIncrease", delta: 1, identifier: "sheet.item.quantity.increase")
+                .disabled(quantity >= ReceiptReviewModel.quantityRange.upperBound)
+        }
+        .frame(minHeight: TapTarget.minimum)
+    }
+
+    private func quantityButton(_ systemImage: String, label: LocalizedStringKey, delta: Int, identifier: String) -> some View {
+        Button {
+            quantity = min(max(quantity + delta, ReceiptReviewModel.quantityRange.lowerBound), ReceiptReviewModel.quantityRange.upperBound)
+        } label: {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.semibold))
+                .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum)
+                .background(Color.esp.well, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.esp.primary)
+        .accessibilityLabel(Text(label))
+        .accessibilityIdentifier(identifier)
+    }
+
+    @ViewBuilder private var deleteButton: some View {
+        if let itemID {
+            Button("sheet.delete") {
+                model.deleteItem(id: itemID)
+                onClose()
+            }
+            .buttonStyle(.espWarn)
+            .accessibilityIdentifier("sheet.delete")
+        }
+    }
+
+    private var cancelButton: some View {
+        Button("sheet.cancel", action: onClose)
+            .buttonStyle(.espQuiet)
+            .accessibilityIdentifier("sheet.cancel")
     }
 
     private func flagNote(_ cents: Int) -> some View {

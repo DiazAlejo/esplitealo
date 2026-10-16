@@ -10,13 +10,14 @@ import Testing
 @MainActor
 struct AccessibilitySnapshotTests {
     /// The accessibility matrix at the phone's height, and AX5 on a canvas twice as tall.
-    private func snapshot(_ view: some View, _ name: String, height: CGFloat = 844) {
+    private func snapshot(_ view: some View, _ name: String, height: CGFloat = 844, testName: String = #function) {
         assertDesignSnapshot(
             view, named: "a11y-\(name)",
             variants: SnapshotVariant.accessibilityMatrix.filter { $0.dynamicType != .accessibility5 },
-            fixedHeight: height
+            fixedHeight: height,
+            testName: testName
         )
-        assertDesignSnapshot(view, named: "a11y-\(name)", variants: [.ax5LightSpanish], fixedHeight: height * 2)
+        assertDesignSnapshot(view, named: "a11y-\(name)", variants: [.ax5LightSpanish], fixedHeight: height * 2, testName: testName)
     }
 
     private func store(_ session: BillSession?) -> BillStore {

@@ -6,14 +6,20 @@ public struct PersonAvatar: View {
     private let name: String
     private let participantIndex: Int
     private let showsName: Bool
-    @ScaledMetric private var size: CGFloat
+    @ScaledMetric private var scaledSize: CGFloat
+    private let baseSize: CGFloat
 
     public init(name: String, participantIndex: Int, size: CGFloat = 28, announcesName: Bool = true) {
         self.name = name
         self.participantIndex = participantIndex
         self.showsName = announcesName
-        _size = ScaledMetric(wrappedValue: size, relativeTo: .body)
+        baseSize = size
+        _scaledSize = ScaledMetric(wrappedValue: size, relativeTo: .body)
     }
+
+    /// The circle grows with the text, but not past 1.75 times its size: at AX5 a 40 pt avatar would be 124 pt wide and
+    /// leave no room for the name next to it.
+    private var size: CGFloat { min(scaledSize, baseSize * 1.75) }
 
     public var body: some View {
         let slot = PersonColorSlot(participantIndex: participantIndex)

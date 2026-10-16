@@ -57,14 +57,35 @@ struct ShareSheetContent: View {
         showsActivity = true
     }
 
+    /// The recipients go under the title when the title has no room beside them (large text).
     private var header: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: Spacing.sm) {
+                headerIcon
+                headerTitle
+                RecipientsStack(people: model.people)
+            }
+            VStack(alignment: .leading, spacing: Spacing.xs) {
+                HStack(alignment: .top, spacing: Spacing.sm) {
+                    headerIcon
+                    headerTitle
+                }
+                RecipientsStack(people: model.people)
+            }
+        }
+    }
+
+    private var headerIcon: some View {
+        Image(systemName: "text.document")
+            .font(.title3)
+            .foregroundStyle(Color.esp.primary)
+            .frame(width: 44, height: 44)
+            .background(Color.esp.okBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .accessibilityHidden(true)
+    }
+
+    private var headerTitle: some View {
         HStack(spacing: Spacing.sm) {
-            Image(systemName: "text.document")
-                .font(.title3)
-                .foregroundStyle(Color.esp.primary)
-                .frame(width: 44, height: 44)
-                .background(Color.esp.okBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
                 Group {
                     if model.merchantName.isEmpty {
@@ -81,7 +102,6 @@ struct ShareSheetContent: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isHeader)
-            RecipientsStack(people: model.people)
         }
     }
 

@@ -8,9 +8,9 @@ struct ChromePolicyTests {
     static let sizes = DynamicTypeSize.allCases
 
     @Test(arguments: sizes)
-    func aHeaderIsPinnedOnlyBelowTheAccessibilitySizesAndInPortrait(size: DynamicTypeSize) {
-        #expect(ChromePolicy.pinsHeader(dynamicTypeSize: size, verticalSizeClass: .regular) == !size.isAccessibilitySize)
-        #expect(ChromePolicy.pinsHeader(dynamicTypeSize: size, verticalSizeClass: nil) == !size.isAccessibilitySize)
+    func aHeaderIsPinnedOnlyUpToXXLargeAndInPortrait(size: DynamicTypeSize) {
+        #expect(ChromePolicy.pinsHeader(dynamicTypeSize: size, verticalSizeClass: .regular) == (size <= .xxLarge))
+        #expect(ChromePolicy.pinsHeader(dynamicTypeSize: size, verticalSizeClass: nil) == (size <= .xxLarge))
         #expect(!ChromePolicy.pinsHeader(dynamicTypeSize: size, verticalSizeClass: .compact))
     }
 
@@ -23,8 +23,8 @@ struct ChromePolicyTests {
     }
 
     @Test(arguments: sizes)
-    func aBarWithSeveralButtonsScrollsAtAccessibilitySizesAndInLandscape(size: DynamicTypeSize) {
-        #expect(ChromePolicy.pinsExtraActions(dynamicTypeSize: size, verticalSizeClass: .regular) == !size.isAccessibilitySize)
+    func aBarWithSeveralButtonsScrollsFromXXXLargeAndInLandscape(size: DynamicTypeSize) {
+        #expect(ChromePolicy.pinsExtraActions(dynamicTypeSize: size, verticalSizeClass: .regular) == (size <= .xxLarge))
         #expect(!ChromePolicy.pinsExtraActions(dynamicTypeSize: size, verticalSizeClass: .compact))
     }
 
@@ -32,6 +32,13 @@ struct ChromePolicyTests {
         #expect(ChromePolicy.pinsHeader(dynamicTypeSize: .large, verticalSizeClass: .regular))
         #expect(ChromePolicy.pinsActionBar(dynamicTypeSize: .large, verticalSizeClass: .regular))
         #expect(ChromePolicy.pinsExtraActions(dynamicTypeSize: .large, verticalSizeClass: .regular))
+    }
+
+    @Test func xxxLargeScrollsTheExtrasSoAnIPhoneSEKeepsRoomForTheContent() {
+        #expect(ChromePolicy.pinsHeader(dynamicTypeSize: .xxLarge, verticalSizeClass: .regular))
+        #expect(!ChromePolicy.pinsHeader(dynamicTypeSize: .xxxLarge, verticalSizeClass: .regular))
+        #expect(!ChromePolicy.pinsExtraActions(dynamicTypeSize: .xxxLarge, verticalSizeClass: .regular))
+        #expect(ChromePolicy.pinsActionBar(dynamicTypeSize: .xxxLarge, verticalSizeClass: .regular))
     }
 
     @Test func accessibility3KeepsTheMainButtonPinnedButNothingElse() {

@@ -119,16 +119,16 @@ struct AssignSheet: View {
         } label: {
             Group {
                 if dynamicTypeSize.isAccessibilitySize {
-                    // Narrow columns would break the name and the amount: the amount goes under the name.
-                    HStack(alignment: .top, spacing: Spacing.sm) {
-                        checkmark(person.mark)
-                        PersonAvatar(name: person.name, participantIndex: person.colorIndex, size: 40, announcesName: false)
-                        VStack(alignment: .leading, spacing: Spacing.xxs) {
-                            Text(verbatim: person.name).espText(.headline).multilineTextAlignment(.leading)
-                            trailing(person, units: model.sheetContent?.unitCount ?? 1, alignment: .leading)
+                    // A narrow column would break the name and the amount: the mark and the avatar go above them.
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                        HStack(spacing: Spacing.sm) {
+                            checkmark(person.mark)
+                            PersonAvatar(name: person.name, participantIndex: person.colorIndex, size: 40, announcesName: false)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(verbatim: person.name).espText(.headline).multilineTextAlignment(.leading)
+                        trailing(person, units: model.sheetContent?.unitCount ?? 1, alignment: .leading)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
                     HStack(spacing: Spacing.sm) {
                         checkmark(person.mark)

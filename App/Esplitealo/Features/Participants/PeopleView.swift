@@ -205,6 +205,11 @@ private struct PersonRow: View {
                     remove
                 }
             }
+            VStack(alignment: .leading, spacing: 0) {
+                who
+                rename
+                remove
+            }
         }
         .padding(.leading, Spacing.sm)
         .padding(.trailing, Spacing.xs)

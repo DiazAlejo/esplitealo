@@ -105,6 +105,7 @@ struct TipSettings: View {
     let model: TotalsViewModel
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @FocusState private var fieldFocused: Bool
 
     var body: some View {
@@ -144,11 +145,18 @@ struct TipSettings: View {
     // MARK: Buttons
 
     private var selector: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 2) { segments }
-            VStack(spacing: 2) {
-                HStack(spacing: 2) { presetSegments }
-                HStack(spacing: 2) { customSegment }
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                // "15" and "%" must not be split over two lines: one choice per row.
+                VStack(spacing: 2) { segments }
+            } else {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 2) { segments }
+                    VStack(spacing: 2) {
+                        HStack(spacing: 2) { presetSegments }
+                        HStack(spacing: 2) { customSegment }
+                    }
+                }
             }
         }
         .padding(3)
