@@ -91,6 +91,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
       - name: Export the pictures and check them
+        shell: bash
         run: |
           Scripts/export-store-screenshots.sh "$RUNNER_TEMP/xcresults/store-screenshots.xcresult" \
             "$RUNNER_TEMP/store-screenshots/${{ matrix.slug }}-${{ matrix.size }}" "${{ matrix.size }}" | tee "$RUNNER_TEMP/export.txt"

@@ -1,4 +1,4 @@
-import UIKit
+import ImageIO
 import UniformTypeIdentifiers
 import XCTest
 
@@ -87,17 +87,33 @@ final class StoreScreenshotTests: XCTestCase {
         Thread.sleep(forTimeInterval: 1.5)
     }
 
-    /// App Store Connect rejects images with an alpha channel, so the picture is redrawn opaque and attached as PNG
-    /// (the default attachment format for screenshots is a lossy HEIC).
+    /// App Store Connect rejects images with an alpha channel, so the picture is redrawn into an opaque RGB bitmap and
+    /// attached as PNG (the default attachment format for screenshots is a lossy HEIC, and the simulator's own PNG
+    /// carries an alpha channel).
     private func attach(_ screenshot: XCUIScreenshot, named name: String) {
-        let image = screenshot.image
-        let format = UIGraphicsImageRendererFormat()
-        format.opaque = true
-        format.scale = image.scale
-        let png = UIGraphicsImageRenderer(size: image.size, format: format).pngData { _ in image.draw(at: .zero) }
+        guard let png = Self.opaquePNG(from: screenshot.pngRepresentation) else {
+            XCTFail("\(name): could not make an opaque PNG")
+            return
+        }
         let attachment = XCTAttachment(data: png, uniformTypeIdentifier: UTType.png.identifier)
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    private static func opaquePNG(from data: Data) -> Data? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil),
+              let space = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8, bytesPerRow: 0,
+                                      space: space, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
+        else { return nil }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        let output = NSMutableData()
+        guard let flat = context.makeImage(),
+              let destination = CGImageDestinationCreateWithData(output, UTType.png.identifier as CFString, 1, nil)
+        else { return nil }
+        CGImageDestinationAddImage(destination, flat, nil)
+        return CGImageDestinationFinalize(destination) ? output as Data : nil
     }
 }
