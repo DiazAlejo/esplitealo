@@ -84,4 +84,12 @@ final class ReceiptParserOcrRecoveryTests: XCTestCase {
         XCTAssertEqual(draft.tip?.minorUnits, 150)
         XCTAssertTrue(draft.reconciles)
     }
+
+    func testMultiplicationSignBeforeTheNameIsAQuantityPrefix() {
+        // Vision turns the "x" of `2 x Sorullitos` into "×".
+        let draft = parse(["2 × Sorullitos 12.76", "3 × Tostones 22.80", "Total 35.56"])
+        XCTAssertEqual(draft.items.map(\.quantity), [2, 3])
+        XCTAssertEqual(draft.items.map(\.name), ["Sorullitos", "Tostones"])
+        XCTAssertTrue(draft.items.allSatisfy { $0.flags.isEmpty })
+    }
 }
