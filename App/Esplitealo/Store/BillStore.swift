@@ -63,7 +63,7 @@ final class BillStore {
     func startNewBill(draft: ReceiptDraft = ReceiptDraft()) {
         pendingSave?.cancel()
         pendingSave = nil
-        let bill = BillSession(draft: draft)
+        let bill = BillSession(draft: draft, date: Date())
         session = bill
         if Self.hasContent(bill) { scheduleSave() }
     }

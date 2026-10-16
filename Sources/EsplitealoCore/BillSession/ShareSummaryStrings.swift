@@ -2,7 +2,7 @@ import Foundation
 
 enum ShareSummaryStrings {
     struct Bundle {
-        let head: (String, String, String, String, String, String, String) -> String
+        let head: (String, String, String, String, String, String) -> String
         let tipPct: (Int) -> String
         let tipFlat: String
         let person: (String, String, String, String, String, String) -> String
@@ -24,12 +24,19 @@ enum ShareSummaryStrings {
         }
     }
 
+    /// "Fonda Doña Lola · 13 oct", either half alone, or "" (no header line) when both are empty.
+    static func headerLine(merchant: String, date: String) -> String {
+        [merchant.trimmingCharacters(in: .whitespacesAndNewlines), date]
+            .filter { !$0.isEmpty }
+            .joined(separator: " · ")
+    }
+
     static func bundle(for language: ShareLanguage) -> Bundle {
         switch language {
         case .es:
             Bundle(
-                head: { merchant, date, bill, tipLabel, tip, confirmed, service in
-                    merchant + " · " + date + "\nCuenta " + bill
+                head: { header, bill, tipLabel, tip, confirmed, service in
+                    (header.isEmpty ? "" : header + "\n") + "Cuenta " + bill
                         + (service.isEmpty ? "" : " (incluye servicio " + service + ")")
                         + " + " + tipLabel + " " + tip + " = " + confirmed + "\n"
                 },
@@ -43,8 +50,8 @@ enum ShareSummaryStrings {
             )
         case .en:
             Bundle(
-                head: { merchant, date, bill, tipLabel, tip, confirmed, service in
-                    merchant + " · " + date + "\nBill " + bill
+                head: { header, bill, tipLabel, tip, confirmed, service in
+                    (header.isEmpty ? "" : header + "\n") + "Bill " + bill
                         + (service.isEmpty ? "" : " (includes service " + service + ")")
                         + " + " + tipLabel + " " + tip + " = " + confirmed + "\n"
                 },

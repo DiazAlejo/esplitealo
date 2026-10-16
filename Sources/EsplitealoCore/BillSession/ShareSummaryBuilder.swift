@@ -22,8 +22,7 @@ public enum ShareSummaryBuilder {
         let service =
             session.serviceChargeCents > 0 ? MoneyFormatting.usd(cents: session.serviceChargeCents) : ""
         var text = strings.head(
-            session.merchantName,
-            date,
+            ShareSummaryStrings.headerLine(merchant: session.merchantName, date: date),
             bill,
             tipLabel,
             MoneyFormatting.usd(cents: tipCents),

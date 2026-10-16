@@ -3654,6 +3654,23 @@
         }
       }
     },
+    "shareSheet.titleNoMerchant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your split"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu espliteo"
+          }
+        }
+      }
+    },
     "sheet.amount" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -92,8 +92,10 @@ struct CaptureView: View {
     }
 }
 
+#if DEBUG
 #Preview("Capture, camera denied") {
     NavigationStack { CaptureView() }
         .environment(ScanFlow.preview(camera: .denied))
         .environment(AppRouter())
 }
+#endif
