@@ -81,7 +81,7 @@ struct ShareSheetContent: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isHeader)
-            AvatarStack(people: model.people)
+            RecipientsStack(people: model.people)
         }
     }
 
@@ -105,7 +105,7 @@ struct ShareSheetContent: View {
 }
 
 /// The people the summary goes to, overlapping, in their colours.
-private struct AvatarStack: View {
+private struct RecipientsStack: View {
     let people: [(name: String, colorIndex: Int)]
 
     var body: some View {
