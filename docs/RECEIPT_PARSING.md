@@ -28,6 +28,15 @@ Parser tests replay committed JSON under `Tests/Fixtures/Receipts/` so CI does n
 8. **Totals and payment blocks**: a `TOTAL $x` header at the top of the receipt is only a hint; the last `Total` row below the items wins (and `totalsDoNotAddUp` fires if it disagrees with subtotal + tax + tip). Everything after the first subtotal/total row — card terminal blocks (`Transaction Record`, `Visa`, `AUTHORIZED`, AID, `MID`, `TSI`, receipt number, dates) — is ignored for items and never produces price-row issues.
 9. **Reconciliation**: never rewrite amounts. `reconciles` is true when net item line totals (including discounts) match the printed subtotal, or—if subtotal is missing—when they match `total − tax − tip`. Mismatches become `ReceiptIssue` entries for the review UI.
 
+## Rules added by the receipt stress test
+
+See [OCR_BENCHMARK.md](OCR_BENCHMARK.md#parser-changes-the-stress-test-drove) for the numbers behind each one.
+
+- **Not prices:** a whole number above the first priced item when the receipt prints cents (street number, zip code, table number); a number glued to letters (`12A`, `B-2`); an item count (`Items: 5`, `Total de artículos: 5`); a `15%` tip-table row; a `Propina sugerida` row under the total.
+- **Quantities:** `N x`, `N ×`, `N @` prefixes; a small number before a name is a quantity but flagged `needsReview`; a unit price next to a line total gives the quantity only when the total divides evenly by the unit price, otherwise the row is flagged; a `(N x $price)` row whose N does not multiply out is corrected by the line total and flagged.
+- **Dropped or misread labels, recovered only when the arithmetic confirms:** a price row with no name becomes an unnamed item flagged `needsReview`; a price equal to the sum of the items is the subtotal; a lone price under the totals equal to subtotal + tax + tip is the total. Recovered subtotal and total are marked `needsAttention`.
+- **Tips:** `Service Charge`, `Cargo por servicio`, `Charge` are tips. `Service Charge` is not read as `change`.
+
 ## Output: `ReceiptDraft`
 
 Structured suggestions: `DraftItem` rows (quantity, line total in cents, flags such as `needsReview` / `priceOnNextRow`), optional subtotal/tax/tip/total, discount adjustments, `numberFormat`, `warnings`, `issues`, and `reconciles`.
