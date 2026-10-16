@@ -4,7 +4,8 @@ import Foundation
 /// Starts the app from a bill instead of the camera, for UI tests (the simulator has no camera). Honoured only with
 /// `--uitesting`:
 ///
-/// - `--fixture=<name>` starts a bill: `parsed` (a scan with a flagged row whose receipt does not add up),
+/// - `--fixture=<name>` starts a bill: `parsed` (a scan with a flagged row whose receipt does not add up), `unsure`
+///   (a scan with two prices the parser could not read, so two warnings and a receipt that does not add up),
 ///   `scanned` (the same receipt fixed, nobody at the table), `table` (the same receipt with four people, nothing marked),
 ///   `quantities` (lines of several units, three people, nothing marked), `midway` (four people, items marked),
 ///   `complete` (all marked, ready to share), `mismatch` (all marked, but the receipt does not add up), `service` (all
@@ -16,6 +17,7 @@ enum UITestFixture {
 
         let session: BillSession? = switch value("--fixture=", in: arguments) {
         case "parsed": ReviewSamples.parsedSession()
+        case "unsure": ReviewSamples.unsureSession()
         case "scanned": SampleBill.scanned()
         case "table": AssignSamples.table()
         case "quantities": AssignSamples.quantities()

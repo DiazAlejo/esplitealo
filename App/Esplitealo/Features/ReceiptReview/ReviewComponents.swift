@@ -268,6 +268,91 @@ struct ReviewFieldRow: View {
     }
 }
 
+/// Something the scan could not read well, in plain words, with a button to say "got it". The icon and the words carry
+/// it; the warn colour only backs them up. Warns about the receipt, never asks the user to fix a field.
+struct ReviewWarningRow: View {
+    let row: ReceiptReviewModel.WarningRow
+    let onDismiss: () -> Void
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .center, spacing: Spacing.sm) {
+                message
+                dismissButton
+            }
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
+                message
+                dismissButton
+            }
+        }
+        .padding(.horizontal, Spacing.md)
+        .padding(.vertical, Spacing.xs)
+        .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+        .background(Color.esp.warnBackground)
+    }
+
+    private var message: some View {
+        HStack(alignment: .firstTextBaseline, spacing: Spacing.xs) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(Color.esp.warn)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
+                sentence
+                    .espText(.body)
+                    .multilineTextAlignment(.leading)
+                if let hint {
+                    Text(hint)
+                        .espText(.footnote)
+                        .foregroundStyle(Color.esp.inkSecondary)
+                        .multilineTextAlignment(.leading)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("review.warning.\(row.id.uuidString)")
+    }
+
+    private var sentence: Text {
+        switch (row.kind, row.rowLabel) {
+        case let (.unreadablePrice(text), label?):
+            Text(.reviewUnsurePriceRow(label, text))
+        case let (.unreadablePrice(text), nil):
+            Text(.reviewUnsurePriceOnly(text))
+        case (.formatGuessed, _):
+            Text("review.unsure.format")
+        }
+    }
+
+    private var hint: LocalizedStringKey? {
+        switch row.kind {
+        case .unreadablePrice: "review.unsure.priceHint"
+        case .formatGuessed: nil
+        }
+    }
+
+    /// What the dismiss button names for VoiceOver: the row, else the text that could not be read.
+    private var subject: String {
+        switch row.kind {
+        case let .unreadablePrice(text): row.rowLabel ?? text
+        case .formatGuessed: String(localized: .reviewUnsureFormatSubject)
+        }
+    }
+
+    private var dismissButton: some View {
+        Button(action: onDismiss) {
+            Text("review.unsure.dismiss")
+                .espText(.subhead)
+                .fontWeight(.semibold)
+                .foregroundStyle(Color.esp.warn)
+                .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(.reviewUnsureDismissLabel(subject)))
+        .accessibilityIdentifier("review.warning.dismiss.\(row.id.uuidString)")
+    }
+}
+
 /// A parser row that is not an item (a discount): the label, the amount, and a way to remove it.
 struct ReviewAdjustmentRow: View {
     let row: ReceiptReviewModel.AdjustmentRow
