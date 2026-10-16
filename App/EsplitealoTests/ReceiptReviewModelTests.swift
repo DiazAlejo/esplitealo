@@ -171,7 +171,11 @@ struct ReceiptReviewModelTests {
         #expect(model.updateItem(id: id, name: "Mofongo", priceText: "23.00", quantity: 1) == nil)
         #expect(store.session?.draft.items[3].name == "Mofongo")
         #expect(store.session?.draft.items[3].lineTotal.minorUnits == 2300)
-        #expect(store.session?.assignments == session.assignments)
+        // Pruning rebuilds each participant list through a Set, so only the membership is stable.
+        func normalized(_ assignments: [ItemAssignment]?) -> [[String]] {
+            (assignments ?? []).map { [$0.itemID.uuidString, String($0.unitIndex)] + $0.participantIDs.map(\.uuidString).sorted() }
+        }
+        #expect(normalized(store.session?.assignments) == normalized(session.assignments))
         #expect(model.items[3].name == "Mofongo")
     }
 
