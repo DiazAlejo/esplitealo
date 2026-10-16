@@ -35,6 +35,13 @@ struct HomeView: View {
                         howItWorksButton
                     }
                 }
+                if let bill = store.billInProgress {
+                    ResumeBillCard(
+                        bill: bill,
+                        onContinue: { router.show(bill.resumePath) },
+                        onDiscard: { confirmsDiscard = true }
+                    )
+                }
                 VStack(spacing: Spacing.sm) {
                     ChavitoView(expression: .neutral, size: 220, disc: true, animated: animatesMascot)
                         .accessibilityLabel("mascot.home")
@@ -46,13 +53,6 @@ struct HomeView: View {
                     Text("home.subtitle")
                         .espText(.body)
                         .foregroundStyle(Color.esp.inkSecondary)
-                }
-                if let bill = store.billInProgress {
-                    ResumeBillCard(
-                        bill: bill,
-                        onContinue: { router.show(bill.resumePath) },
-                        onDiscard: { confirmsDiscard = true }
-                    )
                 }
                 if !pinsActions { actions }
             }

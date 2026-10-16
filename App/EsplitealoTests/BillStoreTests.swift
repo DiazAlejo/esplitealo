@@ -281,9 +281,10 @@ struct BillStoreTests {
         await advance(store, by: .milliseconds(500))
         #expect(recording.stored != nil)
 
+        let before = store.session
         store.billShared()
         #expect(recording.stored == nil)
-        #expect(store.session == SampleBill.complete())
+        #expect(store.session == before)
     }
 
     @Test func aSharedBillIsNoLongerInProgress() {

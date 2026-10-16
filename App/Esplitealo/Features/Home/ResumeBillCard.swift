@@ -22,7 +22,6 @@ struct ResumeBillCard: View {
                     .foregroundStyle(Color.esp.inkSecondary)
                     .accessibilityIdentifier("home.resume.summary")
             }
-            .accessibilityElement(children: .combine)
             Button("resume.continue", action: onContinue)
                 .buttonStyle(.espSecondary)
                 .accessibilityIdentifier("home.resume.continue")

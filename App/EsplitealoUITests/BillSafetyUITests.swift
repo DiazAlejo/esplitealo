@@ -92,7 +92,7 @@ final class BillSafetyUITests: XCTestCase {
         XCTAssertTrue(element(app, "screen.home").waitForExistence(timeout: 15))
         XCTAssertTrue(element(app, "home.resume").waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Continuar con tu cuenta"].exists)
-        let summary = element(app, "home.resume.summary")
+        let summary = element(app, "home.resume.summary").firstMatch
         XCTAssertTrue(summary.exists)
         XCTAssertTrue(summary.label.contains("artículos"), summary.label)
         XCTAssertTrue(summary.label.contains("$"), summary.label)
