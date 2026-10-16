@@ -787,7 +787,7 @@ private func stripLeadingQuantityPrefix(_ label: String, quantity: Int) -> Strin
     let prefix = "\(quantity)"
     if trimmed.hasPrefix(prefix) {
         let remainder = trimmed.dropFirst(prefix.count).trimmingCharacters(in: .whitespaces)
-        if remainder.hasPrefix("@") || remainder.hasPrefix("x") || remainder.hasPrefix("X") {
+        if remainder.hasPrefix("@") || remainder.hasPrefix("x") || remainder.hasPrefix("X") || remainder.hasPrefix("×") {
             return remainder.dropFirst().trimmingCharacters(in: .whitespaces)
         }
     }
@@ -797,7 +797,7 @@ private func stripLeadingQuantityPrefix(_ label: String, quantity: Int) -> Strin
 private func parseQuantityPrefix(_ label: String) -> QuantityPrefix? {
     let trimmed = label.trimmingCharacters(in: .whitespaces)
     let patterns = [
-        #"^(\d+)\s*[xX@]\s*(.+)$"#
+        #"^(\d+)\s*[xX×@]\s*(.+)$"#
     ]
     for pattern in patterns {
         guard let regex = try? NSRegularExpression(pattern: pattern),
