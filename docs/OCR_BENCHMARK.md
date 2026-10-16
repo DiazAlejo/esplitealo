@@ -46,9 +46,9 @@ Generates fake Puerto Rico receipts whose every answer is known, scans them with
 | **Before** (parser as of `f8529cc`) | 16.5% | 23.2% | 1.3% | 98.4% | 21.9% | 79.8% / 71.1% | 74.0% |
 | After the first parser fixes | 72.8% | 79.5% | 4.9% | 82.0% | 100% | 97.5% / 97.9% | 96.8% |
 | After OCR-recovery fixes | 79.9% | 84.8% | 1.8% | 91.1% | 100% | 98.5% / 98.2% | 98.2% |
-| **After** (final, see below) | FINAL_EXACT | FINAL_AMOUNTS | FINAL_SILENT | FINAL_FLAGGED | 100% | FINAL_ITEMS | FINAL_QTY |
+| **After** (final) | **81.2%** | 84.8% | **0.4%** (1 receipt) | 97.6% | 100% | 98.5% / 98.2% | 98.6% |
 
-Reading it honestly: the first jump removed numbers that are not prices (street numbers, zip codes, table numbers, item counts) that used to become phantom items and to hide the real ones; it also briefly raised the silent-wrong rate, because quantities that the old parser dropped entirely were now sometimes recovered wrongly or not at all without a flag. The later fixes bring the silent rate back down by recovering only what the receipt's own arithmetic confirms. What remains is image reading: Vision dropping the left text of a row, reading `@` as `€` or `8`, `(` as `1`, or `Service` as `Sorytee`, mostly on blur, noise and photo images. See the failure table in each run's `summary.md`.
+Reading it honestly: the first jump removed numbers that are not prices (street numbers, zip codes, table numbers, item counts) that used to become phantom items and to hide the real ones; it also raised the silent-wrong rate for a while: receipts that used to fail loudly for other reasons now failed only on a quantity that Vision had garbled, which nothing flagged. The later fixes bring the silent rate back down by recovering a quantity only when the receipt's own arithmetic confirms it, and by flagging the rest. The 42 receipts that are still wrong (18.8%) are all image reading, 41 of them flagged for review and 1 silent; the parser is exact on all 224 when given perfect text. They are: Vision dropping the left text of a row, reading `@` as `€` or `8`, `(` as `1`, or `Service` as `Sorytee`, on every kind of image (5 of the 80 undegraded ones, up to 6 of 16 for noise and low contrast). See the failure table in each run's `summary.md`.
 
 ### Parser changes the stress test drove
 

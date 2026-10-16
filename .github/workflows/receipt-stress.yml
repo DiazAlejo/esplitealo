@@ -16,11 +16,6 @@ on:
         default: "2026"
   schedule:
     - cron: "17 6 * * 1"
-  # DEV-ONLY: remove before merge (touch this file to re-run on the branch, 3).
-  push:
-    branches: [fm/esplitealo-receipt-stress]
-    paths:
-      - .github/workflows/receipt-stress.yml
 
 permissions:
   contents: read
