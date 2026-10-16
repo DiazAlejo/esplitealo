@@ -41,7 +41,9 @@ Holds:
 ### Totals
 
 - Default session tip is 20% pre-tax; tip starts at 0% when `serviceChargeCents` or a receipt tip line is present.
-- `splitResult` and `personBreakdowns` call `BillCalculator`; service shares use the same largest-remainder rule via `SessionPoolAllocator`.
+- `splitResult` and `personBreakdowns` call `BillCalculator`; service charge and printed-tip shares use the same largest-remainder rule via `SessionPoolAllocator`. Their leftover cents are surfaced like every other: `PersonBreakdown.adjustments` holds the calculator's adjustments (item units, tax, tip) followed by one `RoundingAdjustment` of one cent in pool `.serviceCharge` or `.printedTip` for each leftover cent. The amounts are unchanged.
+- A negative custom tip or percentage counts as a tip of zero ([rules](CALCULATION_RULES.md#tip)).
+- Invariants the session keeps and the calculator relies on: participants have unique `orderIndex` values (`addParticipant` uses one past the highest in use), and a unit has one assignment row (`assignUnit` and `clearUnitAssignment` replace it).
 - `confirmedBillTotalCents` is always **derived** from allocated components: items + tax + `serviceChargeCents` + `receiptTipOnBillCents` (from `draft.tip` when there is no service charge) + session tip. Person totals must equal that sum exactly.
 - `printedReceiptTotalCents` is optional (`nil` when the draft has no printed total). A missing total is never treated as zero; `phase` is `.missingPrintedTotal` and sharing is blocked with `shareBlockReason == .missingPrintedTotal`.
 - `canShare` additionally requires reconciliation, full assignment, person totals matching the derived total, and `derivedBillTotalCents == printedReceiptTotal + sessionTipCents` when a printed total exists.
@@ -57,7 +59,7 @@ Holds:
 | `totals` | Assigned; user can review totals but not share yet |
 | `ready` | `canShare` is true |
 
-After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it moves through assignment and `.totals` as usual while `canShare` stays false until the receipt reconciles. `shareBlockReason` exposes why sharing is blocked (`missingPrintedTotal`, `receiptMismatch`, `unassignedItems`, `discountNeedsManualAdjustment`).
+After `acknowledgeMismatch()`, the session is no longer stuck in `.mismatch`; it moves through assignment and `.totals` as usual while `canShare` stays false until the receipt reconciles. `shareBlockReason` exposes why sharing is blocked (`missingPrintedTotal`, `unassignedItems`, `discountNeedsManualAdjustment`, `noItemsToCarryCharges`, `receiptMismatch`, in that order of precedence; `noItemsToCarryCharges` applies only to a receipt that adds up). `noItemsToCarryCharges` is a bill with tax, tip or a service charge and no claimed item that costs anything (all free, or no items): nothing can be allocated, so people would owe less than the bill (`chargesHaveNoItemsToCarry`).
 
 ### Parser adjustments (discounts)
 
