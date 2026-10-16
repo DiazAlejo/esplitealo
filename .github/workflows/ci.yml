@@ -56,28 +56,35 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - name: Select Xcode 26.3
-        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
-
-      # The runner image ships only the newest iOS runtime, so install iOS 18 when it is missing.
-      - name: Pick an iOS 18 simulator
+      - name: Set up the iOS 18 simulator
         id: simulator
-        run: |
-          if ! Scripts/ios-simulator-udid.sh 18 >/dev/null 2>&1; then
-            xcodebuild -downloadPlatform iOS -buildVersion 18.6
-          fi
-          udid="$(Scripts/ios-simulator-udid.sh 18)"
-          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/setup-ios-simulator
 
+      # Scripts/ci-xcodebuild.sh writes an .xcresult and prints the failed tests at the end of the step's log.
       - name: Run package tests on the iOS 18 simulator
         run: |
-          xcodebuild test \
+          Scripts/ci-xcodebuild.sh package-ios test \
             -scheme EsplitealoCore-Package \
             -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO
 
-  # The Esplitéalo app (App/Esplitealo.xcodeproj): build, unit and snapshot tests, UI smoke test.
+      - name: Upload the test result bundle
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-simulator-xcresults
+          path: ${{ runner.temp }}/xcresults
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Clean up build output
+        if: ${{ always() }}
+        run: rm -rf "$RUNNER_TEMP/DerivedData" "$RUNNER_TEMP/xcresults"
+
+  # The Esplitéalo app (App/Esplitealo.xcodeproj): the whole test plan of the Esplitealo scheme on an iOS 18 simulator:
+  # unit tests, snapshot tests (EsplitealoTests) and the UI smoke and flow tests (EsplitealoUITests).
   # Not in branch protection and gated on the required "macOS" job, so it can never make the required check slower or flakier.
   ios-app:
     name: iOS App
@@ -90,55 +97,71 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - name: Select Xcode 26.3
-        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
-
-      - name: Pick an iOS 18 simulator
+      - name: Set up the iOS 18 simulator
         id: simulator
-        run: |
-          if ! Scripts/ios-simulator-udid.sh 18 >/dev/null 2>&1; then
-            xcodebuild -downloadPlatform iOS -buildVersion 18.6
-          fi
-          udid="$(Scripts/ios-simulator-udid.sh 18)"
-          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/setup-ios-simulator
 
+      # Only the downloaded packages are cached, under an exact key (the pinned versions in Package.resolved), so a
+      # cache hit gives the same sources a cold run would fetch. Build output is never cached: every run builds from scratch.
       - name: Cache package checkouts (swift-snapshot-testing)
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .spm
           key: ${{ runner.os }}-app-spm-${{ hashFiles('App/Esplitealo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
-      - name: Build the app for the iOS Simulator (no signing)
+      # Scripts/ci-xcodebuild.sh writes one .xcresult per step and prints the failed tests at the end of the step's log,
+      # so `Scripts/ci-logs.sh` shows why a test failed without a simulator.
+      - name: Build the app and its tests for the iOS Simulator (no signing)
+        id: build
         run: |
-          xcodebuild build \
+          Scripts/ci-xcodebuild.sh app-build build-for-testing \
             -project App/Esplitealo.xcodeproj \
             -scheme Esplitealo \
             -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Unit and snapshot tests
         run: |
-          xcodebuild test \
+          Scripts/ci-xcodebuild.sh app-unit test-without-building \
             -project App/Esplitealo.xcodeproj \
             -scheme Esplitealo \
             -only-testing:EsplitealoTests \
             -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
-            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             CODE_SIGNING_ALLOWED=NO
 
-      # Launching the app in a simulator is the flakiest part of any iOS CI, so a failure here is reported but does
-      # not fail the job. Run it locally before merging changes to navigation.
-      - name: UI smoke tests
-        continue-on-error: true
+      # Runs even when the unit tests failed, so one run reports every failure. Launching the app in a simulator is
+      # the flakiest part of any iOS CI, so a failed UI test is retried once before it fails the job.
+      - name: UI smoke and flow tests
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: |
-          xcodebuild test \
+          Scripts/ci-xcodebuild.sh app-ui test-without-building \
             -project App/Esplitealo.xcodeproj \
             -scheme Esplitealo \
             -only-testing:EsplitealoUITests \
+            -retry-tests-on-failure \
+            -test-iterations 2 \
             -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
-            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             CODE_SIGNING_ALLOWED=NO
+
+      # The bundles hold the failure messages, the UI test screenshots and the snapshot diffs.
+      - name: Upload the test result bundles
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-app-xcresults
+          path: ${{ runner.temp }}/xcresults
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Clean up build output
+        if: ${{ always() }}
+        run: |
+          rm -rf "$RUNNER_TEMP/DerivedData" "$RUNNER_TEMP/xcresults"
+          xcrun simctl shutdown all || true
 
   linux-core:
     name: Linux Core build

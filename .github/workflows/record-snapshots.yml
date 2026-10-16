@@ -1,0 +1,205 @@
+name: Record snapshots
+
+# Snapshot references must be recorded on CI's own runner and simulator, never on a Mac: they only match CI's
+# rendering when they come from it. Run this when a snapshot test is new or a visual change is intended:
+#
+#   gh workflow run record-snapshots.yml -R DiazAlejo/esplitealo --ref main -f branch=<your-branch> [-f commit=true]
+#
+# See docs/CI.md ("Record snapshots").
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to record on. It is checked out and, with "commit", pushed to.
+        required: true
+        type: string
+      mode:
+        description: >-
+          missing: record only references that do not exist yet. failed: re-record the ones that differ.
+          all: re-record every reference.
+        required: true
+        type: choice
+        options: [missing, failed, all]
+        default: missing
+      commit:
+        description: Push the recorded references to the branch as a commit (otherwise they are only uploaded as an artifact).
+        required: true
+        type: boolean
+        default: false
+
+# No secrets, no pull_request_target. The job that builds and runs the branch's code can only read the repository;
+# only the small "commit" job below can write, and it runs nothing from the branch.
+permissions:
+  contents: read
+
+concurrency:
+  group: record-snapshots-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: Record on the CI simulator
+    runs-on: macos-26
+    timeout-minutes: 40
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+      sha: ${{ steps.changes.outputs.sha }}
+    env:
+      SOURCE_PACKAGES: ${{ github.workspace }}/.spm
+      BRANCH: ${{ inputs.branch }}
+      MODE: ${{ inputs.mode }}
+    steps:
+      - name: Check the branch name
+        run: |
+          case "$BRANCH" in
+            ''|-*|*[!A-Za-z0-9._/-]*|*..*) echo "::error::Not a usable branch name: $BRANCH"; exit 1 ;;
+          esac
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.branch }}
+          persist-credentials: false
+
+      # The same action CI uses: same Xcode, same iOS 18 runtime, same iPhone model.
+      - name: Set up the iOS 18 simulator
+        id: simulator
+        uses: ./.github/actions/setup-ios-simulator
+
+      - name: Cache package checkouts (swift-snapshot-testing)
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: .spm
+          key: ${{ runner.os }}-app-spm-${{ hashFiles('App/Esplitealo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      - name: Build the app tests
+        run: |
+          Scripts/ci-xcodebuild.sh record-build build-for-testing \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" \
+            CODE_SIGNING_ALLOWED=NO
+
+      # swift-snapshot-testing reads SNAPSHOT_TESTING_RECORD; TEST_RUNNER_ hands it to the test process.
+      # A test that records a reference reports a failure by design, so this step does not decide the outcome:
+      # the verification step below does.
+      - name: Record snapshots (${{ inputs.mode }})
+        run: |
+          TEST_RUNNER_SNAPSHOT_TESTING_RECORD="$MODE" Scripts/ci-xcodebuild.sh record test-without-building \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            -only-testing:EsplitealoTests \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            || echo "Recording reports failures by design; the next step checks the recorded references."
+
+      # Compare mode, no recording: proves the references just written are what this simulator renders.
+      - name: Verify the recorded references
+        run: |
+          Scripts/ci-xcodebuild.sh verify test-without-building \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            -only-testing:EsplitealoTests \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: List what changed
+        id: changes
+        run: |
+          changed="$(git status --porcelain -- App/SnapshotReferences)"
+          {
+            echo "### Snapshot references (${MODE})"
+            echo
+            if [ -z "$changed" ]; then
+              echo "Nothing changed: every reference already matches this simulator."
+            else
+              echo '```text'
+              echo "$changed"
+              echo '```'
+              echo
+              echo "Download the \`snapshot-references\` artifact and unzip it over \`App/SnapshotReferences\`, or re-run with \`commit=true\`."
+            fi
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "changed=$([ -n "$changed" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the references
+        if: ${{ steps.changes.outputs.changed == 'true' && success() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: snapshot-references
+          path: App/SnapshotReferences
+          retention-days: 14
+
+      - name: Upload the test result bundles
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: record-xcresults
+          path: ${{ runner.temp }}/xcresults
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Clean up build output
+        if: ${{ always() }}
+        run: |
+          rm -rf "$RUNNER_TEMP/DerivedData" "$RUNNER_TEMP/xcresults"
+          xcrun simctl shutdown all || true
+
+  # The only job with write access. It runs no code from the branch: it unpacks the verified PNGs and pushes a commit.
+  # Pushes made with the built-in token do not start other workflows, so CI does not run on this commit by itself
+  # (see docs/CI.md for how to start it).
+  commit:
+    name: Commit the references
+    needs: record
+    if: ${{ inputs.commit && needs.record.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      BRANCH: ${{ inputs.branch }}
+      RECORDED_SHA: ${{ needs.record.outputs.sha }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      - name: Check the branch name
+        run: |
+          case "$BRANCH" in
+            ''|-*|*[!A-Za-z0-9._/-]*|*..*) echo "::error::Not a usable branch name: $BRANCH"; exit 1 ;;
+          esac
+          if [ "$BRANCH" = "$DEFAULT_BRANCH" ]; then
+            echo "::error::Refusing to push to the default branch ($DEFAULT_BRANCH). Record on a feature branch."
+            exit 1
+          fi
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Check the branch did not move
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$RECORDED_SHA" ]; then
+            echo "::error::$BRANCH moved while recording (was $RECORDED_SHA, now $(git rev-parse HEAD)). Run this workflow again."
+            exit 1
+          fi
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: snapshot-references
+          path: App/SnapshotReferences
+
+      - name: Commit and push
+        run: |
+          git config user.name DiazAlejo
+          git config user.email 170361437+DiazAlejo@users.noreply.github.com
+          git add App/SnapshotReferences
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git diff --cached --stat
+          git commit -m "test: record snapshot references on CI (${{ inputs.mode }})"
+          git push origin "HEAD:refs/heads/$BRANCH"
