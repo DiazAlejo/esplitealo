@@ -56,7 +56,25 @@ public enum BillExactness {
             } else {
                 causes.append(.itemExtra)
             }
-            details.append("items: missing \(format(missing)), extra \(format(extra))")
+            var remainingExtra = extra
+            var extraNames: [String] = []
+            for item in draft.items {
+                if let index = remainingExtra.firstIndex(of: item.lineTotal.minorUnits) {
+                    remainingExtra.remove(at: index)
+                    extraNames.append("\"\(item.name)\"")
+                }
+            }
+            var remainingMissing = missing
+            var missingNames: [String] = []
+            for item in truth.items {
+                if let index = remainingMissing.firstIndex(of: item.lineTotalMinor) {
+                    remainingMissing.remove(at: index)
+                    missingNames.append("\"\(item.name)\"")
+                }
+            }
+            details.append(
+                "items: missing \(format(missing)) \(missingNames.joined(separator: ", ")), extra \(format(extra)) \(extraNames.joined(separator: ", "))"
+            )
         }
 
         var quantitiesExact = true
