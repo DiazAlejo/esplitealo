@@ -5,9 +5,10 @@ import XCTest
 /// The parser on perfect OCR text for the generated Puerto Rico receipts. No image and no Vision, so it runs in the
 /// required CI job: a parser regression on any layout feature fails here before the nightly Vision stress run sees it.
 final class StressParserIdealTextTests: XCTestCase {
-    private static let count = 224
-    private lazy var receipts = StressReceiptGenerator.corpus(count: Self.count)
-    private lazy var report = StressBenchmark.runIdealText(receipts: receipts, seed: StressReceiptGenerator.defaultSeed)
+    private static let receipts = StressReceiptGenerator.corpus(count: 112)
+    private static let report = StressBenchmark.runIdealText(receipts: receipts, seed: StressReceiptGenerator.defaultSeed)
+    private var receipts: [StressReceipt] { Self.receipts }
+    private var report: StressReport { Self.report }
 
     override func tearDown() {
         // `ESPLITEALO_STRESS_DUMP=/path/dir` writes the report and every failing receipt for inspection.

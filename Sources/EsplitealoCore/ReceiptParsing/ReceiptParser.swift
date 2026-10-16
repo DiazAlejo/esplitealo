@@ -197,6 +197,7 @@ public struct ReceiptParser: Sendable {
         }
 
         var pendingName: (String, PixelRect?)?
+        var pendingNameIndex = -1
         var i = 0
         while i < classified.count {
             let entry = classified[i]
@@ -248,8 +249,20 @@ public struct ReceiptParser: Sendable {
             case .item:
                 guard !isPastTotalsSection(i) else { break }
                 var qty = line.leadingQty ?? 1
-                var name = line.label
-                if let q = parseQuantityPrefix(line.label) {
+                var label = line.label
+                var itemFlags: Set<ItemFlag> = []
+                // `3 x Pastelillo de` / `carne 21.15`: a name that wraps with the price on its last row. Only a row
+                // that starts with a quantity prefix is joined, so header text above the first item stays out.
+                if let pending = pendingName, pendingNameIndex == i - 1, line.leadingQty == nil,
+                   parseQuantityPrefix(line.label) == nil, let pendingQty = classified[i - 1].line.leadingQty,
+                   isRowAdjacent(classified, at: i, after: i - 1) {
+                    qty = pendingQty
+                    label = pending.0 + " " + line.label
+                    itemFlags.insert(.needsReview)
+                    pendingName = nil
+                }
+                var name = label
+                if let q = parseQuantityPrefix(label) {
                     qty = q.quantity
                     name = q.name
                 } else if let leadingQty = line.leadingQty {
@@ -257,7 +270,6 @@ public struct ReceiptParser: Sendable {
                 }
                 // `4 Double Burger 25.00`: a small number before the name is read as the quantity, but it could be
                 // part of the name (`7 Up`), so the row is left for review.
-                var itemFlags: Set<ItemFlag> = []
                 if qty == 1, let leading = parseLeadingNumberQuantity(name) {
                     qty = leading.quantity
                     name = leading.name
@@ -320,6 +332,7 @@ public struct ReceiptParser: Sendable {
                     }
                 } else if hasLetters(line.label) {
                     pendingName = (line.label, rect)
+                    pendingNameIndex = i
                 }
 
             case .amountOnly:
@@ -664,6 +677,8 @@ private func isRowAdjacent(_ lines: [ParsedLine], at index: Int, after previous:
 private func isNameContinuation(_ lines: [ParsedLine], at index: Int, after previous: Int) -> Bool {
     let entry = lines[index]
     guard entry.kind == .nameOnly, hasLetters(entry.line.label) else { return false }
+    // A row that starts with a quantity (`3 x Pastelillo de`) begins a new item, it does not modify the one above.
+    if entry.line.leadingQty != nil { return false }
     let label = entry.line.label.trimmingCharacters(in: .whitespaces)
     if label.hasPrefix("+") || label.hasPrefix("-") { return false }
     if index + 1 < lines.count, lines[index + 1].kind == .amountOnly { return false }
@@ -745,10 +760,15 @@ private func matches(_ keywords: [String], _ text: String) -> Bool {
         let tokens = lower.split { !$0.isLetter && !$0.isNumber }.map(String.init)
         for token in tokens {
             if token == kw { return true }
-            if token.count >= 5, kw.count >= 5, editDistance(token, kw) <= 1 { return true }
+            if token.count >= 5, kw.count >= 5, editDistance(token, kw) <= 1, !isKnownLookAlike(token, kw) { return true }
         }
     }
     return false
+}
+
+/// Words one letter apart that mean different things: `Service Charge` is a tip, not `change` given back.
+private func isKnownLookAlike(_ token: String, _ keyword: String) -> Bool {
+    token == "charge" && keyword == "change"
 }
 
 private func matchesTipTable(_ text: String) -> Bool {

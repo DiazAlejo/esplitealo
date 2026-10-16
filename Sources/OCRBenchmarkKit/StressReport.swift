@@ -108,10 +108,14 @@ public enum StressBenchmark {
         scanError: String? = nil,
         parser: ReceiptParser = ReceiptParser()
     ) -> (result: StressCaseResult, draft: ReceiptDraft?) {
-        let ideal = parser.parse(StressRecognizedTextBuilder.build(from: receipt))
-        let idealExact = BillExactness.compare(draft: ideal, truth: receipt.truth).exact
+        // Perfect text is parsed once: when that is what was scanned, its answer is also the ideal answer.
+        func parsesExactlyOnPerfectText() -> Bool {
+            let ideal = parser.parse(StressRecognizedTextBuilder.build(from: receipt))
+            return BillExactness.compare(draft: ideal, truth: receipt.truth).exact
+        }
 
         guard let recognized else {
+            let idealExact = parsesExactlyOnPerfectText()
             let result = StressCaseResult(
                 id: receipt.id,
                 venue: receipt.venue.rawValue,
@@ -143,6 +147,7 @@ public enum StressBenchmark {
         let comparison = BillExactness.compare(draft: draft, truth: receipt.truth)
         let flagged = BillExactness.isFlagged(draft)
         let score = ReceiptBenchmarkScorer().score(draft: draft, groundTruth: receipt.groundTruth)
+        let idealExact = recognized.engine == "stress-ideal" ? comparison.exact : parsesExactlyOnPerfectText()
         let attribution: StressAttribution = comparison.exact ? .exact : (idealExact ? .ocr : .parser)
         let result = StressCaseResult(
             id: receipt.id,
