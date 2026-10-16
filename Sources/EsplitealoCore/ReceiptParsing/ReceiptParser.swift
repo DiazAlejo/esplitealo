@@ -25,14 +25,18 @@ public struct ReceiptParser: Sendable {
     func parseRows(_ rows: [ReceiptRow]) -> ReceiptDraft {
         var classified: [ParsedLine] = []
         var rowIndexByEntry: [Int] = []
+        let headerNumberRows = headerNumberRowIndexes(rows)
+        func classify(_ line: LineFields, at index: Int) -> RowKind {
+            headerNumberRows.contains(index) ? .other : EsplitealoCore.classify(line)
+        }
         var index = 0
         while index < rows.count {
             let line = splitLine(rows[index])
-            var kind = classify(line)
+            var kind = classify(line, at: index)
 
             if kind == .nameOnly, index + 1 < rows.count {
                 let next = splitLine(rows[index + 1])
-                if classify(next) == .amountOnly {
+                if classify(next, at: index + 1) == .amountOnly {
                     classified.append(ParsedLine(line: line, kind: .nameOnly, row: rows[index]))
                     rowIndexByEntry.append(index)
                     classified.append(ParsedLine(line: next, kind: .amountOnly, row: rows[index + 1]))
@@ -44,7 +48,7 @@ public struct ReceiptParser: Sendable {
 
             if kind == .amountOnly, index + 1 < rows.count {
                 let next = splitLine(rows[index + 1])
-                if classify(next) == .nameOnly {
+                if classify(next, at: index + 1) == .nameOnly {
                     classified.append(ParsedLine(line: line, kind: .amountOnly, row: rows[index]))
                     rowIndexByEntry.append(index)
                     classified.append(ParsedLine(line: next, kind: .nameOnly, row: rows[index + 1]))
@@ -56,11 +60,11 @@ public struct ReceiptParser: Sendable {
 
             if isKeywordWithoutAmount(kind), index + 1 < rows.count {
                 let next = splitLine(rows[index + 1])
-                if classify(next) == .amountOnly, next.label.trimmingCharacters(in: .whitespaces).isEmpty {
+                if classify(next, at: index + 1) == .amountOnly, next.label.trimmingCharacters(in: .whitespaces).isEmpty {
                     var merged = line
                     merged.amounts = next.amounts
                     merged.row = line.row ?? next.row
-                    kind = classify(merged)
+                    kind = classify(merged, at: index)
                     classified.append(ParsedLine(line: merged, kind: kind, row: rows[index]))
                     rowIndexByEntry.append(index)
                     index += 2
@@ -225,6 +229,8 @@ public struct ReceiptParser: Sendable {
                 }
 
             case .tip:
+                // `Propina sugerida 18%: $2.61` under the total offers a tip to add; it is not part of the bill.
+                if totalSeenAfterItems, line.label.lowercased().contains("sugerid") { break }
                 if let a = amount(from: line.amounts, rect: rect, label: line.label) { tip = a }
 
             case .total:
@@ -249,8 +255,16 @@ public struct ReceiptParser: Sendable {
                 } else if let leadingQty = line.leadingQty {
                     name = stripLeadingQuantityPrefix(name, quantity: leadingQty)
                 }
+                // `4 Double Burger 25.00`: a small number before the name is read as the quantity, but it could be
+                // part of the name (`7 Up`), so the row is left for review.
+                var itemFlags: Set<ItemFlag> = []
+                if qty == 1, let leading = parseLeadingNumberQuantity(name) {
+                    qty = leading.quantity
+                    name = leading.name
+                    itemFlags.insert(.needsReview)
+                }
                 let countBefore = items.count
-                addItem(name: name, qty: qty, tokens: line.amounts, rect: rect, entryIndex: i)
+                addItem(name: name, qty: qty, tokens: line.amounts, rect: rect, flags: itemFlags, entryIndex: i)
                 guard items.count > countBefore else { break }
 
                 // A name that wraps over several rows stays one item: modifier rows ("Negro") and an
@@ -543,6 +557,7 @@ private func classify(_ line: LineFields) -> RowKind {
     let lower = canonicalKeywords(line.label)
     let tokens = lower.split(separator: " ")
     if line.amounts.isEmpty, isColumnHeader(tokens) { return .other }
+    if isItemCountLine(line, tokens) { return .other }
     if tokens.contains(where: { $0.hasPrefix("(qty") }) || tokens.first == "qty" { return .other }
     if lower.contains("change due") { return .payment }
     if tokens.contains("no:") && !line.amounts.isEmpty { return .payment }
@@ -561,6 +576,48 @@ private func classify(_ line: LineFields) -> RowKind {
     case (true, true): return .nameOnly
     default: return .other
     }
+}
+
+private let itemCountWords: Set<String> = [
+    "item", "items", "artículo", "artículos", "articulo", "articulos", "producto", "productos", "product", "products",
+    "article", "articles"
+]
+
+/// `Items: 5`, `Total de artículos: 5`: how many things were bought, not a price.
+private func isItemCountLine(_ line: LineFields, _ tokens: [Substring]) -> Bool {
+    guard line.amounts.count == 1, line.amounts[0].shape == .integer, line.leadingQty == nil else { return false }
+    let words = tokens.map { $0.trimmingCharacters(in: CharacterSet.letters.inverted) }.filter { !$0.isEmpty }
+    guard words.contains(where: itemCountWords.contains) else { return false }
+    return words.allSatisfy { itemCountWords.contains($0) || ["total", "de", "count", "cantidad", "number", "of", "num"].contains($0) }
+}
+
+/// Rows above the first priced item whose only "price" is a whole number (`Calle Luna 123`, `Tab #41 Bar 4`,
+/// `Ponce, PR 00717`) when the receipt prints its prices with cents. They are header text, not items. A receipt
+/// with no cents anywhere (`Café 3`) keeps whole numbers as prices.
+private func headerNumberRowIndexes(_ rows: [ReceiptRow]) -> Set<Int> {
+    let lines = rows.map(splitLine)
+    func hasCents(_ line: LineFields) -> Bool {
+        guard let last = line.amounts.last else { return false }
+        return last.shape == .decimalDot || last.shape == .decimalComma
+    }
+    guard lines.contains(where: hasCents),
+          let firstPriced = lines.indices.first(where: { classify(lines[$0]) == .item && hasCents(lines[$0]) })
+    else { return [] }
+    return Set((0..<firstPriced).filter { index in
+        let line = lines[index]
+        return classify(line) == .item && line.amounts.count == 1 && line.amounts[0].shape == .integer
+    })
+}
+
+private func parseLeadingNumberQuantity(_ label: String) -> QuantityPrefix? {
+    let trimmed = label.trimmingCharacters(in: .whitespaces)
+    guard let regex = try? NSRegularExpression(pattern: #"^(\d{1,2})\s+(\p{L}.*)$"#),
+          let match = regex.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
+          let qRange = Range(match.range(at: 1), in: trimmed),
+          let nameRange = Range(match.range(at: 2), in: trimmed),
+          let quantity = Int(trimmed[qRange]), quantity >= 2
+    else { return nil }
+    return QuantityPrefix(quantity: quantity, name: String(trimmed[nameRange]))
 }
 
 private let columnHeaderWords: Set<String> = [

@@ -112,4 +112,39 @@ final class ReceiptParserHeaderNoiseTests: XCTestCase {
         XCTAssertEqual(draft.items.map(\.quantity), [1])
         XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [325])
     }
+
+    func testServiceChargeIsATipNotAPaymentLine() {
+        let draft = parse([
+            "Rum & Coke 10.00",
+            "Sub Total 10.00",
+            "Service Charge 18% 1.80",
+            "State Tax (10.5%) 1.05",
+            "Municipal Tax (1%) 0.10",
+            "Total Due 12.95"
+        ])
+        XCTAssertEqual(draft.tip?.minorUnits, 180)
+        XCTAssertEqual(draft.tax?.minorUnits, 115)
+        XCTAssertTrue(draft.reconciles)
+    }
+
+    func testQuantityPrefixOnAWrappedNameWithThePriceOnTheLastRow() {
+        let draft = parse([
+            "Papas fritas 10.15",
+            "3 x Pastelillo de",
+            "carne 21.15",
+            "Hamburguesa doble 10.35",
+            "Subtotal 41.65",
+            "Total 41.65"
+        ])
+        XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [1015, 2115, 1035])
+        XCTAssertEqual(draft.items.map(\.quantity), [1, 3, 1])
+        XCTAssertEqual(draft.items[1].name, "Pastelillo de carne")
+        XCTAssertTrue(draft.items[1].flags.contains(.needsReview))
+        XCTAssertTrue(draft.reconciles)
+    }
+
+    func testHeaderTextAboveTheFirstItemIsNotMergedIntoIt() {
+        let draft = parse(["Mesero: María", "Dec 21, 2026 08:15AM", "Papas fritas 10.15", "Total 10.15"])
+        XCTAssertEqual(draft.items.map(\.name), ["Papas fritas"])
+    }
 }
