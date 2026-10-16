@@ -43,7 +43,8 @@ Si cambiamos esta política, publicaremos la versión nueva en esta misma págin
 
 ### Contacto
 
-Si tienes preguntas sobre esta política, reporta un problema en GitHub: <https://github.com/DiazAlejo/esplitealo/issues>.
+<!-- TODO(before App Store submission): replace the contact placeholder with the real contact (owner to provide) -->
+Si tienes preguntas sobre esta política, escríbenos a: [correo de contacto, por definir antes del lanzamiento]
 
 ---
 
@@ -84,4 +85,5 @@ If we change this policy, we will post the new version on this same page and upd
 
 ### Contact
 
-If you have questions about this policy, open an issue at <https://github.com/DiazAlejo/esplitealo/issues>.
+<!-- TODO(before App Store submission): replace the contact placeholder with the real contact (owner to provide) -->
+If you have questions about this policy, write to us at: [contact email, to be defined before launch]

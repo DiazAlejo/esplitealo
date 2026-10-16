@@ -11,6 +11,11 @@ What to answer in App Store Connect › App Privacy, and why. The policy text is
 | Privacy Policy URL | Required for every app (Guideline 5.1.1(i)). Use the published URL of the policy; see below |
 | Age rating | Answer Apple's questionnaire separately; expect 4+ |
 
+## Before App Store submission
+
+- [ ] Replace the contact placeholder at the end of both sections of [PRIVACY_POLICY.md](PRIVACY_POLICY.md) with the real contact (owner to provide).
+- [ ] Publish the policy and enter its URL in App Store Connect (see below).
+
 ## Why "Data Not Collected"
 
 Apple counts data as collected only when it leaves the device and is kept longer than needed to serve the request. Nothing leaves the device:
