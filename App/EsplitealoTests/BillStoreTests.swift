@@ -198,6 +198,34 @@ struct BillStoreTests {
         #expect(recording.saveCount == 0)
     }
 
+    // MARK: Warnings from the scan
+
+    @Test func warningsFromTheScanAreSavedAndComeBackOnResume() async {
+        let store = makeStore()
+        store.startNewBill(draft: ReviewSamples.unsureSession().draft)
+        #expect(store.session?.draft.warnings.count == 2, "starting a bill from a scan keeps what the scan was unsure about")
+        await advance(store, by: .milliseconds(500))
+        #expect(drafts.stored?.draft.warnings == store.session?.draft.warnings)
+
+        let resumed = makeStore(drafts: drafts)
+        resumed.loadSavedDraft()
+        resumed.resumeSavedDraft()
+        #expect(resumed.session?.draft.warnings == store.session?.draft.warnings)
+    }
+
+    @Test func aWarningDismissedBeforeTheAppWasClosedStaysDismissed() async {
+        let store = makeStore()
+        store.startNewBill(draft: ReviewSamples.unsureSession().draft)
+        let id = store.session!.draft.warnings[0].id
+        store.update { $0.applyDraft(ReceiptDraftEditing.dismissWarning(in: $0.draft, id: id)) }
+        await advance(store, by: .milliseconds(500))
+
+        let resumed = makeStore(drafts: drafts)
+        resumed.loadSavedDraft()
+        resumed.resumeSavedDraft()
+        #expect(resumed.session?.draft.activeWarnings.map(\.id) == [store.session!.draft.warnings[1].id])
+    }
+
     // MARK: Draft location
 
     @Test func theLiveStoreKeepsTheDraftInApplicationSupportAndOutOfBackups() throws {
