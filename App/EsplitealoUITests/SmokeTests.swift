@@ -49,6 +49,11 @@ final class SmokeTests: XCTestCase {
                 name.typeText("Ana")
                 app.buttons["people.add"].tap()
             }
+            if screen == "mark" {
+                // Review split with nothing marked explains instead of moving on; splitting the rest evenly fixes it.
+                app.buttons["screen.next"].tap()
+                app.buttons["assign.restEven"].tap()
+            }
             if screen != "totals" { app.buttons["screen.next"].tap() }
         }
         XCTAssertFalse(app.buttons["screen.next"].exists)

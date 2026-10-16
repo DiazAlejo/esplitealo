@@ -4,7 +4,7 @@ import XCTest
 /// at the table (`--fixture=table`: the Fonda Doña Lola receipt, four people, nothing marked; `midway`: six of eight
 /// marked; `quantities`: a ×3 line and a ×2 line, three people), honoured only with `--uitesting`.
 final class AssignFlowUITests: XCTestCase {
-    private let flan = "assign.item.10000000-0000-0000-0000-000000000008"
+    private let jugo = "assign.item.10000000-0000-0000-0000-000000000001"
     private let surtido = "assign.item.10000000-0000-0000-0000-000000000003"
     private let medalla = "assign.item.20000000-0000-0000-0000-000000000001"
 
@@ -44,7 +44,7 @@ final class AssignFlowUITests: XCTestCase {
         let app = launch()
         XCTAssertTrue(element(app, "screen.mark").waitForExistence(timeout: 15))
         waitForLabel(element(app, "assign.progress"), containing: "0 de 8")
-        XCTAssertTrue(app.buttons[flan].label.contains("sin marcar"), app.buttons[flan].label)
+        XCTAssertTrue(app.buttons[jugo].label.contains("sin marcar"), app.buttons[jugo].label)
         XCTAssertEqual(app.buttons["screen.next"].label, "Chequear el espliteo · faltan 8")
         XCTAssertTrue(element(app, "assign.chip.0").label.contains("Marisol"))
     }
@@ -59,7 +59,7 @@ final class AssignFlowUITests: XCTestCase {
         app.buttons["assign.sheet.person.0"].tap()
         app.buttons["assign.sheet.person.1"].tap()
         app.buttons["assign.sheet.person.2"].tap()
-        XCTAssertTrue(element(app, "assign.sheet.note").label.contains("Dividido en 3 partes iguales"), element(app, "assign.sheet.note").label)
+        XCTAssertTrue(element(app, "assign.sheet.note").label.contains("Dividido en 3."), element(app, "assign.sheet.note").label)
         XCTAssertTrue(element(app, "assign.sheet.note").label.contains("2¢"), element(app, "assign.sheet.note").label)
         app.buttons["assign.sheet.done"].tap()
 
@@ -74,14 +74,14 @@ final class AssignFlowUITests: XCTestCase {
     @MainActor
     func testTakingSomeoneOffInTheSheetPutsTheItemBackInTheUnassignedBlock() {
         let app = launch()
-        XCTAssertTrue(app.buttons[flan].waitForExistence(timeout: 15))
-        app.buttons[flan].tap()
+        XCTAssertTrue(app.buttons[jugo].waitForExistence(timeout: 15))
+        app.buttons[jugo].tap()
         app.buttons["assign.sheet.person.3"].tap()
         XCTAssertTrue(app.buttons["assign.sheet.person.3"].isSelected)
         app.buttons["assign.sheet.person.3"].tap()
         XCTAssertFalse(app.buttons["assign.sheet.person.3"].isSelected)
         app.buttons["assign.sheet.done"].tap()
-        XCTAssertTrue(app.buttons[flan].label.contains("sin marcar"), app.buttons[flan].label)
+        XCTAssertTrue(app.buttons[jugo].label.contains("sin marcar"), app.buttons[jugo].label)
     }
 
     // MARK: Review split with items left
@@ -117,11 +117,11 @@ final class AssignFlowUITests: XCTestCase {
         XCTAssertTrue(element(app, "assign.paintbar").waitForExistence(timeout: 5))
         XCTAssertTrue(element(app, "assign.paintbar").label.contains("Héctor"), element(app, "assign.paintbar").label)
 
-        app.buttons[flan].tap()
+        app.buttons[jugo].tap()
         app.buttons[surtido].tap()
         XCTAssertFalse(element(app, "assign.sheet").exists, "painting does not open the sheet")
-        XCTAssertTrue(app.buttons[flan].label.contains("marcado para Héctor"), app.buttons[flan].label)
-        waitForLabel(element(app, "assign.chip.1"), containing: "23 dólares")
+        XCTAssertTrue(app.buttons[jugo].label.contains("marcado para Héctor"), app.buttons[jugo].label)
+        waitForLabel(element(app, "assign.chip.1"), containing: "18 dólares")
 
         app.buttons["assign.paintbar.done"].tap()
         XCTAssertFalse(element(app, "assign.paintbar").waitForExistence(timeout: 1))
@@ -133,7 +133,7 @@ final class AssignFlowUITests: XCTestCase {
     func testAQuantityLineIsMarkedUnitByUnit() {
         let app = launch(fixture: "quantities")
         XCTAssertTrue(app.buttons[medalla].waitForExistence(timeout: 15))
-        XCTAssertTrue(app.buttons[medalla].label.contains("3 ×"), app.buttons[medalla].label)
+        XCTAssertTrue(app.buttons[medalla].label.contains("3 unidades"), app.buttons[medalla].label)
         app.buttons[medalla].tap()
 
         XCTAssertTrue(element(app, "assign.sheet").waitForExistence(timeout: 5))

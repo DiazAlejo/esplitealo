@@ -5,7 +5,8 @@ import Foundation
 /// `--uitesting`:
 ///
 /// - `--fixture=<name>` starts a bill: `parsed` (a scan with a flagged row whose receipt does not add up),
-///   `scanned` (the same receipt fixed, nobody at the table), `midway` (four people, items marked), `empty`.
+///   `scanned` (the same receipt fixed, nobody at the table), `table` (the same receipt with four people, nothing marked),
+///   `quantities` (lines of several units, three people, nothing marked), `midway` (four people, items marked), `empty`.
 /// - `--start-at=<screen>` opens that screen (`review`, `people`, `mark`, `totals`) with the earlier ones behind it.
 enum UITestFixture {
     static func apply(arguments: [String], store: BillStore, router: AppRouter) {
@@ -14,6 +15,8 @@ enum UITestFixture {
         let session: BillSession? = switch value("--fixture=", in: arguments) {
         case "parsed": ReviewSamples.parsedSession()
         case "scanned": SampleBill.scanned()
+        case "table": AssignSamples.table()
+        case "quantities": AssignSamples.quantities()
         case "midway": SampleBill.midway()
         case "empty": BillSession(draft: ReceiptDraft())
         default: nil
