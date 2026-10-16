@@ -193,5 +193,114 @@ class WorkedExampleTests(unittest.TestCase):
         self.assertEqual([p["receiptTipShareCents"] for p in result["people"]], [0, 0])
 
 
+class SurfacedPoolRoundingTests(unittest.TestCase):
+    """Invariant 5: every leftover cent of every pool is an adjustment, service charge and printed tip included."""
+
+    def three_equal_diners(self, **overrides):
+        return bill(
+            participants=[{"orderIndex": 0}, {"orderIndex": 1}, {"orderIndex": 2}],
+            items=[{"quantity": 1, "lineTotalCents": 1000}] * 3,
+            assignments=[claim(0, 0, 0), claim(1, 0, 1), claim(2, 0, 2)],
+            **overrides,
+        )
+
+    def test_service_charge_leftover_cents_are_adjustments(self):
+        # 100 cents over three equal subtotals: 34, 33, 33, the extra cent to the earliest person.
+        result = calculate(self.three_equal_diners(serviceChargeCents=100))
+        self.assertEqual([p["serviceShareCents"] for p in result["people"]], [34, 33, 33])
+        self.assertEqual([p["serviceAdjustments"] for p in result["people"]], [1, 0, 0])
+        self.assertEqual([p["printedTipAdjustments"] for p in result["people"]], [0, 0, 0])
+
+    def test_printed_tip_leftover_cents_are_adjustments(self):
+        result = calculate(self.three_equal_diners(printedTipCents=200))
+        self.assertEqual([p["receiptTipShareCents"] for p in result["people"]], [67, 67, 66])
+        self.assertEqual([p["printedTipAdjustments"] for p in result["people"]], [1, 1, 0])
+        self.assertEqual([p["serviceAdjustments"] for p in result["people"]], [0, 0, 0])
+
+    def test_printed_tip_under_a_service_charge_is_not_allocated_so_it_has_no_adjustments(self):
+        result = calculate(self.three_equal_diners(serviceChargeCents=100, printedTipCents=200))
+        self.assertEqual([p["printedTipAdjustments"] for p in result["people"]], [0, 0, 0])
+
+    def test_pools_that_divide_exactly_have_no_adjustments(self):
+        result = calculate(self.three_equal_diners(serviceChargeCents=300, printedTipCents=None))
+        self.assertEqual([p["serviceAdjustments"] for p in result["people"]], [0, 0, 0])
+
+    def test_a_person_without_items_gets_no_service_adjustment(self):
+        b = bill(
+            participants=[{"orderIndex": 0}, {"orderIndex": 1}, {"orderIndex": 2}],
+            items=[{"quantity": 1, "lineTotalCents": 1000}],
+            assignments=[claim(0, 0, 0, 1)],
+            serviceChargeCents=101,
+        )
+        result = calculate(b)
+        self.assertEqual([p["serviceShareCents"] for p in result["people"]], [51, 50, 0])
+        self.assertEqual([p["serviceAdjustments"] for p in result["people"]], [1, 0, 0])
+
+
+class NobodyCarriesChargesTests(unittest.TestCase):
+    """A bill whose people all owe nothing for items but that has tax, tip or a service charge stays blocked."""
+
+    def free_items(self, **overrides):
+        return bill(
+            items=[{"quantity": 2, "lineTotalCents": 0}],
+            assignments=[claim(0, 0, 0), claim(0, 1, 1)],
+            **overrides,
+        )
+
+    def test_free_items_with_tax_are_blocked_and_flagged(self):
+        result = calculate(self.free_items(taxLinesCents=[100], printedSubtotalCents=0, printedTotalCents=100))
+        self.assertTrue(result["nobodyCarriesCharges"])
+        self.assertFalse(result["canShare"])
+        self.assertEqual([p["totalOwedCents"] for p in result["people"]], [0, 0])
+
+    def test_free_items_with_a_service_charge_or_a_custom_tip_are_flagged(self):
+        service = calculate(self.free_items(serviceChargeCents=50, printedSubtotalCents=0, printedTotalCents=50))
+        tip = calculate(self.free_items(sessionTip={"kind": "custom", "cents": 300}, printedSubtotalCents=0, printedTotalCents=0))
+        self.assertTrue(service["nobodyCarriesCharges"])
+        self.assertTrue(tip["nobodyCarriesCharges"])
+        self.assertFalse(tip["canShare"])
+
+    def test_no_items_at_all_with_a_charge_is_flagged(self):
+        result = calculate(bill(taxLinesCents=[100], printedSubtotalCents=0, printedTotalCents=100))
+        self.assertTrue(result["nobodyCarriesCharges"])
+        self.assertFalse(result["canShare"])
+
+    def test_free_items_with_nothing_to_carry_are_not_flagged_and_can_share(self):
+        result = calculate(self.free_items(printedSubtotalCents=0, printedTotalCents=0))
+        self.assertFalse(result["nobodyCarriesCharges"])
+        self.assertTrue(result["canShare"])
+
+    def test_someone_with_items_carries_the_charges(self):
+        b = bill(
+            items=[{"quantity": 1, "lineTotalCents": 1000}],
+            assignments=[claim(0, 0, 0)],
+            taxLinesCents=[100],
+        )
+        self.assertFalse(calculate(b)["nobodyCarriesCharges"])
+
+    def test_an_unsettled_bill_is_not_flagged(self):
+        # An unclaimed unit is the reason sharing is blocked, not the missing weight.
+        b = self.free_items(taxLinesCents=[100], printedSubtotalCents=0, printedTotalCents=100)
+        b["assignments"] = [claim(0, 0, 0)]
+        self.assertFalse(calculate(b)["nobodyCarriesCharges"])
+
+    def test_a_receipt_that_does_not_add_up_is_a_mismatch_first(self):
+        result = calculate(self.free_items(taxLinesCents=[100], printedSubtotalCents=0, printedTotalCents=999))
+        self.assertFalse(result["nobodyCarriesCharges"])
+
+    def test_a_missing_printed_total_is_reported_first(self):
+        result = calculate(self.free_items(taxLinesCents=[100], printedSubtotalCents=0))
+        self.assertFalse(result["nobodyCarriesCharges"])
+
+
+class NegativeTipTests(unittest.TestCase):
+    def test_a_negative_custom_tip_is_zero(self):
+        self.assertEqual(session_tip_cents({"kind": "custom", "cents": -500}, 10000, 1000), 0)
+
+    def test_a_negative_percentage_is_zero(self):
+        for basis in ("preTax", "postTax"):
+            self.assertEqual(session_tip_cents({"kind": "percent", "percent": -10, "basis": basis}, 10000, 1000), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
