@@ -88,6 +88,8 @@ struct ScanLaunchConfiguration {
         switch camera {
         case .status(let status):
             services.cameraStatus = { status }
+            // The simulator reports no camera, which would hide the permission screens being tested.
+            services.isCameraSupported = { true }
             // A user who is asked says yes, so "notDetermined" walks the grant path.
             services.requestCameraAccess = { .authorized }
         case .unsupported:

@@ -38,6 +38,14 @@ struct ScanLaunchConfigurationTests {
         }
     }
 
+    /// The simulator has no camera, so without this a "denied" or "restricted" status would show the "no camera" screen.
+    @Test func aPermissionStatusMeansTheDeviceHasACamera() throws {
+        for word in ["authorized", "denied", "restricted", "notDetermined"] {
+            let configuration = try #require(ScanLaunchConfiguration(arguments: ["--uitesting-camera", word]))
+            #expect(try configuration.services().isCameraSupported() == true, "\(word)")
+        }
+    }
+
     @Test func aCameraThatIsNotDeterminedIsGrantedWhenAsked() async throws {
         let configuration = try #require(ScanLaunchConfiguration(arguments: ["--uitesting-camera", "notDetermined"]))
         #expect(try await configuration.services().requestCameraAccess() == .authorized)
