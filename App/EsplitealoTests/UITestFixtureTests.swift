@@ -43,6 +43,23 @@ struct UITestFixtureTests {
         #expect(store.session?.assignments.count == expected.assignments.count)
     }
 
+    @Test func tableIsTheFixedReceiptWithFourPeopleAndNothingMarked() throws {
+        let (store, _) = apply(["--uitesting", "--fixture=table"])
+        let session = try #require(store.session)
+        #expect(session.draft == SampleBill.scanned().draft)
+        #expect(session.participants.map(\.name) == SampleBill.people)
+        #expect(session.assignments.isEmpty)
+    }
+
+    @Test func quantitiesHasLinesWithSeveralUnitsAndNothingMarked() throws {
+        let (store, _) = apply(["--uitesting", "--fixture=quantities"])
+        let session = try #require(store.session)
+        #expect(session.draft.items.map(\.quantity) == [3, 1, 2, 1])
+        #expect(session.participants.count == 3)
+        #expect(session.assignments.isEmpty)
+        #expect(session.draft.reconciles)
+    }
+
     @Test func emptyIsABlankBill() throws {
         let (store, _) = apply(["--uitesting", "--fixture=empty"])
         #expect(store.session?.draft.items.isEmpty == true)

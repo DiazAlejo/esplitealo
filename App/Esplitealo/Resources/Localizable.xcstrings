@@ -1,6 +1,76 @@
 {
   "sourceLanguage" : "es",
   "strings" : {
+    "assign.action.clear" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave unassigned"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dejar sin marcar"
+          }
+        }
+      }
+    },
+    "assign.action.everyone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark for everyone"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar para todos"
+          }
+        }
+      }
+    },
+    "assign.action.mark" : {
+      "comment" : "VoiceOver action on an item row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark for %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar para %@"
+          }
+        }
+      }
+    },
+    "assign.action.unmark" : {
+      "comment" : "VoiceOver action on an item row.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar a %@"
+          }
+        }
+      }
+    },
     "assign.all" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -59,6 +129,59 @@
         }
       }
     },
+    "assign.announce.everyone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assigned to everyone"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcado para todos"
+          }
+        }
+      }
+    },
+    "assign.announce.marked" : {
+      "comment" : "Spoken after a VoiceOver action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assigned to %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcado para %@"
+          }
+        }
+      }
+    },
+    "assign.announce.unmarked" : {
+      "comment" : "Spoken after a VoiceOver action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ is no longer assigned"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ya no está marcado"
+          }
+        }
+      }
+    },
     "assign.aria.assigned" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -76,6 +199,24 @@
         }
       }
     },
+    "assign.aria.partial" : {
+      "comment" : "VoiceOver: a quantity line with some units marked. Arguments: name, price, units marked, units in all, people.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@, %3$lld of %4$lld assigned, assigned to %5$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$@, %3$lld de %4$lld marcadas, marcado para %5$@"
+          }
+        }
+      }
+    },
     "assign.aria.unassigned" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -89,6 +230,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@, %2$@, sin marcar"
+          }
+        }
+      }
+    },
+    "assign.aria.unitsName" : {
+      "comment" : "VoiceOver: a line with several units. Arguments: name, number of units.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld units"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, %2$lld unidades"
           }
         }
       }
@@ -140,6 +299,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chequear el espliteo · faltan %lld"
+          }
+        }
+      }
+    },
+    "assign.byUnit" : {
+      "comment" : "Row of a quantity line whose units have different people.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unit by unit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por unidad"
+          }
+        }
+      }
+    },
+    "assign.chip.hint" : {
+      "comment" : "VoiceOver hint on a person chip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to paint items with this name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca para pintar artículos con este nombre"
           }
         }
       }
@@ -280,6 +475,24 @@
         }
       }
     },
+    "assign.incomplete" : {
+      "comment" : "Sheet note, whole-line view. Arguments: units left, then units in all.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unassigned: %1$lld of %2$lld units."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin marcar: %1$lld de %2$lld unidades."
+          }
+        }
+      }
+    },
     "assign.left" : {
       "comment" : "Arguments: unassigned amount, then the number of items (the plural argument is the second one).",
       "extractionState" : "manual",
@@ -335,6 +548,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Artículos marcados"
+          }
+        }
+      }
+    },
+    "assign.mixed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Each unit has its own people. Pick a unit to see how it is split."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada unidad tiene sus propias personas. Escoge una unidad para ver cómo se divide."
           }
         }
       }
@@ -488,6 +718,118 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sin marcar"
+          }
+        }
+      }
+    },
+    "assign.unit.all" : {
+      "comment" : "Unit picker in the assign sheet: the whole line.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas"
+          }
+        }
+      }
+    },
+    "assign.unit.allLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All units"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las unidades"
+          }
+        }
+      }
+    },
+    "assign.unit.n" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unit %lld"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidad %lld"
+          }
+        }
+      }
+    },
+    "assign.units" : {
+      "comment" : "Under the name of a line with several units.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld unit"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld units"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld unidad"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld unidades"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "assign.unitsLeft" : {
+      "comment" : "Row of a quantity line with some units unmarked. Arguments: units left, then units in all.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld of %2$lld units unassigned"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld de %2$lld unidades sin marcar"
           }
         }
       }
