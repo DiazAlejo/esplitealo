@@ -12,7 +12,8 @@ private func localized(_ resource: LocalizedStringResource, in locale: Locale) -
 // MARK: - Status banner
 
 /// "Suma $132.82" when it all matches the receipt; otherwise why the split cannot be shared yet: items nobody has
-/// claimed, a difference with the receipt, a missing total, or discounts the app cannot split.
+/// claimed, a difference with the receipt, a missing total, discounts the app cannot split, or no priced item to
+/// carry the tax and tip.
 struct TotalsStatusBanner: View {
     let status: TotalsViewModel.Status
 
@@ -58,6 +59,11 @@ struct TotalsStatusBanner: View {
             warning(icon: mascot) {
                 Text("totals.adjust.title").espText(.headline)
                 Text("review.adjustments.note").espText(.footnote)
+            }
+        case .nobodyCarriesCharges:
+            warning(icon: mascot) {
+                Text("totals.nobodyItems.title").espText(.headline)
+                Text("totals.nobodyItems.body").espText(.footnote)
             }
         }
     }

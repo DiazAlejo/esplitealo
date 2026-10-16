@@ -323,7 +323,8 @@ struct TotalsViewModelTests {
         }
         #expect(noted.reduce(0, +) == model.rows.map(\.roundingCents).reduce(0, +))
         #expect(noted.reduce(0, +) > 0)
-        #expect(model.rows.map(\.totalCents).reduce(0, +) == 333 + 667 + 1001 + 101 + 97)
+        let billCents: Int = 333 + 667 + 1001 + 101 + 97
+        #expect(model.rows.map(\.totalCents).reduce(0, +) == billCents)
     }
 
     @Test func aBillWithNothingLeftOverHasNoRoundingCard() {

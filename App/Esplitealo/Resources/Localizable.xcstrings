@@ -4274,6 +4274,40 @@
         }
       }
     },
+    "totals.nobodyItems.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The items cost nothing (or there are none), so the tax, tip and service charge have nothing to be split by. Fix the prices on the receipt to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los artículos no cuestan nada (o no hay ninguno), así que el impuesto, la propina y el servicio no tienen en qué repartirse. Arregla los precios del recibo para compartir."
+          }
+        }
+      }
+    },
+    "totals.nobodyItems.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nobody has items to carry the tax or tip"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadie tiene artículos para repartir el impuesto o la propina"
+          }
+        }
+      }
+    },
     "totals.notSettled.body" : {
       "comment" : "Arguments: unassigned item count, then their amount.",
       "extractionState" : "manual",
