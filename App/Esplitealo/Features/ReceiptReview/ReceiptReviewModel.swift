@@ -92,6 +92,35 @@ final class ReceiptReviewModel {
         }
     }
 
+    /// Something the scan was unsure about that is not a row to fix: a price it could not read, or a guessed number
+    /// format. Shown until the user accepts it, and kept in the bill after that.
+    struct WarningRow: Identifiable, Equatable {
+        enum Kind: Equatable {
+            case unreadablePrice(text: String)
+            case formatGuessed
+        }
+
+        let id: UUID
+        let kind: Kind
+        /// The label printed on the unreadable row, when the parser knew it.
+        let rowLabel: String?
+    }
+
+    /// The warnings the user has not yet accepted, in the order the scan found them. Unreadable prices and a guessed
+    /// format only: a mismatch, no items and no printed total are already the banner's and the empty state's job.
+    var warnings: [WarningRow] {
+        draft.activeWarnings.compactMap { warning in
+            switch warning.issue {
+            case let .unparsedPriceRow(text):
+                WarningRow(id: warning.id, kind: .unreadablePrice(text: text), rowLabel: warning.rowLabel)
+            case .numberFormatGuessed:
+                WarningRow(id: warning.id, kind: .formatGuessed, rowLabel: nil)
+            case .itemsDoNotMatchSubtotal, .totalsDoNotAddUp, .noTotalFound, .noItemsFound:
+                nil
+            }
+        }
+    }
+
     var flaggedItems: [ItemRow] { items.filter { $0.flag != nil } }
     var plainItems: [ItemRow] { items.filter { $0.flag == nil } }
 
@@ -213,7 +242,7 @@ final class ReceiptReviewModel {
                     updated.items[index].lineTotal.needsAttention = false
                     updated.items[index].unitPrice?.needsAttention = false
                 }
-                session.applyDraft(updated)
+                session.applyDraft(ReceiptDraftEditing.dismissWarnings(in: updated, forItem: id))
             }
             return nil
         }
@@ -231,6 +260,14 @@ final class ReceiptReviewModel {
             guard updated.adjustments.indices.contains(index) else { return }
             updated.adjustments.remove(at: index)
             session.applyDraft(updated)
+        }
+    }
+
+    /// The user read the warning and accepts it. It stays in the bill, retired. This is not an edit of the receipt, so
+    /// it does not withdraw a "continue anyway".
+    func dismissWarning(id: UUID) {
+        store.update { session in
+            session.applyDraft(ReceiptDraftEditing.dismissWarning(in: session.draft, id: id))
         }
     }
 

@@ -1,0 +1,195 @@
+{
+  "imageSize": {
+    "width": 420,
+    "height": 148
+  },
+  "lines": [
+    {
+      "text": "Cafe Central",
+      "confidence": 1,
+      "rect": {
+        "x": 12,
+        "y": 8,
+        "width": 200,
+        "height": 18
+      },
+      "baselineAngle": 0,
+      "words": [
+        {
+          "text": "Cafe",
+          "rect": {
+            "x": 12,
+            "y": 8,
+            "width": 36,
+            "height": 18
+          }
+        },
+        {
+          "text": "Central",
+          "rect": {
+            "x": 84,
+            "y": 8,
+            "width": 63,
+            "height": 18
+          }
+        }
+      ]
+    },
+    {
+      "text": "Coffee 3.50",
+      "confidence": 1,
+      "rect": {
+        "x": 12,
+        "y": 30,
+        "width": 200,
+        "height": 18
+      },
+      "baselineAngle": 0,
+      "words": [
+        {
+          "text": "Coffee",
+          "rect": {
+            "x": 12,
+            "y": 30,
+            "width": 54,
+            "height": 18
+          }
+        },
+        {
+          "text": "3.50",
+          "rect": {
+            "x": 300,
+            "y": 30,
+            "width": 36,
+            "height": 18
+          }
+        }
+      ]
+    },
+    {
+      "text": "Tostada 2.25",
+      "confidence": 1,
+      "rect": {
+        "x": 12,
+        "y": 52,
+        "width": 200,
+        "height": 18
+      },
+      "baselineAngle": 0,
+      "words": [
+        {
+          "text": "Tostada",
+          "rect": {
+            "x": 12,
+            "y": 52,
+            "width": 63,
+            "height": 18
+          }
+        },
+        {
+          "text": "2.25",
+          "rect": {
+            "x": 300,
+            "y": 52,
+            "width": 36,
+            "height": 18
+          }
+        }
+      ]
+    },
+    {
+      "text": "Soda 3,5",
+      "confidence": 1,
+      "rect": {
+        "x": 12,
+        "y": 74,
+        "width": 200,
+        "height": 18
+      },
+      "baselineAngle": 0,
+      "words": [
+        {
+          "text": "Soda",
+          "rect": {
+            "x": 12,
+            "y": 74,
+            "width": 36,
+            "height": 18
+          }
+        },
+        {
+          "text": "3,5",
+          "rect": {
+            "x": 300,
+            "y": 74,
+            "width": 27,
+            "height": 18
+          }
+        }
+      ]
+    },
+    {
+      "text": "Subtotal 5.75",
+      "confidence": 1,
+      "rect": {
+        "x": 12,
+        "y": 96,
+        "width": 200,
+        "height": 18
+      },
+      "baselineAngle": 0,
+      "words": [
+        {
+          "text": "Subtotal",
+          "rect": {
+            "x": 12,
+            "y": 96,
+            "width": 72,
+            "height": 18
+          }
+        },
+        {
+          "text": "5.75",
+          "rect": {
+            "x": 300,
+            "y": 96,
+            "width": 36,
+            "height": 18
+          }
+        }
+      ]
+    },
+    {
+      "text": "Total 5.75",
+      "confidence": 1,
+      "rect": {
+        "x": 12,
+        "y": 118,
+        "width": 200,
+        "height": 18
+      },
+      "baselineAngle": 0,
+      "words": [
+        {
+          "text": "Total",
+          "rect": {
+            "x": 12,
+            "y": 118,
+            "width": 45,
+            "height": 18
+          }
+        },
+        {
+          "text": "5.75",
+          "rect": {
+            "x": 300,
+            "y": 118,
+            "width": 36,
+            "height": 18
+          }
+        }
+      ]
+    }
+  ],
+  "engine": "hand-written"
+}

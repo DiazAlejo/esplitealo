@@ -2,7 +2,7 @@ import Foundation
 
 public struct BillSession: Sendable, Equatable {
     /// Version of the JSON written by `BillSessionCoding`. Bump it (and add a fixture) when the stored shape changes.
-    public static let currentSchemaVersion = 1
+    public static let currentSchemaVersion = 2
 
     public var draft: ReceiptDraft
     public var merchantName: String
@@ -55,7 +55,17 @@ public struct BillSession: Sendable, Equatable {
         if draft.total == nil { return .missingPrintedTotal }
         if !unassignedUnits.isEmpty { return .unassignedItems }
         if hasUnallocatedAdjustments { return .discountNeedsManualAdjustment }
+        if draft.reconciliation.reconciles, chargesHaveNoItemsToCarry { return .noItemsToCarryCharges }
         return .receiptMismatch
+    }
+
+    /// Tax, tip or a service charge to share, and nobody with an item that costs anything to share it by: every pool
+    /// is split in proportion to the items people have, so with none of them nothing is allocated and the people owe
+    /// less than the bill.
+    public var chargesHaveNoItemsToCarry: Bool {
+        guard !splitResult.shares.contains(where: { $0.itemSubtotalCents > 0 }) else { return false }
+        let tax = draft.tax?.minorUnits ?? 0
+        return tax > 0 || sessionTipCents > 0 || serviceChargeCents > 0 || receiptTipOnBillCents > 0
     }
 
     public var canShare: Bool {
@@ -119,6 +129,7 @@ public struct BillSession: Sendable, Equatable {
         public var receiptTipShareCents: Int
         public var tipShareCents: Int
         public var totalOwedCents: Int
+        /// Every leftover cent this person got, from items, tax, tip, the service charge and a printed tip.
         public var adjustments: [RoundingAdjustment]
     }
 
@@ -128,15 +139,17 @@ public struct BillSession: Sendable, Equatable {
         let weights = ordered.map { participant in
             split.shares.first { $0.participantID == participant.id }?.itemSubtotalCents ?? 0
         }
-        let serviceShares = SessionPoolAllocator.allocate(
+        let (serviceShares, serviceAdjustments) = SessionPoolAllocator.allocate(
             amount: serviceChargeCents,
             participants: ordered,
-            weights: weights
+            weights: weights,
+            pool: .serviceCharge
         )
-        let receiptTipShares = SessionPoolAllocator.allocate(
+        let (receiptTipShares, receiptTipAdjustments) = SessionPoolAllocator.allocate(
             amount: receiptTipOnBillCents,
             participants: ordered,
-            weights: weights
+            weights: weights,
+            pool: .printedTip
         )
         return ordered.enumerated().map { offset, participant in
             let share = split.shares.first { $0.participantID == participant.id }
@@ -153,7 +166,9 @@ public struct BillSession: Sendable, Equatable {
                 receiptTipShareCents: receiptTip,
                 tipShareCents: tipShare,
                 totalOwedCents: items + tax + service + receiptTip + tipShare,
-                adjustments: share?.adjustments ?? []
+                adjustments: (share?.adjustments ?? [])
+                    + serviceAdjustments.filter { $0.participantID == participant.id }
+                    + receiptTipAdjustments.filter { $0.participantID == participant.id }
             )
         }
     }

@@ -926,6 +926,142 @@
         }
       }
     },
+    "bill.discard" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard bill"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonar cuenta"
+          }
+        }
+      }
+    },
+    "bill.discard.keep" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the bill"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguir con la cuenta"
+          }
+        }
+      }
+    },
+    "bill.discard.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The items, the people and your marks are deleted. This can’t be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se borran los artículos, las personas y lo que hayas marcado. No se puede deshacer."
+          }
+        }
+      }
+    },
+    "bill.discard.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard this bill?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abandonar esta cuenta?"
+          }
+        }
+      }
+    },
+    "bill.replace.continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue my bill"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar con mi cuenta"
+          }
+        }
+      }
+    },
+    "bill.replace.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You already have a bill in progress. If you start a new one, the current bill is discarded."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya tienes una cuenta empezada. Si empiezas otra, la que tienes se descarta."
+          }
+        }
+      }
+    },
+    "bill.replace.start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a new one"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar una nueva"
+          }
+        }
+      }
+    },
+    "bill.replace.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a new bill?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Empezar una cuenta nueva?"
+          }
+        }
+      }
+    },
     "capture.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1320,6 +1456,65 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cuentas recientes"
+          }
+        }
+      }
+    },
+    "home.resume.summary" : {
+      "comment" : "Under the title of Home's card. Arguments: the bill's total, then the number of items (the plural argument is the second one).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%2$lld item · %1$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%2$lld items · %1$@"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%2$lld artículo · %1$@"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%2$lld artículos · %1$@"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "home.resume.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue your bill"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar con tu cuenta"
           }
         }
       }
@@ -3408,6 +3603,142 @@
         }
       }
     },
+    "review.unsure.dismiss" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Got it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendido"
+          }
+        }
+      }
+    },
+    "review.unsure.dismissLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Got it: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendido: %@"
+          }
+        }
+      }
+    },
+    "review.unsure.format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It wasn’t clear how the numbers on this receipt are written, so I guessed. Check that the prices look right."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No estaba claro cómo vienen escritos los números en este recibo, así que adiviné. Chequea que los precios estén bien."
+          }
+        }
+      }
+    },
+    "review.unsure.formatSubject" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the numbers"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "los números"
+          }
+        }
+      }
+    },
+    "review.unsure.priceHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If it’s an item, add it with its price."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si es un artículo, añádelo con su precio."
+          }
+        }
+      }
+    },
+    "review.unsure.priceOnly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I couldn’t read a price on the receipt: “%@”."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pude leer un precio del recibo: «%@»."
+          }
+        }
+      }
+    },
+    "review.unsure.priceRow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I couldn’t read the price of **%1$@**: “%2$@”."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pude leer el precio de **%1$@**: «%2$@»."
+          }
+        }
+      }
+    },
+    "review.unsure.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What I couldn’t read well"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo que no pude leer bien"
+          }
+        }
+      }
+    },
     "review.warn.items" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3650,6 +3981,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Espliteo de %@"
+          }
+        }
+      }
+    },
+    "shareSheet.titleNoMerchant" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your split"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu espliteo"
           }
         }
       }
@@ -4270,6 +4618,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "artículos %1$@ · impuesto %2$@ · servicio %3$@ · propina %4$@"
+          }
+        }
+      }
+    },
+    "totals.nobodyItems.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The items cost nothing (or there are none), so the tax, tip and service charge have nothing to be split by. Fix the prices on the receipt to share."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los artículos no cuestan nada (o no hay ninguno), así que el impuesto, la propina y el servicio no tienen en qué repartirse. Arregla los precios del recibo para compartir."
+          }
+        }
+      }
+    },
+    "totals.nobodyItems.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nobody has items to carry the tax or tip"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadie tiene artículos para repartir el impuesto o la propina"
           }
         }
       }

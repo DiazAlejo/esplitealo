@@ -15,10 +15,12 @@ struct ReviewView: View {
 }
 
 private struct ReviewScreen: View {
+    @Environment(BillStore.self) private var store
     @Environment(AppRouter.self) private var router
     @Environment(\.locale) private var locale
     @State private var model: ReceiptReviewModel
     @State private var sheet: ReviewSheet?
+    @State private var confirmsDiscard = false
 
     init(store: BillStore) {
         _model = State(initialValue: ReceiptReviewModel(store: store))
@@ -50,6 +52,7 @@ private struct ReviewScreen: View {
 
                 ReviewBanner(status: model.status, model: model)
 
+                warnings
                 items
                 adjustments
 
@@ -62,6 +65,11 @@ private struct ReviewScreen: View {
                 .accessibilityIdentifier("review.add")
 
                 amounts
+
+                Button("bill.discard", role: .destructive) { confirmsDiscard = true }
+                    .buttonStyle(.espQuiet)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityIdentifier("review.discard")
             }
             .padding(.horizontal, Spacing.screenMargin)
             .padding(.vertical, Spacing.md)
@@ -84,6 +92,10 @@ private struct ReviewScreen: View {
         .navigationTitle("people.back")
         .stepCounterToolbar(for: .review)
         .onAppear { model.startBillIfNeeded() }
+        .discardBillConfirmation(isPresented: $confirmsDiscard) {
+            store.finishBill()
+            router.popToRoot()
+        }
         .onChange(of: model.status) { _, status in announce(status) }
         .sheet(item: $sheet) { sheet in
             switch sheet {
@@ -107,6 +119,23 @@ private struct ReviewScreen: View {
     }
 
     // MARK: Sections
+
+    /// What the scan could not read well. Each one stays until the user accepts it; none of them stops the receipt
+    /// from being edited or continued.
+    @ViewBuilder
+    private var warnings: some View {
+        let rows = model.warnings
+        if !rows.isEmpty {
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
+                ReviewSectionHeader(title: "review.unsure.title", count: rows.count, isWarning: true)
+                RowsCard(rows, style: .warn) { row in
+                    ReviewWarningRow(row: row) { model.dismissWarning(id: row.id) }
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("review.warnings")
+        }
+    }
 
     @ViewBuilder
     private var items: some View {
@@ -194,6 +223,13 @@ private struct ReviewScreen: View {
 #Preview("Review, mismatch, Español") {
     NavigationStack { ReviewView() }
         .environment(previewStore(ReviewSamples.parsedSession()))
+        .environment(AppRouter())
+        .environment(\.locale, Locale(identifier: "es"))
+}
+
+#Preview("Review, unreadable prices, Español") {
+    NavigationStack { ReviewView() }
+        .environment(previewStore(ReviewSamples.unsureSession()))
         .environment(AppRouter())
         .environment(\.locale, Locale(identifier: "es"))
 }

@@ -41,6 +41,9 @@ final class ScanFlow {
     private(set) var offersManualEntry = false
     /// The reading in progress. Exposed so tests can wait for it.
     private(set) var scanTask: Task<Void, Never>?
+    /// Home was asked to start a scan while a bill with content exists: nothing opens until the user chooses to
+    /// continue that bill (`keepCurrentBill()`) or replace it (`confirmReplacement()`).
+    private(set) var pendingReplacement: ScanSource?
 
     @ObservationIgnored private let store: BillStore
     @ObservationIgnored private let router: AppRouter
@@ -62,17 +65,40 @@ final class ScanFlow {
     // MARK: Starting
 
     /// Home's buttons: remember the source and push the capture screen, which starts the capture when it appears.
+    /// A bill with content is never replaced silently: the user is asked first (`pendingReplacement`). The old bill
+    /// is only replaced once the new scan is handed over, so cancelling the camera keeps it.
     func open(_ source: ScanSource) {
+        if store.hasBillInProgress {
+            pendingReplacement = source
+            return
+        }
+        start(source)
+    }
+
+    /// "Empezar una nueva": go on with the scan that was asked for.
+    func confirmReplacement() {
+        guard let source = pendingReplacement else { return }
+        pendingReplacement = nil
+        start(source)
+    }
+
+    /// "Continuar con mi cuenta": drop the new scan and open the existing bill at the step it reached.
+    func keepCurrentBill() {
+        pendingReplacement = nil
+        if let path = store.billInProgress?.resumePath { router.show(path) }
+    }
+
+    private func start(_ source: ScanSource) {
         stopWork()
         self.source = source
         phase = .idle
         router.push(.capture)
     }
 
-    /// The capture screen appeared: start a capture, unless one is already under way. Coming back from Review
-    /// (the bill is already handed over) starts a new one.
+    /// The capture screen appeared: start a capture, unless one is already under way. Once the bill is handed over
+    /// (`.finished`) the screen is gone from the stack, and if it ever shows again it must not open the camera.
     func captureScreenAppeared() async {
-        guard phase == .idle || phase == .finished else { return }
+        guard phase == .idle else { return }
         await begin()
     }
 
@@ -212,7 +238,8 @@ final class ScanFlow {
     private func handOver(_ draft: ReceiptDraft) {
         store.startNewBill(draft: draft)
         phase = .finished
-        router.push(.review)
+        // Review takes the place of Capture, so Back from Review is Home, never the camera.
+        router.show([.review])
     }
 
     // MARK: Status messages and the manual-entry offer

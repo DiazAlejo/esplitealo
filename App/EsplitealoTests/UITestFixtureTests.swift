@@ -28,6 +28,15 @@ struct UITestFixtureTests {
         #expect(session.participants.isEmpty)
     }
 
+    @Test func unsureIsAScanWithTwoPricesTheParserCouldNotRead() throws {
+        let (store, _) = apply(["--uitesting", "--fixture=unsure"])
+        let session = try #require(store.session)
+        #expect(session.draft.items.count == 7)
+        #expect(session.draft.activeWarnings.count == 2)
+        #expect(session.draft.reconciles == false)
+        #expect(session.participants.isEmpty)
+    }
+
     @Test func scannedIsTheFixedReceiptWithNobodyAtTheTable() throws {
         let (store, _) = apply(["--uitesting", "--fixture=scanned"])
         #expect(store.session == SampleBill.scanned())

@@ -2,17 +2,21 @@ import EsplitealoDesign
 import SwiftUI
 
 /// Home: Chavito on his pink disc, the pitch, and two buttons to start a bill: scan with the document camera or
-/// choose a photo. A saved bill from a previous launch is offered by the shell's "¿Seguimos con tu cuenta?" prompt
-/// (see `RootView`), which sits on top of this screen. The recent-bills list is optional in the first version and
-/// is not built.
+/// choose a photo. While a bill with content exists a "Continuar con tu cuenta" card offers to resume it (or abandon
+/// it), and starting a scan asks before it would replace that bill. A saved bill from a previous launch is offered by
+/// the shell's "¿Seguimos con tu cuenta?" prompt (see `RootView`), which sits on top of this screen. The recent-bills
+/// list is optional in the first version and is not built.
 /// The content scrolls (large Dynamic Type); the buttons stay pinned at the bottom, except at accessibility sizes.
 struct HomeView: View {
     /// Chavito blinks and bobs; snapshot tests turn that off. Reduce Motion turns it off too.
     var animatesMascot = true
 
     @Environment(ScanFlow.self) private var flow
+    @Environment(BillStore.self) private var store
+    @Environment(AppRouter.self) private var router
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showsHowItWorks = false
+    @State private var confirmsDiscard = false
 
     /// At accessibility sizes the buttons would take half the screen if they stayed pinned, so they scroll with the page.
     private var pinsActions: Bool { !dynamicTypeSize.isAccessibilitySize }
@@ -30,6 +34,13 @@ struct HomeView: View {
                         EspWordmark()
                         howItWorksButton
                     }
+                }
+                if let bill = store.billInProgress {
+                    ResumeBillCard(
+                        bill: bill,
+                        onContinue: { router.show(bill.resumePath) },
+                        onDiscard: { confirmsDiscard = true }
+                    )
                 }
                 VStack(spacing: Spacing.sm) {
                     ChavitoView(expression: .neutral, size: 220, disc: true, animated: animatesMascot)
@@ -66,9 +77,21 @@ struct HomeView: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
+        .discardBillConfirmation(isPresented: $confirmsDiscard) { store.finishBill() }
+        .alert("bill.replace.title", isPresented: replacementBinding) {
+            Button("bill.replace.continue", role: .cancel) { flow.keepCurrentBill() }
+            Button("bill.replace.start", role: .destructive) { flow.confirmReplacement() }
+        } message: {
+            Text("bill.replace.message")
+        }
         // `.contain` keeps the children's own identifiers; a bare identifier here would replace them.
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AppRoute.home.accessibilityIdentifier)
+    }
+
+    /// The question closes only through its two buttons.
+    private var replacementBinding: Binding<Bool> {
+        Binding(get: { flow.pendingReplacement != nil }, set: { _ in })
     }
 
     private var howItWorksButton: some View {
@@ -150,9 +173,11 @@ private struct BubbleShape: Shape {
     }
 }
 
+#if DEBUG
 #Preview("Home, Español") {
     NavigationStack { HomeView() }
         .environment(AppRouter())
+        .environment(BillStore.live(arguments: ["--uitesting"]))
         .environment(ScanFlow.preview())
         .environment(\.locale, Locale(identifier: "es"))
 }
@@ -160,7 +185,9 @@ private struct BubbleShape: Shape {
 #Preview("Home, English, dark") {
     NavigationStack { HomeView() }
         .environment(AppRouter())
+        .environment(BillStore.live(arguments: ["--uitesting"]))
         .environment(ScanFlow.preview())
         .environment(\.locale, Locale(identifier: "en"))
         .preferredColorScheme(.dark)
 }
+#endif

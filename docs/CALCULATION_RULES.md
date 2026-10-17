@@ -24,6 +24,7 @@ Assignments: Alex $60.00 of items, Sam $40.00 of items (proportional tax and tip
 
 - Each participant has a stable **participant order** (the order they were added to the bill, index `0` first).
 - Every tie-break in this document uses that order: **earlier participant wins**.
+- Order indices are **unique** within a bill. This is an invariant of the session (`BillSession` hands out one past the highest index in use, so removing someone never makes an index repeat), not something the calculator repairs: two people with the same index would tie on both remainder and order, and the result would depend on the sort.
 
 ## Receipt lines and quantity
 
@@ -32,7 +33,7 @@ Assignments: Alex $60.00 of items, Sam $40.00 of items (proportional tax and tip
   - `base = lineTotal ÷ Q` (integer division)
   - `extra = lineTotal mod Q`
   - Unit indices `0 ..< extra` cost `base + 1` cent; unit indices `extra ..< Q` cost `base` cents.
-- **Assignment is per unit.** For quantity `1`, there is a single unit index `0`.
+- **Assignment is per unit.** For quantity `1`, there is a single unit index `0`. A unit has **one** assignment row: assigning a unit again replaces its row (`BillSession` never keeps two), and the calculator reads the first row it finds for a unit.
 - An **item assignment** lists one or more participants for one unit. Multiple participants on the same unit split that unit’s price **equally** (equal weights).
 
 ## Assignment model (item-first)
@@ -56,13 +57,14 @@ To split an integer amount `A` (cents) across participants with non-negative int
 5. Give one cent to each of the first `R` participants in that sorted list (increment `sᵢ`).
 6. Participants with `wᵢ = 0` keep share `0` and are **never** given a leftover cent.
 
-**Surfacing adjustments:** whenever step 5 gives a cent to someone whose initial `quotientᵢ` was not already the maximum possible, record a **rounding adjustment** for that participant and pool (item unit, tax, or tip). The UI shows every adjustment; nothing is silent.
+**Surfacing adjustments:** **every** leftover cent given in step 5 is a **rounding adjustment**: one adjustment of one cent for that participant and pool, so the number of adjustments in a pool equals its leftover cents `R`, and a person's share is their floor plus the cents they were adjusted. The pools are an item unit, tax, tip, the service charge and a tip printed on the receipt. The UI shows every adjustment; nothing is silent.
 
 This rule is used for:
 
 - Splitting a unit price among that unit’s assignees (equal weights).
 - Allocating tax across participants (weight = each person’s assigned item subtotal).
 - Allocating tip across participants (weight = each person’s assigned item subtotal).
+- Allocating the receipt’s service charge, or a tip printed on it, across participants (same weights). These two pools are shared by `BillSession` (see [BILL_SESSION.md](BILL_SESSION.md)) rather than `BillCalculator`, with the same function, and their adjustments appear in each person’s `adjustments` beside the calculator’s. The amounts do not depend on whether the cents are surfaced.
 
 ## Tax
 
@@ -80,6 +82,8 @@ Exactly one of:
 1. **Percentage tip** — compute tip cents from a basis, then round **half up** to the nearest cent:
    - `tipCents = (basis × percent + 50) ÷ 100` (integer arithmetic).
 2. **Custom tip** — use the user-entered tip cents directly.
+
+**A negative custom tip or percentage is treated as zero** (`tipCents = 0`, never a discount). The Totals screen does not accept a negative amount in the tip field, and its − button stops at $0.00, so a negative tip can only come from a saved bill or from code; the engine still returns 0 for it.
 
 ### Tip basis (per bill)
 
@@ -103,6 +107,7 @@ For each participant:
 - Compare to the user’s **confirmed receipt total** in cents.
 - If they differ, the split is **not shareable** until inputs are corrected (invariant for the product; the engine exposes the mismatch).
 - When assignments and confirmed components are consistent, the sum of every person’s `amountOwed` equals the confirmed total **exactly**.
+- **Nobody to carry the charges.** Tax, tip and the service charge are shared by item subtotal, so when every claimed item is free (or the bill has no items) there is no weight: nothing is allocated and the people owe less than the bill. If that bill has tax, tip or a service charge to share, it stays **blocked from sharing** and the session says why with its own reason, `noItemsToCarryCharges` (the app: “nobody has items to carry the tax or tip”), not a generic mismatch. A receipt that does not add up, a missing printed total and unclaimed units are reported first. A free-items bill with nothing to share is not blocked.
 
 ## Discounts and service charges
 
@@ -116,8 +121,11 @@ The test suite must enforce these:
 2. For each unit, the sum of participant shares equals that unit’s price, exactly.
 3. The sum of tax shares equals the tax, and the sum of tip shares equals the tip.
 4. The same inputs always produce the same output, including which person receives a leftover cent.
-5. Every rounding adjustment from largest remainder is surfaced, never hidden.
+5. Every leftover cent from largest remainder is an adjustment, in every pool (item units, tax, tip, service charge, printed tip), and is surfaced, never hidden.
 6. A bill with any unclaimed unit is not treated as settled.
+7. Participants have unique order indices, and a unit has one assignment row. The session keeps both; the calculator assumes them.
+8. A negative custom tip or percentage is a tip of zero.
+9. A bill with charges to share and no item that costs anything is never shareable, and is reported as such.
 
 ## Additional worked examples
 

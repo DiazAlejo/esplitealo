@@ -104,6 +104,16 @@ struct AppRouterTests {
         #expect(router.path.isEmpty)
     }
 
+    @Test func showingReviewInPlaceOfCaptureMakesBackGoHome() {
+        let router = AppRouter()
+        router.push(.capture)
+        router.show([.review])
+        #expect(router.path == [.review])
+        router.back()
+        #expect(router.current == .home)
+        #expect(router.path.isEmpty)
+    }
+
     @Test func showDropsHomeFromThePath() {
         let router = AppRouter()
         router.show([.home, .capture])
