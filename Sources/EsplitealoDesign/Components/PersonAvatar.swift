@@ -6,13 +6,31 @@ public struct PersonAvatar: View {
     private let name: String
     private let participantIndex: Int
     private let showsName: Bool
-    @ScaledMetric private var size: CGFloat
+    @ScaledMetric private var scaledSize: CGFloat
+    private let baseSize: CGFloat
 
     public init(name: String, participantIndex: Int, size: CGFloat = 28, announcesName: Bool = true) {
         self.name = name
         self.participantIndex = participantIndex
         self.showsName = announcesName
-        _size = ScaledMetric(wrappedValue: size, relativeTo: .body)
+        baseSize = size
+        _scaledSize = ScaledMetric(wrappedValue: size, relativeTo: .body)
+    }
+
+    /// The circle grows with the text, but not past 1.75 times its size: at AX5 a 40 pt avatar would be 124 pt wide and
+    /// leave no room for the name next to it.
+    private var size: CGFloat { min(scaledSize, baseSize * 1.75) }
+
+    /// The initial is set in a text style (so it scales with Dynamic Type like any text, not by a fixed point size), the
+    /// one closest to half the circle: caption2 in a 20 pt circle up to title3 in a 40 pt one.
+    private var letterStyle: Font.TextStyle {
+        switch baseSize {
+        case ..<22: .caption2
+        case ..<26: .caption
+        case ..<30: .footnote
+        case ..<36: .callout
+        default: .title3
+        }
     }
 
     public var body: some View {
@@ -22,9 +40,8 @@ public struct PersonAvatar: View {
             .frame(width: size, height: size)
             .overlay {
                 Text(verbatim: PersonInitial.make(from: name))
-                    .font(.system(size: size * 0.5, weight: .semibold))
+                    .font(.system(letterStyle, weight: .semibold))
                     .foregroundStyle(slot.letterColor)
-                    .minimumScaleFactor(0.6)
             }
             .overlay {
                 if PersonColorSlot.usesDottedRing(participantIndex: participantIndex) {

@@ -111,6 +111,7 @@ struct TipSettings: View {
     let model: TotalsViewModel
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @FocusState private var fieldFocused: Bool
 
     var body: some View {
@@ -150,12 +151,8 @@ struct TipSettings: View {
     // MARK: Buttons
 
     private var selector: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 2) { segments }
-            VStack(spacing: 2) {
-                HStack(spacing: 2) { presetSegments }
-                HStack(spacing: 2) { customSegment }
-            }
+        AdaptiveStack(stackedAlignment: .center, rowSpacing: 2) {
+            segments
         }
         .padding(3)
         .background(Color.esp.well, in: RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous))
@@ -198,7 +195,7 @@ struct TipSettings: View {
                     .disabled(!model.canDecreaseTip)
                 TextField(
                     text: Binding(get: { model.customTipText }, set: { model.customTipText = $0 }),
-                    prompt: Text(verbatim: "0.00")
+                    prompt: Text(verbatim: "0.00").foregroundStyle(Color.esp.inkSecondary)
                 ) {
                     Text("totals.tip.customAria")
                 }
@@ -209,10 +206,7 @@ struct TipSettings: View {
                 .padding(.horizontal, Spacing.sm)
                 .frame(minHeight: TapTarget.primaryButtonHeight)
                 .background(Color.esp.well, in: RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous)
-                        .strokeBorder(Color.esp.warn, lineWidth: model.customTipIsInvalid ? 1.5 : 0)
-                }
+                .espFieldOutline(isInvalid: model.customTipIsInvalid)
                 .accessibilityLabel(Text("totals.tip.customAria"))
                 .accessibilityIdentifier("totals.tip.field")
                 .toolbar {
@@ -321,34 +315,44 @@ struct TotalsSummary: View {
                 Capsule().fill(Color.esp.pink).frame(width: 64, height: 3).accessibilityHidden(true)
             }
             Rectangle().fill(Color.esp.hairline).frame(height: Stroke.hairline).accessibilityHidden(true)
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: Spacing.xs) { columns }
-                VStack(spacing: 0) { rows }
+            AdaptiveStack(rowAlignment: .top, stackedAlignment: .leading, rowSpacing: Spacing.xs, stackedSpacing: 0) {
+                cell("totals.subtotal", summary.subtotalCents)
+                cell("totals.tax", summary.taxCents)
+                if summary.showsService { cell("totals.service", summary.serviceCents) }
+                cell("totals.tip", summary.tipCents)
             }
         }
         .padding(.top, Spacing.xs)
     }
 
-    @ViewBuilder private var columns: some View {
-        column("totals.subtotal", summary.subtotalCents)
-        column("totals.tax", summary.taxCents)
-        if summary.showsService { column("totals.service", summary.serviceCents) }
-        column("totals.tip", summary.tipCents)
+    /// A part of the total: a small title over its amount, in a row of columns; at large sizes a line (title, then amount
+    /// under it at accessibility sizes) in a list, like `AmountRow`. Always the same two views, so they stay the same
+    /// elements as the text size changes.
+    private func cell(_ title: LocalizedStringKey, _ cents: Int) -> some View {
+        SummaryCell(title: title, cents: cents)
     }
+}
 
-    @ViewBuilder private var rows: some View {
-        AmountRow("totals.subtotal", cents: summary.subtotalCents)
-        AmountRow("totals.tax", cents: summary.taxCents)
-        if summary.showsService { AmountRow("totals.service", cents: summary.serviceCents) }
-        AmountRow("totals.tip", cents: summary.tipCents)
-    }
+private struct SummaryCell: View {
+    let title: LocalizedStringKey
+    let cents: Int
 
-    private func column(_ title: LocalizedStringKey, _ cents: Int) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.xxs) {
-            Text(title).espText(.caption).foregroundStyle(Color.esp.inkSecondary)
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        let isLine = AdaptiveLayoutPolicy.stacks(dynamicTypeSize: dynamicTypeSize)
+        let layout = isLine && !dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.sm))
+            : AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xxs))
+        layout {
+            Text(title)
+                .espText(isLine ? .body : .caption)
+                .foregroundStyle(isLine ? Color.esp.ink : Color.esp.inkSecondary)
+                .frame(maxWidth: isLine ? .infinity : nil, alignment: .leading)
             MoneyText(cents: cents, style: .amount)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, isLine ? Spacing.xxs : 0)
         .accessibilityElement(children: .combine)
     }
 }
@@ -360,6 +364,7 @@ struct WhoOwesSection: View {
     let showsService: Bool
 
     @Environment(\.locale) private var locale
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var expanded: Set<UUID> = []
     @ScaledMetric(relativeTo: .footnote) private var markSize: CGFloat = 11
 
@@ -379,7 +384,7 @@ struct WhoOwesSection: View {
 
             RowsCard(rows) { row in
                 PersonCard(row: row, showsService: showsService, isExpanded: expanded.contains(row.id)) {
-                    withAnimation(.snappy(duration: 0.25)) {
+                    withAnimation(reduceMotion ? nil : .snappy(duration: 0.25)) {
                         if expanded.contains(row.id) { expanded.remove(row.id) } else { expanded.insert(row.id) }
                     }
                 }
@@ -392,10 +397,6 @@ struct WhoOwesSection: View {
 /// with names and percentages (colour is never the only signal).
 struct ShareBar: View {
     let rows: [TotalsViewModel.PersonRow]
-
-    private var spoken: String {
-        rows.map { "\($0.name) \($0.percent)%" }.joined(separator: ", ")
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -414,21 +415,21 @@ struct ShareBar: View {
                 .frame(height: 10)
                 Capsule().fill(Color.esp.pink).frame(height: 3)
             }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("totals.bar.aria"))
-            .accessibilityValue(Text(verbatim: spoken))
+            // The bar is a picture; the legend under it says the same in words, so VoiceOver reads the legend.
+            .accessibilityHidden(true)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), alignment: .leading)], alignment: .leading, spacing: Spacing.xxs) {
+            FlowLayout(spacing: Spacing.md, lineSpacing: Spacing.xxs) {
                 ForEach(rows) { row in
                     HStack(spacing: 6) {
-                        Circle().fill(PersonColorSlot(participantIndex: row.colorIndex).fillColor).frame(width: 8, height: 8)
+                        // The initial inside the colour, so the bar's segments can be told apart without colour.
+                        PersonAvatar(name: row.name, participantIndex: row.colorIndex, size: 20, announcesName: false)
                         Text(verbatim: "\(row.name) \(row.percent)%")
                     }
+                    .accessibilityElement(children: .combine)
                 }
             }
             .espText(.footnote)
             .foregroundStyle(Color.esp.inkSecondary)
-            .accessibilityHidden(true)
         }
     }
 }
@@ -483,19 +484,12 @@ struct PersonCard: View {
     }
 
     private var header: some View {
-        ViewThatFits(in: .horizontal) {
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) { stacked in
+            who
             HStack(spacing: Spacing.sm) {
-                who
                 MoneyText(cents: row.totalCents, style: .amount)
+                if stacked { Spacer(minLength: 0) }
                 chevron
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                who
-                HStack {
-                    MoneyText(cents: row.totalCents, style: .amount)
-                    Spacer(minLength: 0)
-                    chevron
-                }
             }
         }
         .padding(.leading, Spacing.md)
@@ -554,7 +548,7 @@ struct RoundingCard: View {
     var body: some View {
         let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xs)) : AnyLayout(HStackLayout(alignment: .top, spacing: Spacing.sm))
         layout {
-            ChavitoView(expression: .thinking, size: 76, decorative: false, animated: false)
+            ChavitoView(expression: .thinking, size: 76, decorative: true, animated: false)
             VStack(alignment: .leading, spacing: Spacing.xxs) {
                 Text("totals.round.title")
                     .espText(.headline)

@@ -12,7 +12,7 @@ struct RenameSheet: View {
                 SheetTitle("sheet.rename")
 
                 SheetField("sheet.name", error: model.renameMessage?.text) {
-                    TextField(text: $model.renameDraft, prompt: Text("sheet.name")) { Text("sheet.name") }
+                    TextField(text: $model.renameDraft, prompt: Text("sheet.name").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.name") }
                         .focused($focused)
                         .textInputAutocapitalization(.words)
                         .autocorrectionDisabled()
@@ -62,15 +62,9 @@ struct RemovePersonSheet: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("people.remove.body")
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Spacing.sm) {
-                        keep.frame(maxWidth: .infinity)
-                        remove.frame(maxWidth: .infinity)
-                    }
-                    VStack(spacing: Spacing.xs) {
-                        keep
-                        remove
-                    }
+                AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.sm, stackedSpacing: Spacing.xs) {
+                    keep.frame(maxWidth: .infinity)
+                    remove.frame(maxWidth: .infinity)
                 }
                 .padding(.top, Spacing.xs)
             }

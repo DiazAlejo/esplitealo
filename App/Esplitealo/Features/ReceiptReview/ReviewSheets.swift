@@ -9,6 +9,7 @@ struct ItemEditorSheet: View {
     let onClose: () -> Void
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var name: String
     @State private var priceText: String
     @State private var quantity: Int
@@ -43,7 +44,9 @@ struct ItemEditorSheet: View {
                 }
 
                 SheetField("sheet.description", error: error == .missingName ? Text("sheet.errName") : nil) {
-                    TextField(text: $name, prompt: Text("sheet.descriptionPlaceholder")) { Text("sheet.description") }
+                    // One line truncates a long name at accessibility sizes, so there the field grows to up to four.
+                    TextField(text: $name, prompt: Text("sheet.descriptionPlaceholder").foregroundStyle(Color.esp.inkSecondary), axis: dynamicTypeSize.isAccessibilitySize ? .vertical : .horizontal) { Text("sheet.description") }
+                        .lineLimit(1 ... 4)
                         .focused($focus, equals: .name)
                         .textInputAutocapitalization(.sentences)
                         .submitLabel(.next)
@@ -51,17 +54,15 @@ struct ItemEditorSheet: View {
                         .accessibilityIdentifier("sheet.item.name")
                 }
 
-                Stepper(value: $quantity, in: ReceiptReviewModel.quantityRange) {
-                    Text(.sheetQuantityValue(quantity)).espText(.body)
-                }
-                .accessibilityIdentifier("sheet.item.quantity")
+                quantityRow
 
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     SheetField("sheet.unitPrice", error: error == .invalidPrice ? Text("sheet.errPrice") : nil) {
-                        TextField(text: $priceText, prompt: Text(verbatim: "0.00")) { Text("sheet.unitPrice") }
+                        TextField(text: $priceText, prompt: Text(verbatim: "0.00").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.unitPrice") }
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .focused($focus, equals: .price)
+                            .decimalPadDoneButton { focus = nil }
                             .accessibilityIdentifier("sheet.item.price")
                     }
                     if quantity > 1, let lineTotalCents {
@@ -75,24 +76,62 @@ struct ItemEditorSheet: View {
                     .buttonStyle(.espPrimary)
                     .accessibilityIdentifier("sheet.save")
 
-                HStack(spacing: Spacing.xs) {
-                    if let itemID {
-                        Button("sheet.delete") {
-                            model.deleteItem(id: itemID)
-                            onClose()
-                        }
-                        .buttonStyle(.espWarn)
-                        .accessibilityIdentifier("sheet.delete")
-                    }
-                    Button("sheet.cancel", action: onClose)
-                        .buttonStyle(.espQuiet)
-                        .accessibilityIdentifier("sheet.cancel")
+                AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.xs) {
+                    deleteButton
+                    cancelButton
                 }
             }
         }
         .onChange(of: name) { error = error == .missingName ? nil : error }
         .onChange(of: priceText) { error = error == .invalidPrice ? nil : error }
         .onAppear { if itemID == nil { focus = .name } }
+    }
+
+    /// "Cantidad: 2" with two 44 pt buttons. The system stepper is 32 pt tall, too small to hit with a shaky hand.
+    private var quantityRow: some View {
+        HStack(spacing: Spacing.xs) {
+            Text(.sheetQuantityValue(quantity))
+                .espText(.body)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("sheet.item.quantity")
+            quantityButton("minus", label: "sheet.quantityDecrease", delta: -1, identifier: "sheet.item.quantity.decrease")
+                .disabled(quantity <= ReceiptReviewModel.quantityRange.lowerBound)
+            quantityButton("plus", label: "sheet.quantityIncrease", delta: 1, identifier: "sheet.item.quantity.increase")
+                .disabled(quantity >= ReceiptReviewModel.quantityRange.upperBound)
+        }
+        .frame(minHeight: TapTarget.minimum)
+    }
+
+    private func quantityButton(_ systemImage: String, label: LocalizedStringKey, delta: Int, identifier: String) -> some View {
+        Button {
+            quantity = min(max(quantity + delta, ReceiptReviewModel.quantityRange.lowerBound), ReceiptReviewModel.quantityRange.upperBound)
+        } label: {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.semibold))
+                .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum)
+                .background(Color.esp.well, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.esp.primary)
+        .accessibilityLabel(Text(label))
+        .accessibilityIdentifier(identifier)
+    }
+
+    @ViewBuilder private var deleteButton: some View {
+        if let itemID {
+            Button("sheet.delete") {
+                model.deleteItem(id: itemID)
+                onClose()
+            }
+            .buttonStyle(.espWarn)
+            .accessibilityIdentifier("sheet.delete")
+        }
+    }
+
+    private var cancelButton: some View {
+        Button("sheet.cancel", action: onClose)
+            .buttonStyle(.espQuiet)
+            .accessibilityIdentifier("sheet.cancel")
     }
 
     private func flagNote(_ cents: Int) -> some View {
@@ -170,10 +209,11 @@ struct AmountEditorSheet: View {
                 }
 
                 SheetField("sheet.amount", error: hasError ? Text("sheet.errAmount") : nil) {
-                    TextField(text: $text, prompt: Text(verbatim: "0.00")) { Text("sheet.amount") }
+                    TextField(text: $text, prompt: Text(verbatim: "0.00").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.amount") }
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .focused($focused)
+                        .decimalPadDoneButton { focused = false }
                         .accessibilityIdentifier("sheet.amount.field")
                 }
 
@@ -227,15 +267,9 @@ struct MismatchConfirmationSheet: View {
                     Text("review.bad.bodyMissing").espText(.body)
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Spacing.sm) {
-                        fix.frame(maxWidth: .infinity)
-                        keepGoing.frame(maxWidth: .infinity)
-                    }
-                    VStack(spacing: Spacing.xs) {
-                        fix
-                        keepGoing
-                    }
+                AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.sm, stackedSpacing: Spacing.xs) {
+                    fix.frame(maxWidth: .infinity)
+                    keepGoing.frame(maxWidth: .infinity)
                 }
             }
         }

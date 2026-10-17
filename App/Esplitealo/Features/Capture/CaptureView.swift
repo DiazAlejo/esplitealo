@@ -9,6 +9,7 @@ import SwiftUI
 struct CaptureView: View {
     @Environment(ScanFlow.self) private var flow
     @Environment(\.openURL) private var openURL
+    @Environment(\.locale) private var locale
 
     @State private var pickedPhoto: PhotosPickerItem?
 
@@ -27,6 +28,14 @@ struct CaptureView: View {
                     let result = await PhotoImport.loadImage(from: item)
                     pickedPhoto = nil
                     flow.photoFinished(result, loadToken: loadToken)
+                }
+            }
+            // The screen changes in place (no push), so VoiceOver is told what happened.
+            .onChange(of: flow.phase) { _, phase in
+                switch phase {
+                case let .failed(failure): AccessibilityAnnouncements.post(AccessibilityAnnouncements.scanFailed(failure, locale: locale))
+                case let .blocked(block): AccessibilityAnnouncements.post(AccessibilityAnnouncements.cameraBlocked(block, locale: locale))
+                default: break
                 }
             }
             // `.contain` keeps the children's own identifiers; a bare identifier here would replace them.

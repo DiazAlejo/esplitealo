@@ -20,15 +20,9 @@ public struct AmountRow: View {
     }
 
     public var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .firstTextBaseline, spacing: Spacing.sm) {
-                description
-                MoneyText(cents: cents, style: style)
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                description
-                MoneyText(cents: cents, style: style)
-            }
+        AdaptiveStack(rowAlignment: .firstTextBaseline, rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) {
+            description
+            MoneyText(cents: cents, style: style)
         }
         .accessibilityElement(children: .combine)
     }

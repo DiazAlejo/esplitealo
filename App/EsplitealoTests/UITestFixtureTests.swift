@@ -95,4 +95,17 @@ struct UITestFixtureTests {
         let (_, router) = apply(["--uitesting", "--fixture=scanned", "--start-at=nowhere"])
         #expect(router.path.isEmpty)
     }
+
+    @Test func resumePromptArgumentLeavesASavedBillWaitingToBeResumed() throws {
+        let store = BillStore.live(arguments: ["--uitesting", "--uitesting-resume-prompt"])
+        store.loadSavedDraft()
+        #expect(store.session == nil)
+        #expect(store.resumeCandidate?.participants.count == SampleBill.midway().participants.count)
+    }
+
+    @Test func withoutTheResumeArgumentNothingIsWaiting() {
+        let store = BillStore.live(arguments: ["--uitesting"])
+        store.loadSavedDraft()
+        #expect(store.resumeCandidate == nil)
+    }
 }

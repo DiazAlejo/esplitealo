@@ -68,6 +68,8 @@ extension View {
                         }
                         .espText(.body)
                         .foregroundStyle(Color.esp.primary)
+                        .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum, alignment: .leading)
+                        .contentShape(Rectangle())
                     }
                     .accessibilityIdentifier("capture.back")
                 }

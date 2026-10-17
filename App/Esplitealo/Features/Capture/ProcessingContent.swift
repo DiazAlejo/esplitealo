@@ -10,6 +10,8 @@ struct ProcessingContent: View {
     var onManual: () -> Void = {}
     var onCancel: () -> Void = {}
 
+    @Environment(\.locale) private var locale
+
     var body: some View {
         CenteredScroll {
             VStack(spacing: Spacing.sm) {
@@ -23,11 +25,13 @@ struct ProcessingContent: View {
                     .accessibilityAddTraits(.isHeader)
                 IndeterminateBar(animates: animates)
                     .accessibilityElement(children: .ignore)
+                    // Read like the line above it: a 6 pt bar is not a control, so it is not offered as one.
+                    .accessibilityAddTraits(.isStaticText)
                     .accessibilityLabel("processing.bar")
                     .accessibilityValue(messageText)
-                    .accessibilityAddTraits(.updatesFrequently)
                     .accessibilityIdentifier("capture.progress")
                 Text("processing.footer")
+                    .accessibilityIdentifier("capture.privacy")
                     .espText(.footnote)
                     .foregroundStyle(Color.esp.inkSecondary)
                     .multilineTextAlignment(.center)
@@ -48,6 +52,10 @@ struct ProcessingContent: View {
         }
         .espScreenBackground()
         .captureBackButton("processing.cancel", showsChevron: false, action: onCancel)
+        // Three messages in a few seconds: announced as they change, not as a stream of progress values.
+        .onChange(of: messageIndex) { _, index in
+            AccessibilityAnnouncements.post(AccessibilityAnnouncements.readingProgress(messageIndex: index, locale: locale))
+        }
     }
 
     @ViewBuilder private var message: some View {

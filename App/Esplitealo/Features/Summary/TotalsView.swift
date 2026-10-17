@@ -16,6 +16,7 @@ private struct TotalsScreen: View {
     @Environment(AppRouter.self) private var router
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model: TotalsViewModel
     /// The success moment waits for the share preview to finish closing, so two presentations never overlap.
     @State private var showsSuccess = false
@@ -35,7 +36,10 @@ private struct TotalsScreen: View {
                 if model.hasRounding {
                     RoundingCard(notes: model.roundingNotes)
                 }
-                if dynamicTypeSize.isAccessibilitySize {
+                if !pinsFooter {
+                    footer
+                }
+                if !pinsExtra {
                     editButtons
                 }
             }
@@ -45,7 +49,9 @@ private struct TotalsScreen: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
-        .safeAreaInset(edge: .bottom) { footer }
+        .safeAreaInset(edge: .bottom) {
+            if pinsFooter { footer }
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .espScreenBackground()
         .stepCounterToolbar(for: .totals)
@@ -71,12 +77,24 @@ private struct TotalsScreen: View {
             .espScreenBackground()
         }
         .onChange(of: model.canShare) { model.closeShareIfBlocked() }
+        // Nothing moves when the tip changes, so VoiceOver is told the new total, and that stray cents were shared out.
+        .onChange(of: model.summary.billTotalCents) { _, cents in
+            AccessibilityAnnouncements.post(AccessibilityAnnouncements.billTotalWithTip(cents: cents, locale: locale))
+        }
+        .onChange(of: model.hasRounding) { _, shows in
+            if shows { AccessibilityAnnouncements.post(AccessibilityAnnouncements.strayCentsShared(locale: locale)) }
+        }
         // `.contain` keeps the children's own identifiers; a bare identifier here would replace them.
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(AppRoute.totals.accessibilityIdentifier)
     }
 
     // MARK: Bottom bar
+
+    /// The share button stays pinned up to AX3; at the two largest sizes it would cover half the screen.
+    private var pinsFooter: Bool { ChromePolicy.pinsActionBar(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass) }
+    /// The two quiet edit buttons join the pinned bar only at ordinary sizes in portrait.
+    private var pinsExtra: Bool { ChromePolicy.pinsExtraActions(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass) }
 
     private var footer: some View {
         VStack(spacing: Spacing.xs) {
@@ -102,7 +120,7 @@ private struct TotalsScreen: View {
                 .accessibilityIdentifier("totals.blocked")
             }
 
-            if !dynamicTypeSize.isAccessibilitySize {
+            if pinsExtra && pinsFooter {
                 editButtons
             }
         }
@@ -115,9 +133,9 @@ private struct TotalsScreen: View {
     }
 
     private var editButtons: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: Spacing.xs) { editAssignments; editReceipt }
-            VStack(spacing: 0) { editAssignments; editReceipt }
+        AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.xs, stackedSpacing: 0) {
+            editAssignments
+            editReceipt
         }
     }
 

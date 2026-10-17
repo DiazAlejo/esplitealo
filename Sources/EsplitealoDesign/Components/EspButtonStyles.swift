@@ -5,6 +5,7 @@ import SwiftUI
 public struct EspPrimaryButtonStyle: ButtonStyle {
     public var showsDivisionCoin: Bool
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init(showsDivisionCoin: Bool = false) {
         self.showsDivisionCoin = showsDivisionCoin
@@ -12,11 +13,13 @@ public struct EspPrimaryButtonStyle: ButtonStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
         let shape = RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+        // At accessibility sizes the words need the whole width: the coin is decoration and steps aside.
+        let showsCoin = showsDivisionCoin && isEnabled && !dynamicTypeSize.isAccessibilitySize
         configuration.label
             .espText(.headline)
             .multilineTextAlignment(.center)
             .foregroundStyle(isEnabled ? Color.esp.onPrimary : Color.esp.inkSecondary)
-            .padding(.horizontal, showsDivisionCoin && isEnabled ? 48 : Spacing.md)
+            .padding(.horizontal, showsCoin ? 48 : Spacing.md)
             .padding(.vertical, Spacing.xs)
             .padding(.bottom, isEnabled ? Stroke.buttonLip : 0)
             .frame(maxWidth: .infinity, minHeight: TapTarget.primaryButtonHeight)
@@ -33,7 +36,7 @@ public struct EspPrimaryButtonStyle: ButtonStyle {
                 }
             }
             .overlay(alignment: .trailing) {
-                if showsDivisionCoin && isEnabled {
+                if showsCoin {
                     DivisionCoin()
                         .padding(.trailing, 14)
                         .padding(.bottom, Stroke.buttonLip)

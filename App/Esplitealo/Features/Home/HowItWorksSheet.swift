@@ -30,7 +30,6 @@ struct HowItWorksSheet: View {
                                 .foregroundStyle(Color.esp.primary)
                                 .frame(width: 32, height: 32)
                                 .background(Circle().fill(Color.esp.okBackground))
-                                .accessibilityHidden(true)
                             VStack(alignment: .leading, spacing: 0) {
                                 Text(step.title).espText(.headline).foregroundStyle(Color.esp.ink)
                                 Text(step.detail).espText(.subhead).foregroundStyle(Color.esp.inkSecondary)
