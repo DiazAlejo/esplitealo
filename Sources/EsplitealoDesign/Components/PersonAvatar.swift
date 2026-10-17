@@ -21,6 +21,18 @@ public struct PersonAvatar: View {
     /// leave no room for the name next to it.
     private var size: CGFloat { min(scaledSize, baseSize * 1.75) }
 
+    /// The initial is set in a text style (so it scales with Dynamic Type like any text, not by a fixed point size), the
+    /// one closest to half the circle: caption2 in a 20 pt circle up to title3 in a 40 pt one.
+    private var letterStyle: Font.TextStyle {
+        switch baseSize {
+        case ..<22: .caption2
+        case ..<26: .caption
+        case ..<30: .footnote
+        case ..<36: .callout
+        default: .title3
+        }
+    }
+
     public var body: some View {
         let slot = PersonColorSlot(participantIndex: participantIndex)
         Circle()
@@ -28,7 +40,7 @@ public struct PersonAvatar: View {
             .frame(width: size, height: size)
             .overlay {
                 Text(verbatim: PersonInitial.make(from: name))
-                    .font(.system(size: size * 0.5, weight: .semibold))
+                    .font(.system(letterStyle, weight: .semibold))
                     .foregroundStyle(slot.letterColor)
                     .minimumScaleFactor(0.6)
             }

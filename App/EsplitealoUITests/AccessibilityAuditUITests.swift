@@ -58,30 +58,34 @@ final class AccessibilityAuditUITests: XCTestCase {
     }
 
     @MainActor
-    private func audit(_ app: XCUIApplication, _ label: String, scrolls: Int = 0, file: StaticString = #filePath, line: UInt = #line) {
-        run(app, label, file: file, line: line)
+    private func audit(_ app: XCUIApplication, _ label: String, scrolls: Int = 0, underSheet: Bool = false, file: StaticString = #filePath, line: UInt = #line) {
+        run(app, label, underSheet: underSheet, file: file, line: line)
         // Scrolled audits only where the text is largest: that is where content falls off the first screen.
         for index in 0 ..< min(scrolls, label.contains("AX5") ? 2 : 0) {
             app.swipeUp()
-            run(app, "\(label), scrolled \(index + 1)", file: file, line: line)
+            run(app, "\(label), scrolled \(index + 1)", underSheet: underSheet, file: file, line: line)
         }
     }
 
     @MainActor
-    private func run(_ app: XCUIApplication, _ label: String, file: StaticString, line: UInt) {
+    private func run(_ app: XCUIApplication, _ label: String, underSheet: Bool, file: StaticString, line: UInt) {
         let systemFrames = [app.keyboards.firstMatch, app.alerts.firstMatch].filter(\.exists).map(\.frame)
         let navigationBar = app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame : nil
+        let window = app.windows.firstMatch.frame
         do {
             try app.performAccessibilityAudit { issue in
                 // One greppable line per finding in the CI log: what, where and on which element.
                 let element = issue.element
                 let frame = element.map { "\(Int($0.frame.minX)),\(Int($0.frame.minY)) \(Int($0.frame.width))x\(Int($0.frame.height))" } ?? "-"
-                let detail = element.map { "\($0.debugDescription.replacingOccurrences(of: "\n", with: " ").prefix(240))" } ?? "-"
-                let line = "AUDIT [\(label)] \(issue.compactDescription) | type=\(element?.elementType.rawValue ?? 0) id=\(element?.identifier ?? "-") label=\(element?.label ?? "-") frame=\(frame) | \(detail)"
+                let detail = element.map { "\($0.debugDescription.replacingOccurrences(of: "\n", with: " ").prefix(900))" } ?? "-"
+                let line = "AUDIT [\(label)] \(issue.compactDescription) | auditType=\(issue.auditType.rawValue) type=\(element?.elementType.rawValue ?? 0) id=\(element?.identifier ?? "-") label=\(element?.label ?? "-") frame=\(frame) sys=\(systemFrames) | \(detail)"
                 XCTContext.runActivity(named: line) { _ in }
-                guard let element else { return false }
-                let center = CGPoint(x: element.frame.midX, y: element.frame.midY)
-                return AuditWaiver.reason(isDynamicTypeIssue: issue.auditType == .dynamicType, elementCenter: center, navigationBar: navigationBar, systemFrames: systemFrames) != nil
+                let kind: AuditWaiver.Kind = switch issue.auditType {
+                case .dynamicType: .dynamicType
+                case .contrast: .contrast
+                default: issue.compactDescription == "Potentially inaccessible text" ? .inaccessibleText : .other
+                }
+                return AuditWaiver.reason(kind: kind, elementFrame: element?.frame, window: window, navigationBar: navigationBar, systemFrames: systemFrames, underSheet: underSheet) != nil
             }
         } catch {
             XCTFail("\(label): the audit could not run: \(error)", file: file, line: line)
@@ -117,7 +121,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             XCTAssertTrue(app.buttons["home.how"].waitForExistence(timeout: 15))
             app.buttons["home.how"].tap()
             XCTAssertTrue(element(app, "how.sheet").waitForExistence(timeout: 5))
-            audit(app, "How it works \(situation.name)", scrolls: 2)
+            audit(app, "How it works \(situation.name)", scrolls: 2, underSheet: true)
         }
     }
 
@@ -177,7 +181,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             if !app.buttons["review.add"].isHittable { for _ in 0 ..< 6 where !app.buttons["review.add"].isHittable { app.swipeUp() } }
             app.buttons["review.add"].tap()
             XCTAssertTrue(app.buttons["sheet.save"].waitForExistence(timeout: 5))
-            audit(app, "Item editor \(situation.name)", scrolls: 1)
+            audit(app, "Item editor \(situation.name)", scrolls: 1, underSheet: true)
         }
         eachSituation(["--fixture=parsed", "--start-at=review"], hardestOnly: true) { app, situation in
             let total = app.buttons["review.field.total"]
@@ -185,13 +189,15 @@ final class AccessibilityAuditUITests: XCTestCase {
             for _ in 0 ..< 8 where !total.isHittable { app.swipeUp() }
             total.tap()
             XCTAssertTrue(app.buttons["sheet.save"].waitForExistence(timeout: 5))
-            audit(app, "Amount sheet \(situation.name)", scrolls: 1)
+            audit(app, "Amount sheet \(situation.name)", scrolls: 1, underSheet: true)
         }
         eachSituation(["--fixture=parsed", "--start-at=review"], hardestOnly: true) { app, situation in
             XCTAssertTrue(app.buttons["screen.next"].waitForExistence(timeout: 15))
-            if app.buttons["screen.next"].isHittable { app.buttons["screen.next"].tap() }
+            // At the largest sizes the button scrolls with the page instead of being pinned.
+            for _ in 0 ..< 8 where !app.buttons["screen.next"].isHittable { app.swipeUp() }
+            app.buttons["screen.next"].tap()
             XCTAssertTrue(app.buttons["review.confirm.fix"].waitForExistence(timeout: 5))
-            audit(app, "Mismatch confirmation \(situation.name)", scrolls: 1)
+            audit(app, "Mismatch confirmation \(situation.name)", scrolls: 1, underSheet: true)
         }
     }
 
@@ -225,7 +231,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             for _ in 0 ..< 8 where !rename.isHittable { app.swipeUp() }
             rename.tap()
             XCTAssertTrue(app.buttons["sheet.save"].waitForExistence(timeout: 5))
-            audit(app, "Rename sheet \(situation.name)", scrolls: 1)
+            audit(app, "Rename sheet \(situation.name)", scrolls: 1, underSheet: true)
         }
         eachSituation(["--fixture=midway", "--start-at=people"], hardestOnly: true) { app, situation in
             let remove = app.buttons["people.remove.1"]
@@ -233,7 +239,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             for _ in 0 ..< 8 where !remove.isHittable { app.swipeUp() }
             remove.tap()
             XCTAssertTrue(app.buttons["people.remove.keep"].waitForExistence(timeout: 5))
-            audit(app, "Remove sheet \(situation.name)", scrolls: 1)
+            audit(app, "Remove sheet \(situation.name)", scrolls: 1, underSheet: true)
         }
     }
 
@@ -252,7 +258,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             for _ in 0 ..< 6 where !firstRow.isHittable { app.swipeUp() }
             firstRow.tap()
             XCTAssertTrue(app.buttons["assign.sheet.done"].waitForExistence(timeout: 5))
-            audit(app, "Assign sheet \(situation.name)", scrolls: 2)
+            audit(app, "Assign sheet \(situation.name)", scrolls: 2, underSheet: true)
         }
     }
 
@@ -287,7 +293,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             for _ in 0 ..< 10 where !share.isHittable { app.swipeUp() }
             share.tap()
             XCTAssertTrue(app.buttons["share.send"].waitForExistence(timeout: 10))
-            audit(app, "Share sheet \(situation.name)", scrolls: 2)
+            audit(app, "Share sheet \(situation.name)", scrolls: 2, underSheet: true)
             for _ in 0 ..< 6 where !app.buttons["share.send"].isHittable { app.swipeUp() }
             app.buttons["share.send"].tap()
             XCTAssertTrue(element(app, "success.title").waitForExistence(timeout: 10))

@@ -23,6 +23,8 @@ struct AssignHeader: View {
                 }
                 ProgressView(value: Double(done), total: Double(max(total, 1)))
                     .tint(isComplete ? Color.esp.primary : Color.esp.pink)
+                    // A 4 pt bar is a reading, not a control: it is read like text and not offered as something to tap.
+                    .accessibilityAddTraits(.isStaticText)
                     .accessibilityLabel("assign.meter")
                     .accessibilityValue(Text(.assignProgress(done, total)))
                     .accessibilityIdentifier("assign.meter")

@@ -82,7 +82,7 @@ struct AssignItemRow: View {
     private var status: some View {
         switch row.state {
         case .unassigned:
-            AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: Spacing.xxs, stacksFrom: .xxLarge) {
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
                 unassignedMark
                 Text("assign.tapChoose").espText(.footnote).foregroundStyle(Color.esp.inkSecondary)
             }
