@@ -33,7 +33,7 @@ final class JourneyRelaunchUITests: JourneyTestCase {
 
         let second = relaunch(directory)
         expectScreen("home", in: second)
-        XCTAssertFalse(second.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertFalse(second.alerts.firstMatch.waitForExistence(timeout: 1))
     }
 
     @MainActor

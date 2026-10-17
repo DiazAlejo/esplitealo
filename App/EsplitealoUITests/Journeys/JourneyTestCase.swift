@@ -105,10 +105,19 @@ class JourneyTestCase: XCTestCase {
         app.descendants(matching: .any)[identifier]
     }
 
+    /// Waits for the element and, when it never comes, prints the screen to the log so a CI failure shows what was there.
+    @MainActor @discardableResult
+    func waitFor(_ found: XCUIElement, _ description: String, in app: XCUIApplication, timeout: TimeInterval = 10, file: StaticString = #filePath, line: UInt = #line) -> Bool {
+        let appeared = found.waitForExistence(timeout: timeout)
+        if !appeared { print("--- \(description) never appeared; the screen:\n\(app.debugDescription)") }
+        XCTAssertTrue(appeared, "\(description) never appeared", file: file, line: line)
+        return appeared
+    }
+
     @MainActor @discardableResult
     func expect(_ identifier: String, in app: XCUIApplication, timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) -> XCUIElement {
         let found = element(app, identifier)
-        XCTAssertTrue(found.waitForExistence(timeout: timeout), "\(identifier) never appeared", file: file, line: line)
+        waitFor(found, identifier, in: app, timeout: timeout, file: file, line: line)
         return found
     }
 
@@ -120,7 +129,9 @@ class JourneyTestCase: XCTestCase {
     @MainActor
     func expectNoElement(_ identifier: String, in app: XCUIApplication, within seconds: TimeInterval = 2, file: StaticString = #filePath, line: UInt = #line) {
         let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: element(app, identifier))
-        XCTAssertEqual(XCTWaiter().wait(for: [gone], timeout: seconds), .completed, "\(identifier) is still there", file: file, line: line)
+        let done = XCTWaiter().wait(for: [gone], timeout: seconds) == .completed
+        if !done { print("--- \(identifier) is still there; the screen:\n\(app.debugDescription)") }
+        XCTAssertTrue(done, "\(identifier) is still there", file: file, line: line)
     }
 
     /// Waits until the element's label contains the text: screens update a moment after a sheet closes.
@@ -190,13 +201,12 @@ class JourneyTestCase: XCTestCase {
     @MainActor
     func addPeople(_ names: [String], in app: XCUIApplication) {
         expectScreen("people", in: app)
-        for name in names {
+        for (index, name) in names.enumerated() {
             let field = app.textFields["people.name"]
             XCTAssertTrue(field.waitForExistence(timeout: 10))
             field.tap()
-            field.typeText(name)
-            app.buttons["people.add"].tap()
-            XCTAssertTrue(element(app, "people.row.\(names.firstIndex(of: name) ?? 0)").waitForExistence(timeout: 5), "\(name) did not join the table")
+            field.typeText(name + "\n")
+            waitFor(element(app, "people.row.\(index)"), "\(name) joining the table", in: app, timeout: 5)
         }
     }
 
@@ -235,6 +245,7 @@ class JourneyTestCase: XCTestCase {
         row.tap()
         XCTAssertTrue(element(app, "assign.sheet").waitForExistence(timeout: 5))
         for (offset, people) in units.enumerated() {
+            waitFor(app.buttons["assign.sheet.unit.\(offset + 1)"], "unit pill \(offset + 1) of \(item)", in: app, timeout: 5)
             app.buttons["assign.sheet.unit.\(offset + 1)"].tap()
             for person in people { app.buttons["assign.sheet.person.\(person)"].tap() }
         }

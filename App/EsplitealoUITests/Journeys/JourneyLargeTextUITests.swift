@@ -28,9 +28,8 @@ final class JourneyLargeTextUITests: JourneyTestCase {
             XCTAssertTrue(field.waitForExistence(timeout: 10))
             scrollTo(field, in: app)
             field.tap()
-            field.typeText(name)
-            tapReaching(app.buttons["people.add"], in: app)
-            XCTAssertTrue(element(app, "people.row.\(index)").waitForExistence(timeout: 5), "\(name) did not join the table")
+            field.typeText(name + "\n")
+            waitFor(element(app, "people.row.\(index)"), "\(name) joining the table", in: app, timeout: 8)
         }
     }
 

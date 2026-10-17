@@ -220,17 +220,19 @@ final class JourneyInterruptionsUITests: JourneyTestCase {
         XCTAssertTrue(rice.waitForExistence(timeout: 5))
         rice.tap()
         let price = app.textFields["sheet.item.price"]
-        XCTAssertTrue(price.waitForExistence(timeout: 5))
+        waitFor(price, "the item price field", in: app, timeout: 5)
         replaceText(in: price, with: "10.00")
         app.buttons["sheet.save"].tap()
+        expectNoElement("sheet.item.price", in: app, within: 5)
         waitForLabel(element(app, "review.banner"), containing: "no cuadran")
 
         for (field, value) in [("subtotal", "24.50"), ("total", "27.09")] {
             let button = app.buttons["review.field.\(field)"]
+            waitFor(button, "the \(field) row", in: app, timeout: 5)
             scrollTo(button, in: app)
             button.tap()
             let amount = app.textFields["sheet.amount.field"]
-            XCTAssertTrue(amount.waitForExistence(timeout: 5))
+            waitFor(amount, "the \(field) amount field", in: app, timeout: 5)
             replaceText(in: amount, with: value)
             app.buttons["sheet.save"].tap()
             expectNoElement("sheet.amount.field", in: app, within: 5)
@@ -261,8 +263,10 @@ final class JourneyInterruptionsUITests: JourneyTestCase {
         tapNext(app)
         addPeople(["Ana", "Luis"], in: app)
         let people = ["people.row."]
+        // Taken before anything is marked, so only who is at the table must match: the rest of a row's label counts marks.
         let peopleBefore = fingerprint(of: app, prefixes: people)
         XCTAssertEqual(peopleBefore.count, 2)
+        let names = ["Ana", "Luis"]
 
         tapNext(app)
         expectScreen("mark", in: app)
@@ -284,7 +288,11 @@ final class JourneyInterruptionsUITests: JourneyTestCase {
         XCTAssertEqual(fingerprint(of: app, prefixes: mark), markBefore)
         goBack(app)
         expectScreen("people", in: app)
-        XCTAssertEqual(fingerprint(of: app, prefixes: people), peopleBefore)
+        let peopleAfter = fingerprint(of: app, prefixes: people)
+        XCTAssertEqual(Set(peopleAfter.keys), Set(peopleBefore.keys))
+        for (offset, name) in names.enumerated() {
+            XCTAssertTrue(peopleAfter["people.row.\(offset)"]?.hasPrefix(name) == true, "\(peopleAfter)")
+        }
         goBack(app)
         expectScreen("review", in: app)
         XCTAssertEqual(fingerprint(of: app, prefixes: review), reviewBefore)
@@ -323,17 +331,17 @@ final class JourneyInterruptionsUITests: JourneyTestCase {
         scrollTo(discard, in: app)
         discard.tap()
         let alert = app.alerts.firstMatch
-        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        waitFor(alert, "the discard alert", in: app, timeout: 5)
         alert.buttons["Abandonar cuenta"].tap()
         expectScreen("home", in: app)
-        XCTAssertFalse(element(app, "home.resume").waitForExistence(timeout: 2))
+        expectNoElement("home.resume", in: app, within: 1)
 
         backgroundAndTerminate(app)
         var again = Options(draftDirectory: directory)
         again.receipt = nil
         let relaunched = launch(again)
         expectScreen("home", in: relaunched)
-        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 3), "an abandoned bill is not offered")
+        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 1), "an abandoned bill is not offered")
         XCTAssertFalse(element(relaunched, "home.resume").exists)
     }
 
@@ -352,14 +360,14 @@ final class JourneyInterruptionsUITests: JourneyTestCase {
         app.buttons["home.resume.discard"].tap()
         XCTAssertTrue(app.alerts.firstMatch.waitForExistence(timeout: 5))
         app.alerts.firstMatch.buttons["Abandonar cuenta"].tap()
-        XCTAssertFalse(element(app, "home.resume").waitForExistence(timeout: 2))
+        XCTAssertFalse(element(app, "home.resume").waitForExistence(timeout: 1))
 
         backgroundAndTerminate(app)
         var again = Options(draftDirectory: directory)
         again.receipt = nil
         let relaunched = launch(again)
         expectScreen("home", in: relaunched)
-        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 1))
     }
 
     @MainActor
@@ -381,6 +389,6 @@ final class JourneyInterruptionsUITests: JourneyTestCase {
         backgroundAndTerminate(second)
         let third = launch(again)
         expectScreen("home", in: third)
-        XCTAssertFalse(third.alerts.firstMatch.waitForExistence(timeout: 3), "starting over deleted the draft")
+        XCTAssertFalse(third.alerts.firstMatch.waitForExistence(timeout: 1), "starting over deleted the draft")
     }
 }

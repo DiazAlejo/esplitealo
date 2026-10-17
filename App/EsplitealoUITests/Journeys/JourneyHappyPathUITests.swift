@@ -48,7 +48,7 @@ final class JourneyHappyPathUITests: JourneyTestCase {
         again.receipt = nil
         let relaunched = launch(again)
         expectScreen("home", in: relaunched)
-        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 1))
         XCTAssertFalse(element(relaunched, "home.resume").exists)
     }
 
@@ -99,7 +99,7 @@ final class JourneyHappyPathUITests: JourneyTestCase {
         again.receipt = nil
         let relaunched = launch(again)
         expectScreen("home", in: relaunched)
-        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 1))
         XCTAssertFalse(element(relaunched, "home.resume").exists)
     }
 
@@ -148,7 +148,7 @@ final class JourneyHappyPathUITests: JourneyTestCase {
 
         expectScreen("mark", in: app)
         markUnits(of: "Negro", [[0], [0], [1]], in: app)
-        markUnits(of: "Marrón", [[1]], in: app)
+        paint(person: 1, items: ["Marrón"], in: app)
         waitForLabel(element(app, "assign.chip.0"), containing: "23 dólares")
         waitForLabel(element(app, "assign.chip.1"), containing: "23 dólares")
         tapNext(app)

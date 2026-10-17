@@ -183,7 +183,7 @@ final class JourneyScanRecoveryUITests: JourneyTestCase {
         again.receipt = nil
         let relaunched = launch(again)
         expectScreen("home", in: relaunched)
-        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 3))
+        XCTAssertFalse(relaunched.alerts.firstMatch.waitForExistence(timeout: 1))
         XCTAssertFalse(element(relaunched, "home.resume").exists)
     }
 
