@@ -130,12 +130,17 @@ struct AssignHeader: View {
                 .foregroundStyle(Color.esp.inkSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityIdentifier("assign.paintbar")
-            Button("assign.done") { model.togglePainting(painter.id) }
-                .espText(.subhead)
-                .fontWeight(.semibold)
-                .foregroundStyle(Color.esp.primary)
-                .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum)
-                .accessibilityIdentifier("assign.paintbar.done")
+            Button {
+                model.togglePainting(painter.id)
+            } label: {
+                Text("assign.done")
+                    .espText(.subhead)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color.esp.primary)
+                    .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityIdentifier("assign.paintbar.done")
         }
         .padding(.horizontal, Spacing.screenMargin)
     }

@@ -103,8 +103,10 @@ struct HomeView: View {
             Label("home.how", systemImage: "questionmark.circle")
                 .espText(.subhead)
                 .foregroundStyle(Color.esp.primary)
+                // The frame is inside the label: a frame around the button is not part of what can be tapped.
+                .frame(minHeight: TapTarget.minimum)
+                .contentShape(Rectangle())
         }
-        .frame(minHeight: TapTarget.minimum)
         .accessibilityIdentifier("home.how")
     }
 

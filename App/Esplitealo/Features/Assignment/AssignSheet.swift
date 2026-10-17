@@ -69,13 +69,16 @@ struct AssignSheet: View {
                 .espText(.subhead)
                 .foregroundStyle(Color.esp.inkSecondary)
             Spacer(minLength: Spacing.xs)
-            Button(content.everyoneSelected ? "assign.clear" : "assign.everyone") {
+            Button {
                 model.toggleEveryone(on: itemID, scope: content.scope)
+            } label: {
+                Text(content.everyoneSelected ? "assign.clear" : "assign.everyone")
+                    .espText(.subhead)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color.esp.primary)
+                    .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum, alignment: .trailing)
+                    .contentShape(Rectangle())
             }
-            .espText(.subhead)
-            .fontWeight(.semibold)
-            .foregroundStyle(Color.esp.primary)
-            .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum, alignment: .trailing)
             .accessibilityIdentifier("assign.sheet.everyone")
         }
     }
