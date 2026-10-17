@@ -9,6 +9,7 @@ struct HomeSnapshotTests {
         assertDesignSnapshot(
             NavigationStack { HomeView(animatesMascot: false) }
                 .environment(AppRouter())
+                .environment(BillStore.live(arguments: ["--uitesting"]))
                 .environment(ScanFlow.preview()),
             named: "home",
             fixedHeight: 844

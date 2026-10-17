@@ -15,10 +15,12 @@ struct ReviewView: View {
 }
 
 private struct ReviewScreen: View {
+    @Environment(BillStore.self) private var store
     @Environment(AppRouter.self) private var router
     @Environment(\.locale) private var locale
     @State private var model: ReceiptReviewModel
     @State private var sheet: ReviewSheet?
+    @State private var confirmsDiscard = false
 
     init(store: BillStore) {
         _model = State(initialValue: ReceiptReviewModel(store: store))
@@ -63,6 +65,11 @@ private struct ReviewScreen: View {
                 .accessibilityIdentifier("review.add")
 
                 amounts
+
+                Button("bill.discard", role: .destructive) { confirmsDiscard = true }
+                    .buttonStyle(.espQuiet)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityIdentifier("review.discard")
             }
             .padding(.horizontal, Spacing.screenMargin)
             .padding(.vertical, Spacing.md)
@@ -85,6 +92,10 @@ private struct ReviewScreen: View {
         .navigationTitle("people.back")
         .stepCounterToolbar(for: .review)
         .onAppear { model.startBillIfNeeded() }
+        .discardBillConfirmation(isPresented: $confirmsDiscard) {
+            store.finishBill()
+            router.popToRoot()
+        }
         .onChange(of: model.status) { _, status in announce(status) }
         .sheet(item: $sheet) { sheet in
             switch sheet {

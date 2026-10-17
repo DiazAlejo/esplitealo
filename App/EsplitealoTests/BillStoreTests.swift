@@ -213,6 +213,167 @@ struct BillStoreTests {
         #expect(recording.saveCount == 0)
     }
 
+    // MARK: A bill in progress
+
+    @Test func noBillMeansNothingInProgress() {
+        let store = makeStore()
+        #expect(store.billInProgress == nil)
+        #expect(store.hasBillInProgress == false)
+    }
+
+    @Test func aBlankBillIsNotInProgress() {
+        let store = makeStore()
+        store.startNewBill()
+        #expect(store.billInProgress == nil)
+        #expect(store.hasBillInProgress == false)
+    }
+
+    @Test func aBillWithItemsIsInProgressWithItsItemCountPrintedTotalAndWayBack() {
+        let store = makeStore()
+        store.startNewBill(draft: SampleBill.scannedDraft())
+        let session = SampleBill.scanned()
+        let progress = store.billInProgress
+        #expect(store.hasBillInProgress)
+        #expect(progress?.itemCount == session.draft.items.count)
+        #expect(progress?.totalCents == session.printedReceiptTotalCents)
+        #expect(progress?.resumePath == [.review])
+    }
+
+    @Test func withoutAPrintedTotalTheItemsSumIsTheTotal() {
+        let store = makeStore()
+        var draft = SampleBill.scannedDraft()
+        draft.total = nil
+        store.startNewBill(draft: draft)
+        #expect(store.billInProgress?.totalCents == store.session?.netItemsSubtotalCents)
+    }
+
+    @Test func aBillWithOnlyPeopleIsInProgress() {
+        let store = makeStore()
+        store.startNewBill()
+        store.update { $0.addParticipant(name: "Marisol") }
+        #expect(store.hasBillInProgress)
+        #expect(store.billInProgress?.itemCount == 0)
+    }
+
+    @Test func theWayBackFollowsTheStepTheBillReached() {
+        let store = makeStore()
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.midway() }
+        #expect(store.billInProgress?.resumePath == [.review, .people, .mark])
+        store.update { $0 = SampleBill.complete() }
+        #expect(store.billInProgress?.resumePath == [.review, .people, .mark, .totals])
+    }
+
+    @Test func abandoningTheBillForgetsItAndDeletesTheDraftFile() async {
+        let recording = RecordingDraftStore()
+        let store = makeStore(drafts: recording)
+        store.startNewBill(draft: SampleBill.scannedDraft())
+        await advance(store, by: .milliseconds(500))
+        #expect(recording.stored != nil)
+        store.finishBill()
+        #expect(store.session == nil)
+        #expect(store.hasBillInProgress == false)
+        #expect(recording.stored == nil)
+    }
+
+    @Test func replacingABillWithABlankOneAlsoRemovesTheOldDraftFile() async {
+        let recording = RecordingDraftStore()
+        let store = makeStore(drafts: recording)
+        store.startNewBill(draft: SampleBill.scannedDraft())
+        await advance(store, by: .milliseconds(500))
+        #expect(recording.stored != nil)
+        store.startNewBill()
+        #expect(recording.stored == nil, "a stale draft must not be offered at the next launch")
+    }
+
+    // MARK: A bill that was shared
+
+    @Test func sharingDeletesTheDraftFileButKeepsTheBillInMemory() async {
+        let recording = RecordingDraftStore()
+        let store = makeStore(drafts: recording)
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        await advance(store, by: .milliseconds(500))
+        #expect(recording.stored != nil)
+
+        let before = store.session
+        store.billShared()
+        #expect(recording.stored == nil)
+        #expect(store.session == before)
+    }
+
+    @Test func aSharedBillIsNoLongerInProgress() {
+        let store = makeStore()
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        #expect(store.hasBillInProgress)
+        store.billShared()
+        #expect(store.hasBillInProgress == false)
+        #expect(store.billInProgress == nil)
+    }
+
+    @Test func sharingCancelsASaveThatWasStillWaiting() async {
+        let recording = RecordingDraftStore()
+        let store = makeStore(drafts: recording)
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.billShared()
+        #expect(store.pendingSave == nil)
+        clock.advance(by: .seconds(5))
+        await Task.yield()
+        #expect(recording.stored == nil)
+        #expect(recording.saveCount == 0)
+    }
+
+    @Test func goingToTheBackgroundAfterSharingDoesNotBringTheDraftBack() {
+        let recording = RecordingDraftStore()
+        let store = makeStore(drafts: recording)
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.billShared()
+        store.saveNow()
+        #expect(recording.stored == nil)
+    }
+
+    @Test func editingASharedBillMakesItLiveAndSavesItAgain() async {
+        let recording = RecordingDraftStore()
+        let store = makeStore(drafts: recording)
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.billShared()
+
+        store.update { $0.addParticipant(name: "Nuevo") }
+        #expect(store.hasBillInProgress)
+        await advance(store, by: .milliseconds(500))
+        #expect(recording.stored == store.session)
+    }
+
+    @Test func relaunchingAfterSharingDoesNotOfferTheFinishedBill() async {
+        let recording = RecordingDraftStore()
+        let first = makeStore(drafts: recording)
+        first.startNewBill(draft: SampleBill.complete().draft)
+        first.update { $0 = SampleBill.complete() }
+        await advance(first, by: .milliseconds(500))
+        first.billShared()
+
+        let relaunched = makeStore(drafts: recording)
+        relaunched.loadSavedDraft()
+        #expect(relaunched.resumeCandidate == nil)
+    }
+
+    @Test func startingANewBillAfterSharingSavesNormally() async {
+        let recording = RecordingDraftStore()
+        let store = makeStore(drafts: recording)
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.billShared()
+
+        store.startNewBill(draft: SampleBill.scannedDraft())
+        #expect(store.hasBillInProgress)
+        await advance(store, by: .milliseconds(500))
+        #expect(recording.stored == store.session)
+    }
+
     // MARK: Warnings from the scan
 
     @Test func warningsFromTheScanAreSavedAndComeBackOnResume() async {
