@@ -133,9 +133,9 @@ private struct TotalsScreen: View {
     }
 
     private var editButtons: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: Spacing.xs) { editAssignments; editReceipt }
-            VStack(spacing: 0) { editAssignments; editReceipt }
+        AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.xs, stackedSpacing: 0) {
+            editAssignments
+            editReceipt
         }
     }
 

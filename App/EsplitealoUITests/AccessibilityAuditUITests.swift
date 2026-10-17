@@ -69,8 +69,8 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     @MainActor
     private func run(_ app: XCUIApplication, _ label: String, file: StaticString, line: UInt) {
-        // What the system draws on top of the app: the keyboard and alerts. Their issues are not ours to fix.
         let systemFrames = [app.keyboards.firstMatch, app.alerts.firstMatch].filter(\.exists).map(\.frame)
+        let navigationBar = app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame : nil
         do {
             try app.performAccessibilityAudit { issue in
                 // One greppable line per finding in the CI log: what, where and on which element.
@@ -79,27 +79,14 @@ final class AccessibilityAuditUITests: XCTestCase {
                 let detail = element.map { "\($0.debugDescription.replacingOccurrences(of: "\n", with: " ").prefix(240))" } ?? "-"
                 let line = "AUDIT [\(label)] \(issue.compactDescription) | type=\(element?.elementType.rawValue ?? 0) id=\(element?.identifier ?? "-") label=\(element?.label ?? "-") frame=\(frame) | \(detail)"
                 XCTContext.runActivity(named: line) { _ in }
-                return Self.isKnownIssue(issue, systemFrames: systemFrames)
+                guard let element else { return false }
+                let center = CGPoint(x: element.frame.midX, y: element.frame.midY)
+                return AuditWaiver.reason(isDynamicTypeIssue: issue.auditType == .dynamicType, elementCenter: center, navigationBar: navigationBar, systemFrames: systemFrames) != nil
             }
         } catch {
             XCTFail("\(label): the audit could not run: \(error)", file: file, line: line)
         }
         assertTapTargets(app, label, file: file, line: line)
-    }
-
-    /// Findings that are not failures, each for a stated reason (docs/ACCESSIBILITY.md, "What the audit does not decide"):
-    ///
-    /// - Views the system draws (navigation bar, status bar, keyboard, alerts).
-    /// - Contrast, Dynamic Type and clipped text. XCUITest's checks for these read pixels and font metadata, and report
-    ///   text that passes (e.g. 12:1 ink on a banner) and text that does scale (system text styles). They are logged
-    ///   above (`AUDIT [...]`), and decided instead by `ContrastTests` / `AccessibilityContrastTests` (every pair of
-    ///   tokens) and by the AX3 and AX5 snapshots, which are looked at.
-    private static func isKnownIssue(_ issue: XCUIAccessibilityAuditIssue, systemFrames: [CGRect]) -> Bool {
-        if issue.auditType == .contrast || issue.auditType == .dynamicType || issue.auditType == .textClipped { return true }
-        guard let element = issue.element else { return false }
-        if element.elementType == .navigationBar || element.elementType == .statusBar || element.elementType == .keyboard || element.elementType == .alert { return true }
-        let center = CGPoint(x: element.frame.midX, y: element.frame.midY)
-        return systemFrames.contains { $0.contains(center) }
     }
 
     @MainActor

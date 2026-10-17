@@ -275,15 +275,9 @@ struct ReviewWarningRow: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center, spacing: Spacing.sm) {
-                message
-                dismissButton
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                message
-                dismissButton
-            }
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) {
+            message
+            dismissButton
         }
         .padding(.horizontal, Spacing.md)
         .padding(.vertical, Spacing.xs)
@@ -359,15 +353,9 @@ struct ReviewAdjustmentRow: View {
     let onRemove: () -> Void
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center, spacing: Spacing.sm) {
-                label
-                removeButton
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                label
-                removeButton
-            }
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) {
+            label
+            removeButton
         }
         .padding(.horizontal, Spacing.md)
         .padding(.vertical, Spacing.xs)

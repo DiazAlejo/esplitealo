@@ -107,15 +107,9 @@ private struct PeopleScreen: View {
     // MARK: Parts
 
     private func addPersonRow(name: Binding<String>) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: Spacing.xs) {
-                nameField(name)
-                addButton.fixedSize(horizontal: true, vertical: false)
-            }
-            VStack(spacing: Spacing.xs) {
-                nameField(name)
-                addButton
-            }
+        AdaptiveStack(rowAlignment: .top, stackedAlignment: .center, rowSpacing: Spacing.xs, stacksFrom: .xLarge) { stacked in
+            nameField(name)
+            addButton.fixedSize(horizontal: !stacked, vertical: false)
         }
     }
 
@@ -192,21 +186,10 @@ private struct PersonRow: View {
     let onRemove: () -> Void
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: Spacing.xs) {
-                who
-                rename
-                remove
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                who
-                HStack(spacing: Spacing.xs) {
-                    rename
-                    remove
-                }
-            }
-            VStack(alignment: .leading, spacing: 0) {
-                who
+        AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: Spacing.xxs) {
+            who
+            // Side by side up to the accessibility sizes; one above the other from there.
+            AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: 0, stacksFrom: .accessibility1) {
                 rename
                 remove
             }

@@ -62,15 +62,9 @@ struct RemovePersonSheet: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("people.remove.body")
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Spacing.sm) {
-                        keep.frame(maxWidth: .infinity)
-                        remove.frame(maxWidth: .infinity)
-                    }
-                    VStack(spacing: Spacing.xs) {
-                        keep
-                        remove
-                    }
+                AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.sm, stackedSpacing: Spacing.xs) {
+                    keep.frame(maxWidth: .infinity)
+                    remove.frame(maxWidth: .infinity)
                 }
                 .padding(.top, Spacing.xs)
             }

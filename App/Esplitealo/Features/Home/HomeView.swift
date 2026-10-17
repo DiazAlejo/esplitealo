@@ -28,16 +28,9 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.lg) {
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .center) {
-                        EspWordmark()
-                        Spacer(minLength: Spacing.xs)
-                        howItWorksButton
-                    }
-                    VStack(alignment: .leading, spacing: Spacing.xs) {
-                        EspWordmark()
-                        howItWorksButton
-                    }
+                AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: Spacing.xs) {
+                    EspWordmark().frame(maxWidth: .infinity, alignment: .leading)
+                    howItWorksButton
                 }
                 if let bill = store.billInProgress {
                     ResumeBillCard(

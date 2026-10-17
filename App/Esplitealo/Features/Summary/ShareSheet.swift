@@ -59,19 +59,12 @@ struct ShareSheetContent: View {
 
     /// The recipients go under the title when the title has no room beside them (large text).
     private var header: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: Spacing.sm) {
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xs) {
+            HStack(alignment: .top, spacing: Spacing.sm) {
                 headerIcon
                 headerTitle
-                RecipientsStack(people: model.people)
             }
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                HStack(alignment: .top, spacing: Spacing.sm) {
-                    headerIcon
-                    headerTitle
-                }
-                RecipientsStack(people: model.people)
-            }
+            RecipientsStack(people: model.people)
         }
     }
 

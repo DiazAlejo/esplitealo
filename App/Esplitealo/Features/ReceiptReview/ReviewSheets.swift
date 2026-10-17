@@ -76,9 +76,9 @@ struct ItemEditorSheet: View {
                     .buttonStyle(.espPrimary)
                     .accessibilityIdentifier("sheet.save")
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Spacing.xs) { deleteButton; cancelButton }
-                    VStack(spacing: Spacing.xs) { deleteButton; cancelButton }
+                AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.xs) {
+                    deleteButton
+                    cancelButton
                 }
             }
         }
@@ -267,15 +267,9 @@ struct MismatchConfirmationSheet: View {
                     Text("review.bad.bodyMissing").espText(.body)
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: Spacing.sm) {
-                        fix.frame(maxWidth: .infinity)
-                        keepGoing.frame(maxWidth: .infinity)
-                    }
-                    VStack(spacing: Spacing.xs) {
-                        fix
-                        keepGoing
-                    }
+                AdaptiveStack(stackedAlignment: .center, rowSpacing: Spacing.sm, stackedSpacing: Spacing.xs) {
+                    fix.frame(maxWidth: .infinity)
+                    keepGoing.frame(maxWidth: .infinity)
                 }
             }
         }

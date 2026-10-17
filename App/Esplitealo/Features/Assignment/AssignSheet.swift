@@ -43,16 +43,9 @@ struct AssignSheet: View {
     // MARK: Parts
 
     private func header(_ content: AssignViewModel.SheetContent) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .firstTextBaseline, spacing: Spacing.sm) {
-                title(content.itemName)
-                Spacer(minLength: Spacing.xs)
-                MoneyText(cents: content.totalCents, style: .amount)
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                title(content.itemName)
-                MoneyText(cents: content.totalCents, style: .amount)
-            }
+        AdaptiveStack(rowAlignment: .firstTextBaseline, rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) {
+            title(content.itemName).frame(maxWidth: .infinity, alignment: .leading)
+            MoneyText(cents: content.totalCents, style: .amount)
         }
     }
 

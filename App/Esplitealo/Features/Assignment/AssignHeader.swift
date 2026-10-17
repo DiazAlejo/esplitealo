@@ -17,16 +17,9 @@ struct AssignHeader: View {
         let isComplete = total > 0 && done == total
         VStack(alignment: .leading, spacing: Spacing.xs) {
             VStack(alignment: .leading, spacing: Spacing.xs) {
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .firstTextBaseline) {
-                        EspTitle("assign.title")
-                        Spacer(minLength: Spacing.xs)
-                        progress(done: done, total: total, isComplete: isComplete)
-                    }
-                    VStack(alignment: .leading, spacing: Spacing.xxs) {
-                        EspTitle("assign.title")
-                        progress(done: done, total: total, isComplete: isComplete)
-                    }
+                AdaptiveStack(rowAlignment: .firstTextBaseline, rowSpacing: Spacing.xs, stackedSpacing: Spacing.xxs) {
+                    EspTitle("assign.title").frame(maxWidth: .infinity, alignment: .leading)
+                    progress(done: done, total: total, isComplete: isComplete)
                 }
                 ProgressView(value: Double(done), total: Double(max(total, 1)))
                     .tint(isComplete ? Color.esp.primary : Color.esp.pink)

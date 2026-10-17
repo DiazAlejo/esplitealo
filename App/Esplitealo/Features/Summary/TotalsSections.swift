@@ -151,19 +151,8 @@ struct TipSettings: View {
     // MARK: Buttons
 
     private var selector: some View {
-        Group {
-            if dynamicTypeSize.isAccessibilitySize {
-                // "15" and "%" must not be split over two lines: one choice per row.
-                VStack(spacing: 2) { segments }
-            } else {
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 2) { segments }
-                    VStack(spacing: 2) {
-                        HStack(spacing: 2) { presetSegments }
-                        HStack(spacing: 2) { customSegment }
-                    }
-                }
-            }
+        AdaptiveStack(stackedAlignment: .center, rowSpacing: 2) {
+            segments
         }
         .padding(3)
         .background(Color.esp.well, in: RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous))
@@ -326,34 +315,44 @@ struct TotalsSummary: View {
                 Capsule().fill(Color.esp.pink).frame(width: 64, height: 3).accessibilityHidden(true)
             }
             Rectangle().fill(Color.esp.hairline).frame(height: Stroke.hairline).accessibilityHidden(true)
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: Spacing.xs) { columns }
-                VStack(spacing: 0) { rows }
+            AdaptiveStack(rowAlignment: .top, stackedAlignment: .leading, rowSpacing: Spacing.xs, stackedSpacing: 0) {
+                cell("totals.subtotal", summary.subtotalCents)
+                cell("totals.tax", summary.taxCents)
+                if summary.showsService { cell("totals.service", summary.serviceCents) }
+                cell("totals.tip", summary.tipCents)
             }
         }
         .padding(.top, Spacing.xs)
     }
 
-    @ViewBuilder private var columns: some View {
-        column("totals.subtotal", summary.subtotalCents)
-        column("totals.tax", summary.taxCents)
-        if summary.showsService { column("totals.service", summary.serviceCents) }
-        column("totals.tip", summary.tipCents)
+    /// A part of the total: a small title over its amount, in a row of columns; at large sizes a line (title, then amount
+    /// under it at accessibility sizes) in a list, like `AmountRow`. Always the same two views, so they stay the same
+    /// elements as the text size changes.
+    private func cell(_ title: LocalizedStringKey, _ cents: Int) -> some View {
+        SummaryCell(title: title, cents: cents)
     }
+}
 
-    @ViewBuilder private var rows: some View {
-        AmountRow("totals.subtotal", cents: summary.subtotalCents)
-        AmountRow("totals.tax", cents: summary.taxCents)
-        if summary.showsService { AmountRow("totals.service", cents: summary.serviceCents) }
-        AmountRow("totals.tip", cents: summary.tipCents)
-    }
+private struct SummaryCell: View {
+    let title: LocalizedStringKey
+    let cents: Int
 
-    private func column(_ title: LocalizedStringKey, _ cents: Int) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.xxs) {
-            Text(title).espText(.caption).foregroundStyle(Color.esp.inkSecondary)
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        let isLine = AdaptiveLayoutPolicy.stacks(dynamicTypeSize: dynamicTypeSize)
+        let layout = isLine && !dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.sm))
+            : AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xxs))
+        layout {
+            Text(title)
+                .espText(isLine ? .body : .caption)
+                .foregroundStyle(isLine ? Color.esp.ink : Color.esp.inkSecondary)
+                .frame(maxWidth: isLine ? .infinity : nil, alignment: .leading)
             MoneyText(cents: cents, style: .amount)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, isLine ? Spacing.xxs : 0)
         .accessibilityElement(children: .combine)
     }
 }
@@ -485,19 +484,12 @@ struct PersonCard: View {
     }
 
     private var header: some View {
-        ViewThatFits(in: .horizontal) {
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) { stacked in
+            who
             HStack(spacing: Spacing.sm) {
-                who
                 MoneyText(cents: row.totalCents, style: .amount)
+                if stacked { Spacer(minLength: 0) }
                 chevron
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                who
-                HStack {
-                    MoneyText(cents: row.totalCents, style: .amount)
-                    Spacer(minLength: 0)
-                    chevron
-                }
             }
         }
         .padding(.leading, Spacing.md)
