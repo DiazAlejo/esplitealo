@@ -42,7 +42,6 @@ public struct PersonAvatar: View {
                 Text(verbatim: PersonInitial.make(from: name))
                     .font(.system(letterStyle, weight: .semibold))
                     .foregroundStyle(slot.letterColor)
-                    .minimumScaleFactor(0.6)
             }
             .overlay {
                 if PersonColorSlot.usesDottedRing(participantIndex: participantIndex) {
