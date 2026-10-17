@@ -31,6 +31,7 @@ struct ProcessingContent: View {
                     .accessibilityValue(messageText)
                     .accessibilityIdentifier("capture.progress")
                 Text("processing.footer")
+                    .accessibilityIdentifier("capture.privacy")
                     .espText(.footnote)
                     .foregroundStyle(Color.esp.inkSecondary)
                     .multilineTextAlignment(.center)

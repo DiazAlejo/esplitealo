@@ -85,6 +85,7 @@ struct AssignItemRow: View {
             VStack(alignment: .leading, spacing: Spacing.xxs) {
                 unassignedMark
                 Text("assign.tapChoose").espText(.footnote).foregroundStyle(Color.esp.inkSecondary)
+                    .accessibilityIdentifier("assign.rowHint")
             }
         case .partlyAssigned:
             VStack(alignment: .leading, spacing: Spacing.xxs) {

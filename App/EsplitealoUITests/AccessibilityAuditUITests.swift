@@ -69,23 +69,41 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     @MainActor
     private func run(_ app: XCUIApplication, _ label: String, underSheet: Bool, file: StaticString, line: UInt) {
-        let systemFrames = [app.keyboards.firstMatch, app.alerts.firstMatch].filter(\.exists).map(\.frame)
+        let keyboard = app.keyboards.firstMatch
+        let keyboardFrame = keyboard.exists ? keyboard.frame : nil
+        let alertFrames = app.alerts.allElementsBoundByIndex.filter(\.exists).map(\.frame)
         let navigationBar = app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame : nil
         let window = app.windows.firstMatch.frame
+        let isDark = label.contains("dark")
+
+        func handle(_ issue: XCUIAccessibilityAuditIssue, failing: Bool) -> Bool {
+            // One greppable line per finding in the CI log: what, where and on which element.
+            let element = issue.element
+            let frame = element.map { "\(Int($0.frame.minX)),\(Int($0.frame.minY)) \(Int($0.frame.width))x\(Int($0.frame.height))" } ?? "-"
+            let kind: AuditWaiver.Kind = switch issue.auditType {
+            case .dynamicType: .dynamicType
+            case .contrast: .contrast
+            case .textClipped: .textClipped
+            default: issue.compactDescription == "Potentially inaccessible text" ? .inaccessibleText : .other
+            }
+            let reason = AuditWaiver.reason(
+                kind: kind, elementFrame: element?.frame, elementIdentifier: element?.identifier ?? "", isHittable: element?.isHittable ?? true,
+                window: window, navigationBar: navigationBar, keyboard: keyboardFrame, alerts: alertFrames, underSheet: underSheet
+            )
+            let outcome = reason.map { "waived=\($0)" } ?? (failing ? "FAILS" : "not failing (dark contrast)")
+            let text = "AUDIT [\(label)] \(issue.compactDescription) | auditType=\(issue.auditType.rawValue) type=\(element?.elementType.rawValue ?? 0) id=\(element?.identifier ?? "-") label=\(element?.label ?? "-") frame=\(frame) | \(outcome)"
+            XCTContext.runActivity(named: text) { _ in }
+            return !failing || reason != nil
+        }
+
         do {
-            try app.performAccessibilityAudit { issue in
-                // One greppable line per finding in the CI log: what, where and on which element.
-                let element = issue.element
-                let frame = element.map { "\(Int($0.frame.minX)),\(Int($0.frame.minY)) \(Int($0.frame.width))x\(Int($0.frame.height))" } ?? "-"
-                let detail = element.map { "\($0.debugDescription.replacingOccurrences(of: "\n", with: " ").prefix(900))" } ?? "-"
-                let line = "AUDIT [\(label)] \(issue.compactDescription) | auditType=\(issue.auditType.rawValue) type=\(element?.elementType.rawValue ?? 0) id=\(element?.identifier ?? "-") label=\(element?.label ?? "-") frame=\(frame) sys=\(systemFrames) | \(detail)"
-                XCTContext.runActivity(named: line) { _ in }
-                let kind: AuditWaiver.Kind = switch issue.auditType {
-                case .dynamicType: .dynamicType
-                case .contrast: .contrast
-                default: issue.compactDescription == "Potentially inaccessible text" ? .inaccessibleText : .other
-                }
-                return AuditWaiver.reason(kind: kind, elementFrame: element?.frame, window: window, navigationBar: navigationBar, systemFrames: systemFrames, underSheet: underSheet) != nil
+            if isDark {
+                // XCTest's contrast check reads pixels of dark screens and reports text that passes (12:1 ink on a banner).
+                // So in dark mode it runs apart, is logged, and does not fail; the dark pairs are `ContrastTests`.
+                try app.performAccessibilityAudit(for: .all.subtracting(.contrast)) { handle($0, failing: true) }
+                try app.performAccessibilityAudit(for: .contrast) { handle($0, failing: false) }
+            } else {
+                try app.performAccessibilityAudit { handle($0, failing: true) }
             }
         } catch {
             XCTFail("\(label): the audit could not run: \(error)", file: file, line: line)
