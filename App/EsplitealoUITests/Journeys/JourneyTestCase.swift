@@ -143,12 +143,27 @@ class JourneyTestCase: XCTestCase {
         }
     }
 
+    /// Scrolls until `target` can be tapped: reported hittable, clear of the floating continue bar (a tap that lands on
+    /// the bar goes forward instead), and at rest (a tap on a scroll view that is still coasting only stops it).
     @MainActor
     func scrollTo(_ target: XCUIElement, in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
-        for _ in 0 ..< 8 where !target.isHittable {
+        let bar = app.buttons["screen.next"]
+        func reachable() -> Bool {
+            guard target.isHittable else { return false }
+            guard target.identifier != "screen.next", bar.exists, bar.isHittable else { return true }
+            return !target.frame.intersects(bar.frame.insetBy(dx: 0, dy: -24))
+        }
+        for _ in 0 ..< 8 where !reachable() {
             app.swipeUp()
         }
-        XCTAssertTrue(target.isHittable, "\(target) is not reachable", file: file, line: line)
+        var resting = target.frame
+        for _ in 0 ..< 10 {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+            let now = target.frame
+            if now == resting { break }
+            resting = now
+        }
+        XCTAssertTrue(reachable(), "\(target) is not reachable", file: file, line: line)
     }
 
     /// The labels of what a screen shows, by identifier, for comparing a screen before and after a relaunch. The

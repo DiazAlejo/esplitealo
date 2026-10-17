@@ -86,7 +86,7 @@ final class JourneyScanRecoveryUITests: JourneyTestCase {
         var options = Options()
         options.scanFailure = "unreadable"
         let app = launch(options)
-        startScan(app, button: "home.photo")
+        startScan(app)
         _ = expect("capture.another", in: app, timeout: 10)
         app.buttons["capture.another"].tap()
         expectScreen("review", in: app)
