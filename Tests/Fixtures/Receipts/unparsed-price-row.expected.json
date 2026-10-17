@@ -1,0 +1,10 @@
+{
+  "itemNames": ["Coffee", "Tostada"],
+  "itemTotals": [350, 225],
+  "subtotal": 575,
+  "total": 575,
+  "reconciles": true,
+  "itemsNeedingReview": 0,
+  "issueCount": 1,
+  "warningCount": 1
+}

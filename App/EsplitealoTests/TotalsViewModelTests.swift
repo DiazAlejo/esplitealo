@@ -109,6 +109,39 @@ struct TotalsViewModelTests {
         #expect(model.tipSelection == .preset(18))
     }
 
+    @Test(arguments: ["-5", "−5", "-0.50", " -20", "$-5"])
+    func aNegativeCustomTipIsRefusedAndTheTipDoesNotChange(typed: String) {
+        let (model, store) = model()
+        model.selectCustom()
+        let before = store.session?.tip
+        model.customTipText = typed
+        #expect(model.customTipIsInvalid, "\(typed)")
+        #expect(store.session?.tip == before, "\(typed)")
+        #expect(model.summary.tipCents == 2020)
+        model.endCustomTipEditing()
+        #expect(model.customTipText == "20.20")
+    }
+
+    @Test func steppingTheCustomTipDownNeverGoesBelowZero() {
+        let (model, store) = model()
+        model.selectCustom()
+        model.customTipText = "0.20"
+        model.stepCustomTip(by: -50)
+        model.stepCustomTip(by: -50)
+        #expect(store.session?.tip == .custom(cents: 0))
+        #expect(model.canDecreaseTip == false)
+        #expect(model.customTipText == "0.00")
+    }
+
+    @Test func aNegativeTipAlreadyInASavedBillCountsAsZeroOnTheScreen() {
+        var session = SampleBill.complete()
+        session.tip = .custom(cents: -500)
+        let (model, _) = model(session)
+        #expect(model.summary.tipCents == 0)
+        #expect(model.customTipText == "0.00")
+        #expect(model.canShare)
+    }
+
     @Test func aReceiptWithAServiceChargeStartsWithNoTipAndSaysWhy() {
         let (model, _) = model(TotalsSamples.serviceCharge())
         #expect(model.summary.tipCents == 0)
@@ -240,6 +273,60 @@ struct TotalsViewModelTests {
         #expect(Set(pools).isSubset(of: [.tax, .service, .tip]))
     }
 
+    /// Three people with one $10.00 line each; `service` is a service charge or, when `asServiceCharge` is false, a tip
+    /// line printed on the receipt. Either way the receipt's total includes it.
+    private func threeAtATable(service: Int, asServiceCharge: Bool = true, tax: Int = 0, prices: [Int] = [1000, 1000, 1000]) -> BillSession {
+        let people = prices.indices.map { Participant(name: ["Ana", "Ben", "Cris"][$0], orderIndex: $0) }
+        let items = prices.indices.map { DraftItem(name: "Plato \($0)", quantity: 1, lineTotal: DraftAmount(minorUnits: prices[$0])) }
+        let subtotal = prices.reduce(0, +)
+        let draft = ReceiptDraftEditing.reconcile(ReceiptDraft(
+            items: items,
+            subtotal: DraftAmount(minorUnits: subtotal),
+            tax: tax > 0 ? DraftAmount(minorUnits: tax) : nil,
+            tip: service > 0 ? DraftAmount(minorUnits: service) : nil,
+            total: DraftAmount(minorUnits: subtotal + tax + service)
+        ))
+        return BillSession(
+            draft: draft,
+            serviceChargeCents: asServiceCharge ? service : 0,
+            participants: people,
+            assignments: zip(items, people).map { ItemAssignment(itemID: $0.id, unitIndex: 0, participantIDs: [$1.id]) },
+            tip: .percentage(percent: 0, basis: .preTaxSubtotal)
+        )
+    }
+
+    @Test func serviceChargeLeftoverCentsAreStrayCentsReportedByTheCalculatorLayer() throws {
+        let (model, store) = model(threeAtATable(service: 100))
+        let session = try #require(store.session)
+        #expect(model.rows.map(\.serviceCents) == [34, 33, 33])
+        #expect(model.rows.map(\.roundingCents) == [1, 0, 0])
+        #expect(model.roundingNotes == [.pool(.service, cents: 1, names: ["Ana"])])
+        let reported = session.personBreakdowns.flatMap(\.adjustments).map(\.cents).reduce(0, +)
+        #expect(reported == 1, "the session reports the service cent itself, the screen does not work it out")
+        #expect(model.rows.map(\.totalCents) == [1034, 1033, 1033])
+    }
+
+    @Test func aTipPrintedOnTheReceiptIsNamedAsServiceToo() {
+        let (model, _) = model(threeAtATable(service: 200, asServiceCharge: false))
+        #expect(model.rows.map(\.serviceCents) == [67, 67, 66])
+        #expect(model.rows.map(\.roundingCents) == [1, 1, 0])
+        #expect(model.roundingNotes == [.pool(.service, cents: 2, names: ["Ana", "Ben"])])
+    }
+
+    @Test func theNotesAndThePeopleAddUpToTheSameStrayCentsWithServiceTaxAndItems() {
+        let (model, _) = model(threeAtATable(service: 97, tax: 101, prices: [333, 667, 1001]))
+        let noted = model.roundingNotes.map { note -> Int in
+            switch note {
+            case let .item(_, _, _, leftover, _): leftover
+            case let .pool(_, cents, _): cents
+            }
+        }
+        #expect(noted.reduce(0, +) == model.rows.map(\.roundingCents).reduce(0, +))
+        #expect(noted.reduce(0, +) > 0)
+        let billCents: Int = 333 + 667 + 1001 + 101 + 97
+        #expect(model.rows.map(\.totalCents).reduce(0, +) == billCents)
+    }
+
     @Test func aBillWithNothingLeftOverHasNoRoundingCard() {
         var session = SampleBill.complete()
         // Everyone shares every item four ways at prices divisible by four, no tax: nothing to round.
@@ -315,6 +402,24 @@ struct TotalsViewModelTests {
         #expect(model.canShare == false)
     }
 
+    @Test func freeItemsWithTaxStayBlockedAndTheScreenSaysNobodyHasItemsToCarryIt() {
+        let (model, _) = model(threeAtATable(service: 0, tax: 150, prices: [0, 0, 0]))
+        #expect(model.status == .nobodyCarriesCharges)
+        #expect(model.canShare == false)
+        #expect(model.blockedByReceipt, "the way out is in the receipt: the prices")
+    }
+
+    @Test func freeItemsWithAServiceChargeAreBlockedWithThatReasonToo() {
+        let (model, _) = model(threeAtATable(service: 100, prices: [0, 0, 0]))
+        #expect(model.status == .nobodyCarriesCharges)
+    }
+
+    @Test func freeItemsWithNothingToCarryCanStillBeShared() {
+        let (model, _) = model(threeAtATable(service: 0, prices: [0, 0, 0]))
+        #expect(model.status == .reconciled(totalCents: 0))
+        #expect(model.canShare)
+    }
+
     @Test func requestingShareWhileBlockedDoesNotOpenTheSheet() {
         let (model, _) = model(SampleBill.midway())
         model.requestShare()
@@ -386,6 +491,35 @@ struct TotalsViewModelTests {
         model.shareCancelled()
         #expect(model.hasShared == false)
         #expect(model.isSharing == true, "the preview stays so another app can be tried")
+    }
+
+    @Test func completingTheShareDeletesTheDraftFileButKeepsTheBillForTheSuccessScreen() async {
+        let recording = RecordingDraftStore()
+        let clock = ManualClock()
+        let store = BillStore(draftStore: recording, clock: clock)
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.saveNow()
+        #expect(recording.stored != nil)
+        let model = TotalsViewModel(store: store)
+        model.requestShare()
+        model.shareCompleted()
+        #expect(recording.stored == nil, "R-32: the draft goes when the share completes")
+        #expect(store.session != nil, "the success screen and Back still need the bill")
+        #expect(model.hasShared)
+        #expect(model.sharedPeopleCount == 4)
+    }
+
+    @Test func aShareThatWasCancelledKeepsTheDraft() {
+        let recording = RecordingDraftStore()
+        let store = BillStore(draftStore: recording, clock: ManualClock())
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.saveNow()
+        let model = TotalsViewModel(store: store)
+        model.requestShare()
+        model.shareCancelled()
+        #expect(recording.stored != nil)
     }
 
     @Test func startingANewBillForgetsTheBillAndItsDraft() {

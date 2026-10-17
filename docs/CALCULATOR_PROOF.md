@@ -9,7 +9,7 @@ Two kinds of evidence, both deterministic (every bill comes from a seed):
 
 ## What is proven
 
-### Properties (27 generated properties, 1,000 bills each)
+### Properties (29 generated properties, 1,000 bills each)
 
 Swift Testing, in `Tests/EsplitealoCoreTests/CalculatorProof/`. Run names start with `CalculatorProof`. Bills vary people (1–9), items (0–16 lines), quantities up to 12, line totals that are not multiples of the quantity, assignments (solo, pairs, groups, everyone, unclaimed, people who are not on the bill, repeated people), tax from none to three lines, printed tip, service charge, tip as a percentage (pre- or post-tax) or a custom amount, printed subtotal and total (consistent, missing or off), and participant order (contiguous, with gaps, shuffled).
 
@@ -39,7 +39,9 @@ Swift Testing, in `Tests/EsplitealoCoreTests/CalculatorProof/`. Run names start 
 | Property | Statement |
 | -------- | --------- |
 | Totals | `derivedBillTotalCents` = items + tax + service charge + printed tip (never on top of a service charge) + session tip; each person's total is the sum of their parts; service, printed-tip, tax and tip shares each add up to their pool; a settled bill is owed exactly in full |
-| Layers agree | The session's items, tax, tip and rounding adjustments are the calculator's |
+| Layers agree | The session's items, tax, tip and rounding adjustments are the calculator's; the session adds only service-charge and printed-tip adjustments after them |
+| Surfaced service pools | For the service charge and the printed tip, the number of adjustments equals the leftover cents; each share is its floor plus one cent exactly when the person is adjusted; nobody is adjusted twice; a service charge and a printed tip are never both allocated |
+| Charges nobody carries | A fully claimed bill whose printed amounts add up, with no claimed item that costs anything and some tax, tip or service charge to share, is not shareable and its `shareBlockReason` is `noItemsToCarryCharges` |
 | Zero-item person | Owes nothing in any pool |
 | Unclaimed units | Any unclaimed unit means no `canShare`, no `.ready` or `.totals` phase, and an unsettled split. `canShare` implies settled, reconciled, people owing the derived total, and derived = printed + session tip |
 | Shareable | A fully claimed bill whose printed amounts add up can be shared; changing the printed total by any amount, or removing it, blocks sharing |
@@ -54,7 +56,7 @@ Swift Testing, in `Tests/EsplitealoCoreTests/CalculatorProof/`. Run names start 
 
 ### Reference comparison
 
-`Tools/reference-calculator/` computes, for each bill, every person's item subtotal, tax share, service share, printed-tip share, tip share, total, and the exact item units where they got a leftover cent, plus the bill's tip, derived total, settlement, reconciliation and `canShare`. It also checks 600 bare allocation cases. It uses exact fractions, not integer division, and was checked first against the worked examples in the documents (`test_reference_calculator.py`).
+`Tools/reference-calculator/` computes, for each bill, every person's item subtotal, tax share, service share, printed-tip share, tip share, total, and the exact item units where they got a leftover cent (and whether they got one in the tax, tip, service-charge and printed-tip pools), plus the bill's tip, derived total, settlement, reconciliation, `canShare` and whether it is blocked because nobody has items to carry its charges. It also checks 600 bare allocation cases. It uses exact fractions, not integer division, and was checked first against the worked examples in the documents (`test_reference_calculator.py`).
 
 | Corpus | Bills | Allocation cases | Where it runs | Result |
 | ------ | ----- | ---------------- | ------------- | ------ |
@@ -70,37 +72,22 @@ The tests were run against 18 deliberately broken copies of the engine (one chan
 - *Zero-weight people eligible for leftover cents* was caught only by the 5,000-bill comparison; the 300-bill fixture and the properties let it through. That case needs a rare tie, which is why the larger run exists.
 - *`canShare` ignoring settlement* is caught only by the 5,000-bill comparison and is in practice an equivalent change: `canShare` also requires the people's totals to add up to the bill, which an unsettled split cannot satisfy.
 
-The mutation harness is not part of the repository; each change is one line in `BillCalculator.swift` or `BillSession.swift` and the check is `swift test --filter CalculatorProof` with `ESPLITEALO_REFERENCE_CORPUS` set.
+The 18 changes were tried before the service-charge and printed-tip adjustments and the `noItemsToCarryCharges` reason were added; the checks for those two were not mutation-tested. The mutation harness is not part of the repository; each change is one line in `BillCalculator.swift` or `BillSession.swift` and the check is `swift test --filter CalculatorProof` with `ESPLITEALO_REFERENCE_CORPUS` set.
 
 ## What it found
 
 - **Fixed: a person added after a removal could win a tie they should lose.** `BillSession.addParticipant` gave the new person `orderIndex = participants.count`. After removing someone, that repeats an index still in use (`[C2, D3]` + E → 2, + F → 3), so E ranked before D and took leftover cents that belong to the person added earlier. It now uses one past the highest index. Test: `CalculatorProofParticipantOrder`, which failed before the fix.
-- **No discrepancy** between the Swift engine and the reference on 5,300 bills and 900 allocation cases, and none of the 27 properties failed on the calculator.
+- **No discrepancy** between the Swift engine and the reference on 5,300 bills and 900 allocation cases, and none of the 27 properties that existed then failed on the calculator.
 
-## Open questions for the owner
+## Decisions on the open questions
 
-The documents do not settle these, so the tests do not decide them and no behaviour was changed. For each: what the Swift engine does today, how the reference reads the document, and a recommendation for the owner to accept or overrule.
+The first version of this page left five questions for the owner, because the documents did not settle them. The owner accepted the recommendations below. Each is now written into [CALCULATION_RULES.md](CALCULATION_RULES.md), implemented, and checked by tests and by the reference.
 
-1. **Service charge and printed-tip leftover cents are not surfaced.** Invariant 5 says every largest-remainder adjustment is surfaced and "nothing is silent", but only item-unit, tax and tip pools are listed.
-   - *Engine:* `BillSession` splits a service charge and a printed tip by largest remainder through `SessionPoolAllocator`, then drops their adjustments, so `PersonBreakdown.adjustments` never shows them. In the 5,000-bill sample, 1,490 bills (30%) hand out at least one such cent.
-   - *Reference:* allocates both pools by the same rule (the amounts match the engine exactly) and does not record adjustments for them, mirroring the pool list in the document.
-   - *Recommendation:* treat service charge and printed tip as pools under invariant 5 and surface their cents in the UI; the amounts do not change.
-2. **A bill whose items are all free but has tax, tip or a service charge** (or has no items at all).
-   - *Engine:* with total weight zero nothing is allocated, so people owe less than the bill, and `canShare` is false. 250 of 5,000 sample bills are like this.
-   - *Reference:* the same: weight zero allocates nothing, the people's totals fall short, `canShare` is false.
-   - *Recommendation:* keep it blocked, and have the UI say why (nobody has items to carry the tax or tip) rather than showing a generic mismatch.
-3. **Two people with the same `orderIndex`, or two assignment rows for the same unit.**
-   - *Engine:* `BillSession` can no longer create either. Given directly, `BillCalculator` depends on sort stability for equal indices and uses the first of several rows for a unit.
-   - *Reference:* assumes unique order indices and one row per unit, as the document says ("stable participant order", "one set per unit").
-   - *Recommendation:* state in the rules that both are invariants of the session; no engine change needed.
-4. **A negative custom tip or percentage.**
-   - *Engine:* treated as zero.
-   - *Reference:* does not generate negative tips; the document does not say.
-   - *Recommendation:* document "negative tip = 0" (the UI should not allow it anyway).
-5. **Wording of "surfacing adjustments"** ("whenever step 5 gives a cent to someone whose initial quotient was not already the maximum possible").
-   - *Engine:* records an adjustment for every leftover cent.
-   - *Reference:* the same, which makes the quoted condition always true.
-   - *Recommendation:* reword to "every leftover cent is an adjustment".
+1. **Service charge and printed-tip leftover cents are surfaced.** They are pools under invariant 5. `BillSession` still splits them by largest remainder through `SessionPoolAllocator`, and now returns their leftover cents as `RoundingAdjustment`s (pools `.serviceCharge` and `.printedTip`) in `PersonBreakdown.adjustments`, so the Totals screen names them like tax, tip and item cents (it no longer works them out from the shares). No amount changed: before the change 1,490 of the 5,000 sample bills handed out at least one such cent, and every person's total is the same. *Checked by:* `BillSessionCalculationRulesTests`, the "Surfaced service pools" property, the reference's new `serviceAdjustments` and `printedTipAdjustments` per person (compared on all 5,000 bills), `TotalsViewModelTests`.
+2. **A bill whose items are all free but has tax, tip or a service charge** (or has no items at all) stays blocked from sharing, and says why. `ShareBlockReason.noItemsToCarryCharges` is new; the Totals screen shows "Nobody has items to carry the tax or tip" (ES: "Nadie tiene artículos para repartir el impuesto o la propina") with a line on fixing the prices, instead of a generic mismatch. A receipt that does not add up, a missing printed total and unclaimed units are still reported first. 250 of the 5,000 sample bills are like this. *Checked by:* `BillSessionCalculationRulesTests`, the "Charges nobody carries" property, the reference's `nobodyCarriesCharges` (compared on all 5,000 bills), `TotalsViewModelTests`, `LocalizationRuntimeTests`.
+3. **Unique order indices and one row per unit** are stated as invariants of the session in the rules. No engine change: `BillSession` cannot create either, and the calculator assumes both.
+4. **A negative custom tip or percentage is zero**, documented in the rules and in the reference (`session_tip_cents`). The engine already did this; the Totals tip field refuses a negative amount (and its − button stops at $0.00), which `TotalsViewModelTests` now pins down. *Checked by:* `BillSessionCalculationRulesTests`, the reference's `NegativeTipTests`. The generator still draws no negative tips, so the 5,000-bill comparison does not cover it.
+5. **Invariant 5 reads "every leftover cent is an adjustment"**, replacing the wording that said a cent was surfaced only when the person's initial quotient was not already the maximum, which was always true.
 
 ## What is not covered
 
@@ -109,7 +96,7 @@ The documents do not settle these, so the tests do not decide them and no behavi
 - **UI, share text and formatting**: money is checked as integer cents, not as displayed.
 - **Negative amounts, amounts above about 10⁷ cents per line, more than nine people**: not generated.
 - **Arithmetic overflow**: not provoked; amounts stay far below `Int.max`.
-- **Phase and `shareBlockReason` precedence**: the documents list the reasons but not their order, so only `canShare`, the unclaimed-unit rule and the missing-total reason are checked.
+- **Phase and `shareBlockReason` precedence**: only `canShare`, the unclaimed-unit rule, the missing-total reason and `noItemsToCarryCharges` are checked (the reference mirrors that reason's conditions: printed total present, settled, receipt adds up). The order of the other reasons is documented in [BILL_SESSION.md](BILL_SESSION.md) and covered by unit tests, not by the reference.
 - **Both implementations read one document.** Where the document is ambiguous (see above) the two can agree on the same misreading; the questions above are exactly the places to look.
 - **The Swift test harness mirrors the corpus format**, and the reference shares the same bill format. A bill that cannot be expressed in the format is not tested.
 

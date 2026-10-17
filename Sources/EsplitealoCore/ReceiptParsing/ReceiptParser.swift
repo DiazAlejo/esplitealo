@@ -107,8 +107,21 @@ public struct ReceiptParser: Sendable {
         let allTokens = classified.flatMap { $0.line.amounts + [$0.line.quantityDetail?.unit].compactMap { $0 } }
         let numberFormat = NumberFormatInference.infer(from: allTokens, preferred: preferredFormat)
         var issues: [ReceiptIssue] = []
+        // What the Review screen can show: the same unsure readings as `issues`, with the row they came from.
+        var warnings: [ReceiptWarning] = []
         if numberFormat.isGuessed {
             issues.append(.numberFormatGuessed(numberFormat))
+            warnings.append(ReceiptWarning(issue: .numberFormatGuessed(numberFormat)))
+        }
+
+        func noteUnparsedPrice(_ text: String, label: String?, rect: PixelRect?) {
+            issues.append(.unparsedPriceRow(text))
+            let rowLabel = label?.trimmingCharacters(in: .whitespaces)
+            warnings.append(ReceiptWarning(
+                issue: .unparsedPriceRow(text),
+                rowLabel: rowLabel?.isEmpty == false ? rowLabel : nil,
+                sourceRect: rect
+            ))
         }
 
         var items: [DraftItem] = []
@@ -126,10 +139,10 @@ public struct ReceiptParser: Sendable {
             return rowIndexByEntry[entryIndex] > boundary
         }
 
-        func amount(from tokens: [AmountToken], rect: PixelRect?) -> DraftAmount? {
+        func amount(from tokens: [AmountToken], rect: PixelRect?, label: String?) -> DraftAmount? {
             guard let last = tokens.last else { return nil }
             guard let minor = NumberFormatInference.minorUnits(last, format: numberFormat) else {
-                issues.append(.unparsedPriceRow(tokens.map(\.raw).joined(separator: " ")))
+                noteUnparsedPrice(tokens.map(\.raw).joined(separator: " "), label: label, rect: rect)
                 return DraftAmount(minorUnits: 0, sourceRect: rect, needsAttention: true)
             }
             let guessed = numberFormat.isGuessed || last.shape == .integer && last.digits.count >= 4
@@ -138,21 +151,23 @@ public struct ReceiptParser: Sendable {
 
         func addItem(name: String, qty: Int, tokens: [AmountToken], rect: PixelRect?, flags: Set<ItemFlag> = [], entryIndex: Int) {
             guard !isPastTotalsSection(entryIndex) else { return }
-            guard let draftAmount = amount(from: tokens, rect: rect) else { return }
+            let warningsBefore = warnings.count
+            guard let draftAmount = amount(from: tokens, rect: rect, label: name) else { return }
             if draftAmount.minorUnits == 0 && !tokens.last!.isNegative {
                 return
             }
             var itemFlags = flags
             if draftAmount.needsAttention { itemFlags.insert(.formatGuessed) }
-            items.append(
-                DraftItem(
-                    name: name.trimmingCharacters(in: .whitespaces),
-                    quantity: qty,
-                    lineTotal: draftAmount,
-                    flags: itemFlags,
-                    sourceRect: rect
-                )
+            let item = DraftItem(
+                name: name.trimmingCharacters(in: .whitespaces),
+                quantity: qty,
+                lineTotal: draftAmount,
+                flags: itemFlags,
+                sourceRect: rect
             )
+            items.append(item)
+            // An unreadable price that still made a row (a negative one) points at that row.
+            for index in warnings.indices.dropFirst(warningsBefore) { warnings[index].itemID = item.id }
         }
 
         func rowRect(_ row: ReceiptRow?) -> PixelRect? {
@@ -199,27 +214,27 @@ public struct ReceiptParser: Sendable {
                 }
 
             case .subtotal:
-                if let a = amount(from: line.amounts, rect: rect) { subtotal = a }
+                if let a = amount(from: line.amounts, rect: rect, label: line.label) { subtotal = a }
 
             case .tax:
                 // Every tax line counts (state + county, IVU + municipal). A tax line repeated after the
                 // total is a summary of the same tax, not another one.
                 guard !(totalSeenAfterItems && !taxLines.isEmpty) else { break }
-                if let a = amount(from: line.amounts, rect: rect) {
+                if let a = amount(from: line.amounts, rect: rect, label: line.label) {
                     taxLines.append((line.label, a))
                 }
 
             case .tip:
-                if let a = amount(from: line.amounts, rect: rect) { tip = a }
+                if let a = amount(from: line.amounts, rect: rect, label: line.label) { tip = a }
 
             case .total:
-                if let a = amount(from: line.amounts, rect: rect) {
+                if let a = amount(from: line.amounts, rect: rect, label: line.label) {
                     total = a
                     if !items.isEmpty { totalSeenAfterItems = true }
                 }
 
             case .discount:
-                if var a = amount(from: line.amounts, rect: rect) {
+                if var a = amount(from: line.amounts, rect: rect, label: line.label) {
                     a.minorUnits = -abs(a.minorUnits)
                     adjustments.append(DraftAdjustment(label: line.label.isEmpty ? "Descuento" : line.label, amount: a))
                 }
@@ -264,7 +279,7 @@ public struct ReceiptParser: Sendable {
 
             case .quantityDetail:
                 guard !isPastTotalsSection(i) else { break }
-                issues.append(.unparsedPriceRow(line.quantityDetail?.raw ?? ""))
+                noteUnparsedPrice(line.quantityDetail?.raw ?? "", label: nil, rect: rect)
 
             case .nameOnly:
                 guard !isPastTotalsSection(i) else { break }
@@ -321,7 +336,7 @@ public struct ReceiptParser: Sendable {
                     )
                     i += 1
                 } else {
-                    issues.append(.unparsedPriceRow(line.amounts.map(\.raw).joined(separator: " ")))
+                    noteUnparsedPrice(line.amounts.map(\.raw).joined(separator: " "), label: nil, rect: rect)
                 }
             }
             i += 1
@@ -414,6 +429,7 @@ public struct ReceiptParser: Sendable {
             total: total,
             adjustments: adjustments,
             numberFormat: numberFormat,
+            warnings: warnings,
             issues: issues,
             reconciles: reconciles
         )

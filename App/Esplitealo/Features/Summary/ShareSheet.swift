@@ -88,8 +88,8 @@ struct ShareSheetContent: View {
         HStack(spacing: Spacing.sm) {
             VStack(alignment: .leading, spacing: 0) {
                 Group {
-                    if model.merchantName.isEmpty {
-                        Text("totals.title")
+                    if model.merchantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text("shareSheet.titleNoMerchant")
                     } else {
                         Text(.shareSheetTitle(model.merchantName))
                     }

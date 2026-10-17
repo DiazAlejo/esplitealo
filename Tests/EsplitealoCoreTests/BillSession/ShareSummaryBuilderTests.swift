@@ -48,6 +48,49 @@ final class ShareSummaryBuilderTests: XCTestCase {
             """)
     }
 
+    // MARK: Header line without a merchant name or a date
+
+    private func shareText(merchant: String, date: Date?, language: ShareLanguage) -> String {
+        var session = BillSession.sampleReadyToShare()
+        session.merchantName = merchant
+        session.date = date
+        return ShareSummaryBuilder.build(for: session, language: language, calendar: utc)
+    }
+
+    func testHeaderIsDroppedWhenMerchantAndDateAreEmpty() {
+        let es = shareText(merchant: "", date: nil, language: .es)
+        let en = shareText(merchant: "", date: nil, language: .en)
+        XCTAssertTrue(es.hasPrefix("Cuenta $110.00 + propina 20% $20.00 = $130.00\n"), es)
+        XCTAssertTrue(en.hasPrefix("Bill $110.00 + 20% tip $20.00 = $130.00\n"), en)
+        for text in [es, en] {
+            XCTAssertFalse(text.contains("·\n"), text)
+            XCTAssertFalse(text.hasPrefix(" "), text)
+            XCTAssertFalse(text.hasPrefix("\n"), text)
+        }
+    }
+
+    func testHeaderKeepsOnlyTheDateWhenThereIsNoMerchant() {
+        let day = date(2025, 10, 13, in: utc)
+        let es = shareText(merchant: "", date: day, language: .es)
+        let en = shareText(merchant: "", date: day, language: .en)
+        XCTAssertTrue(es.hasPrefix("13 oct\nCuenta $110.00"), es)
+        XCTAssertTrue(en.hasPrefix("Oct 13\nBill $110.00"), en)
+        XCTAssertFalse(es.contains(" · \n") || es.hasPrefix(" ·"), es)
+        XCTAssertFalse(en.contains(" · \n") || en.hasPrefix(" ·"), en)
+    }
+
+    func testHeaderKeepsOnlyTheMerchantWhenThereIsNoDate() {
+        let es = shareText(merchant: "Fonda Doña Lola", date: nil, language: .es)
+        let en = shareText(merchant: "Fonda Doña Lola", date: nil, language: .en)
+        XCTAssertTrue(es.hasPrefix("Fonda Doña Lola\nCuenta $110.00"), es)
+        XCTAssertTrue(en.hasPrefix("Fonda Doña Lola\nBill $110.00"), en)
+    }
+
+    func testWhitespaceOnlyMerchantCountsAsEmpty() {
+        let es = shareText(merchant: "  \n", date: nil, language: .es)
+        XCTAssertTrue(es.hasPrefix("Cuenta $110.00"), es)
+    }
+
     func testShareTextIncludesServiceWhenPresent() {
         var session = BillSession.sampleWithServiceChargeAssigned()
         let text = ShareSummaryBuilder.build(for: session, language: .en, calendar: utc)

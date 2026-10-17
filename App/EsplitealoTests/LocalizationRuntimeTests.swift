@@ -24,6 +24,13 @@ struct LocalizationRuntimeTests {
         #expect(text("totals.share", "en") == "Share breakdown")
     }
 
+    @Test func theBlockedBillWithNothingToCarryTheChargesSaysWhyInBothLanguages() {
+        #expect(text("totals.nobodyItems.title", "en") == "Nobody has items to carry the tax or tip")
+        #expect(text("totals.nobodyItems.title", "es") == "Nadie tiene artículos para repartir el impuesto o la propina")
+        #expect(text("totals.nobodyItems.body", "en").contains("Fix the prices"))
+        #expect(text("totals.nobodyItems.body", "es").contains("Arregla los precios"))
+    }
+
     @Test func pluralsPickTheRightForm() {
         #expect(text("people.assigned", "es", [1]) == "1 artículo marcado")
         #expect(text("people.assigned", "es", [3]) == "3 artículos marcados")

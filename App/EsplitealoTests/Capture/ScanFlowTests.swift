@@ -177,7 +177,7 @@ struct ScanFlowTests {
         #expect(store.session == nil)
         await flow.scanTask?.value
         #expect(store.session?.draft == BillSession(draft: scanned).draft)
-        #expect(router.path == [.capture, .review])
+        #expect(router.path == [.review], "Review replaces Capture, so Back from Review is Home")
         #expect(flow.phase == .finished)
     }
 
@@ -190,15 +190,115 @@ struct ScanFlowTests {
         #expect(router.current == .review)
     }
 
-    @Test func aNewScanReplacesTheBillInProgress() async {
+    @Test func backFromReviewGoesHomeAndNeverBackToTheCamera() async {
+        let flow = makeFlow()
+        await open(flow, .camera)
+        flow.cameraFinished(.success(image()))
+        await flow.scanTask?.value
+        router.back()
+        #expect(router.current == .home)
+        #expect(router.path.isEmpty)
+        #expect(flow.phase != .presenting(.camera))
+    }
+
+    // MARK: A bill already in progress
+
+    /// A bill with content, as if the user had scanned, added people and gone back to Home.
+    func startABillInProgress() {
         store.startNewBill(draft: SampleBill.scannedDraft())
         store.update { $0.addParticipant(name: "Marisol") }
+    }
+
+    @Test func aNewScanReplacesTheBillOnlyAfterTheUserConfirms() async {
+        startABillInProgress()
+        let before = store.session
         let flow = makeFlow(scanner: FakeScanner(.success(ReceiptDraft())))
-        await open(flow, .camera)
+
+        flow.open(.camera)
+        #expect(flow.pendingReplacement == .camera)
+        #expect(router.path.isEmpty, "nothing opens until the user decides")
+        #expect(flow.phase == .idle)
+        #expect(store.session == before)
+
+        flow.confirmReplacement()
+        #expect(flow.pendingReplacement == nil)
+        #expect(router.path == [.capture])
+        await flow.captureScreenAppeared()
         flow.cameraFinished(.success(image()))
         await flow.scanTask?.value
         #expect(store.session?.participants.isEmpty == true)
         #expect(store.session?.draft.items.isEmpty == true)
+    }
+
+    @Test func choosingAPhotoAsksTooAndKeepsTheChosenSource() {
+        startABillInProgress()
+        let flow = makeFlow()
+        flow.open(.photoLibrary)
+        #expect(flow.pendingReplacement == .photoLibrary)
+        flow.confirmReplacement()
+        #expect(flow.source == .photoLibrary)
+        #expect(router.path == [.capture])
+    }
+
+    @Test func continuingTheExistingBillOpensItAtItsStepAndChangesNothing() {
+        startABillInProgress()
+        let before = store.session
+        let flow = makeFlow()
+        flow.open(.camera)
+        flow.keepCurrentBill()
+        #expect(flow.pendingReplacement == nil)
+        #expect(store.session == before)
+        #expect(router.path == store.billInProgress?.resumePath)
+        #expect(router.path == [.review, .people, .mark])
+    }
+
+    @Test func theExistingBillSurvivesUntilTheNewScanArrivesAndCancellingKeepsIt() async {
+        startABillInProgress()
+        let before = store.session
+        let flow = makeFlow()
+        flow.open(.camera)
+        flow.confirmReplacement()
+        await flow.captureScreenAppeared()
+        #expect(store.session == before, "confirming is not the same as finishing the scan")
+        flow.cameraFinished(.failure(.cancelled))
+        #expect(router.path.isEmpty)
+        #expect(store.session == before)
+        #expect(store.hasBillInProgress)
+    }
+
+    @Test func aBillWithoutContentIsReplacedWithoutAsking() {
+        store.startNewBill()
+        let flow = makeFlow()
+        flow.open(.camera)
+        #expect(flow.pendingReplacement == nil)
+        #expect(router.path == [.capture])
+    }
+
+    @Test func noBillMeansNoQuestion() {
+        let flow = makeFlow()
+        flow.open(.camera)
+        #expect(flow.pendingReplacement == nil)
+        #expect(router.path == [.capture])
+    }
+
+    @Test func aBillThatWasAlreadySharedIsReplacedWithoutAsking() {
+        store.startNewBill(draft: SampleBill.complete().draft)
+        store.update { $0 = SampleBill.complete() }
+        store.billShared()
+        let flow = makeFlow()
+        flow.open(.camera)
+        #expect(flow.pendingReplacement == nil)
+        #expect(router.path == [.capture])
+    }
+
+    @Test func enteringItemsByHandAfterConfirmingReplacesTheBill() {
+        startABillInProgress()
+        let flow = makeFlow()
+        flow.open(.camera)
+        flow.confirmReplacement()
+        flow.enterItemsManually()
+        #expect(store.session?.participants.isEmpty == true)
+        #expect(router.path == [.review])
     }
 
     // MARK: A scan that does not
@@ -346,7 +446,7 @@ struct ScanFlowTests {
         await flow.scanTask?.value
         flow.enterItemsManually()
         #expect(store.session?.draft.items.isEmpty == true)
-        #expect(router.path == [.capture, .review])
+        #expect(router.path == [.review])
         #expect(flow.phase == .finished)
     }
 
@@ -360,17 +460,17 @@ struct ScanFlowTests {
         scanner.release()
         await task?.value
         #expect(store.session?.draft.items.isEmpty == true)
-        #expect(router.path == [.capture, .review])
+        #expect(router.path == [.review])
     }
 
-    @Test func comingBackToCaptureFromReviewStartsANewCapture() async {
+    @Test func theCaptureScreenAppearingAfterTheBillWasHandedOverNeverOpensTheCamera() async {
         let flow = makeFlow()
         await open(flow, .camera)
         flow.cameraFinished(.success(image()))
         await flow.scanTask?.value
         #expect(flow.phase == .finished)
         await flow.captureScreenAppeared()
-        #expect(flow.phase == .presenting(.camera))
+        #expect(flow.phase == .finished)
     }
 
     @Test func theCaptureScreenAppearingAgainWhileBusyChangesNothing() async {
