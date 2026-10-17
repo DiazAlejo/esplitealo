@@ -398,10 +398,6 @@ struct WhoOwesSection: View {
 struct ShareBar: View {
     let rows: [TotalsViewModel.PersonRow]
 
-    /// The width of a legend entry grows with the text, so at large sizes the entries fall into one column instead of
-    /// squeezing a name and a percentage into a cell too small for them.
-    @ScaledMetric(relativeTo: .footnote) private var legendColumn: CGFloat = 110
-
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             VStack(spacing: 6) {
@@ -422,7 +418,7 @@ struct ShareBar: View {
             // The bar is a picture; the legend under it says the same in words, so VoiceOver reads the legend.
             .accessibilityHidden(true)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: legendColumn), alignment: .leading)], alignment: .leading, spacing: Spacing.xxs) {
+            FlowLayout(spacing: Spacing.md, lineSpacing: Spacing.xxs) {
                 ForEach(rows) { row in
                     HStack(spacing: 6) {
                         // The initial inside the colour, so the bar's segments can be told apart without colour.

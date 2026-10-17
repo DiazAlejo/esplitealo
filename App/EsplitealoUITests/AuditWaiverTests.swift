@@ -10,11 +10,11 @@ final class AuditWaiverTests: XCTestCase {
 
     private func reason(
         _ kind: AuditWaiver.Kind, _ frame: CGRect?, id: String = "", hittable: Bool = true,
-        bar: Bool = true, keyboard hasKeyboard: Bool = false, alerts: Bool = false, sheet: Bool = false
+        bar: Bool = true, keyboard hasKeyboard: Bool = false, alerts: Bool = false, sheet: Bool = false, pinned: [CGRect] = []
     ) -> AuditWaiver.Reason? {
         AuditWaiver.reason(
             kind: kind, elementFrame: frame, elementIdentifier: id, isHittable: hittable, window: window,
-            navigationBar: bar ? navigationBar : nil, keyboard: hasKeyboard ? keyboard : nil, alerts: alerts ? [alert] : [], underSheet: sheet
+            navigationBar: bar ? navigationBar : nil, keyboard: hasKeyboard ? keyboard : nil, alerts: alerts ? [alert] : [], pinnedBars: pinned, underSheet: sheet
         )
     }
 
@@ -30,7 +30,7 @@ final class AuditWaiverTests: XCTestCase {
 
     func testAnAlertWaivesWhatIsInsideIt() {
         XCTAssertEqual(reason(.dynamicType, CGRect(x: 48, y: 99, width: 306, height: 125), alerts: true), .systemView)
-        XCTAssertNil(reason(.dynamicType, inContent, alerts: true))
+        XCTAssertNil(reason(.dynamicType, CGRect(x: 2, y: 300, width: 20, height: 20), alerts: true), "outside the alert")
     }
 
     func testTheNavigationBarWaivesDynamicTypeAndNothingElse() {
@@ -50,6 +50,9 @@ final class AuditWaiverTests: XCTestCase {
         XCTAssertEqual(reason(.contrast, CGRect(x: 28, y: -123, width: 265, height: 125)), .contrastOfAHiddenElement)
         XCTAssertEqual(reason(.contrast, CGRect(x: 20, y: 860, width: 100, height: 40)), .contrastOfAHiddenElement)
         XCTAssertEqual(reason(.contrast, CGRect(x: 84, y: 685, width: 58, height: 20), hittable: false), .contrastOfAHiddenElement, "under the pinned bar")
+        let pinnedBar = CGRect(x: 0, y: 700, width: 402, height: 174)
+        XCTAssertEqual(reason(.contrast, CGRect(x: 84, y: 685, width: 58, height: 20), pinned: [pinnedBar]), .contrastOfAHiddenElement, "straddling the pinned bar")
+        XCTAssertNil(reason(.contrast, CGRect(x: 84, y: 400, width: 58, height: 20), pinned: [pinnedBar]), "above the bar")
         XCTAssertNil(reason(.other, CGRect(x: 28, y: -123, width: 265, height: 125)), "only contrast")
     }
 

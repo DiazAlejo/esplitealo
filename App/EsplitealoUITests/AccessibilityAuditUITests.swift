@@ -75,6 +75,11 @@ final class AccessibilityAuditUITests: XCTestCase {
         let navigationBar = app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame : nil
         let window = app.windows.firstMatch.frame
         let isDark = label.contains("dark")
+        // The pinned bottom bar of a screen: from just above its main button to the bottom of the window.
+        let pinnedBars = ["screen.next", "totals.share"].map { app.buttons[$0] }.filter(\.exists).map { button in
+            let top = button.frame.minY - 16
+            return CGRect(x: 0, y: top, width: window.width, height: max(0, window.maxY - top))
+        }
 
         func handle(_ issue: XCUIAccessibilityAuditIssue, failing: Bool) -> Bool {
             // One greppable line per finding in the CI log: what, where and on which element.
@@ -88,7 +93,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             }
             let reason = AuditWaiver.reason(
                 kind: kind, elementFrame: element?.frame, elementIdentifier: element?.identifier ?? "", isHittable: element?.isHittable ?? true,
-                window: window, navigationBar: navigationBar, keyboard: keyboardFrame, alerts: alertFrames, underSheet: underSheet
+                window: window, navigationBar: navigationBar, keyboard: keyboardFrame, alerts: alertFrames, pinnedBars: pinnedBars, underSheet: underSheet
             )
             let outcome = reason.map { "waived=\($0)" } ?? (failing ? "FAILS" : "not failing (dark contrast)")
             let text = "AUDIT [\(label)] \(issue.compactDescription) | auditType=\(issue.auditType.rawValue) type=\(element?.elementType.rawValue ?? 0) id=\(element?.identifier ?? "-") label=\(element?.label ?? "-") frame=\(frame) | \(outcome)"
@@ -114,8 +119,10 @@ final class AccessibilityAuditUITests: XCTestCase {
     @MainActor
     private func assertTapTargets(_ app: XCUIApplication, _ label: String, file: StaticString, line: UInt) {
         let screen = app.windows.firstMatch.frame
-        for button in app.buttons.allElementsBoundByIndex where button.exists && button.isHittable {
+        for button in app.buttons.allElementsBoundByIndex where button.exists {
             let frame = button.frame
+            // Fully on screen only: `isHittable` throws for a chip scrolled out of view sideways.
+            guard screen.contains(frame) else { continue }
             // System chrome (the sheet grabber, the keyboard) is not ours; partly visible buttons are measured on screen.
             guard screen.contains(CGPoint(x: frame.midX, y: frame.midY)), button.identifier != "", frame.width > 0 else { continue }
             XCTAssertGreaterThanOrEqual(frame.width, 43.5, "\(label): \(button.identifier) is \(frame.width) pt wide", file: file, line: line)

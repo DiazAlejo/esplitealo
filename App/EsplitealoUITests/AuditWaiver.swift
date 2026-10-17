@@ -8,7 +8,8 @@ import CoreGraphics
 /// - **The navigation bar and Dynamic Type**: UIKit does not scale the bar's items ("Paso 3 de 5", the back button), so
 ///   they cannot grow. Text that has to grow is in the content of the screen, where the audit does check it.
 /// - **Contrast of an element that is hidden or partly off screen**: the audit reads pixels, and the pixels under the
-///   pinned bottom bar, or past the edge of the screen, are not the element's own. The colour pairs themselves are decided
+///   pinned bottom bar (the area of the screen's main button and what is below it), or past the edge of the screen, are
+///   not the element's own. The colour pairs themselves are decided
 ///   by `ContrastTests` and `AccessibilityContrastTests`.
 /// - **"Potentially inaccessible text" under a sheet**: a sheet that does not cover the whole screen leaves the screen
 ///   behind it visible but, as it should be, hidden from VoiceOver.
@@ -51,6 +52,7 @@ struct AuditWaiver {
         navigationBar: CGRect?,
         keyboard: CGRect? = nil,
         alerts: [CGRect] = [],
+        pinnedBars: [CGRect] = [],
         underSheet: Bool
     ) -> Reason? {
         if kind == .inaccessibleText, underSheet { return .screenBehindASheet }
@@ -62,7 +64,9 @@ struct AuditWaiver {
             if withBar.contains(center) { return .systemView }
         }
         if kind == .dynamicType, let navigationBar, navigationBar.contains(center) { return .navigationBarDoesNotScale }
-        if kind == .contrast, !isHittable || !window.insetBy(dx: -0.5, dy: -0.5).contains(elementFrame) { return .contrastOfAHiddenElement }
+        if kind == .contrast, !isHittable || !window.insetBy(dx: -0.5, dy: -0.5).contains(elementFrame) || pinnedBars.contains(where: { $0.intersects(elementFrame) }) {
+            return .contrastOfAHiddenElement
+        }
         if kind == .textClipped, wrappingTextIdentifiers.contains(elementIdentifier) { return .wrappingText }
         return nil
     }
