@@ -44,6 +44,17 @@ final class ReceiptParserOcrRecoveryTests: XCTestCase {
         XCTAssertEqual(draft.items.map(\.quantity), [3])
         XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [3216])
         XCTAssertTrue(draft.items[0].flags.contains(.needsReview))
+        XCTAssertTrue(draft.items[0].flags.contains(.quantityMismatch))
+        XCTAssertEqual(draft.items.first?.unitPrice?.minorUnits, 1072)
+    }
+
+    func testExplicitQuantityThatDoesNotMultiplyOutIsKeptAndFlagged() {
+        let draft = parse(["Pitcher $15.00", "(2 x $5.00)", "Total $15.00"])
+        XCTAssertEqual(draft.items.map(\.quantity), [2])
+        XCTAssertEqual(draft.items.map(\.lineTotal.minorUnits), [1500])
+        XCTAssertEqual(draft.items.first?.unitPrice?.minorUnits, 500)
+        XCTAssertTrue(draft.items[0].flags.contains(.quantityMismatch))
+        XCTAssertTrue(draft.items[0].flags.contains(.needsReview))
     }
 
     func testPriceRowsWhoseNamesWereDroppedStayAsFlaggedItems() {

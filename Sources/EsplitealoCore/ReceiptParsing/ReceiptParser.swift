@@ -194,9 +194,11 @@ public struct ReceiptParser: Sendable {
             let lineTotal = items[index].lineTotal.minorUnits
             let previousQuantity = items[index].quantity
             items[index].quantity = detail.quantity
-            // A misread parenthesis (`13 x $10.72)` for `(3 x $10.72)`) is corrected by the line total.
-            if detail.quantity * unitMinor != lineTotal, unitMinor > 0, lineTotal % unitMinor == 0,
-               (1...99).contains(lineTotal / unitMinor) {
+            // Only a misread parenthesis (`13 x $10.72)` for `(3 x $10.72)`) is corrected: the printed quantity
+            // is implausible and without its leading artifact digit it is exactly what the line total says.
+            if detail.quantity >= 10, unitMinor > 0, lineTotal % unitMinor == 0,
+               Int(String(detail.quantity).dropFirst()) == lineTotal / unitMinor,
+               lineTotal / unitMinor > 0 {
                 items[index].quantity = lineTotal / unitMinor
                 items[index].unitPrice = DraftAmount(minorUnits: unitMinor, needsAttention: numberFormat.isGuessed)
                 items[index].flags.formUnion([.quantityMismatch, .needsReview])
