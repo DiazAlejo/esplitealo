@@ -46,6 +46,8 @@ struct AmountToken: Equatable {
 
         let cleaned = s.filter { $0.isNumber || $0 == "." || $0 == "," }
         guard !cleaned.isEmpty else { return nil }
+        // A whole number glued to letters (`12A`, `B-2`) is a unit or lot number; only a decimal may carry a tax flag (`4.50T`).
+        if s.contains(where: \.isLetter), !cleaned.contains(where: { $0 == "." || $0 == "," }) { return nil }
 
         let dotCount = cleaned.filter { $0 == "." }.count
         let commaCount = cleaned.filter { $0 == "," }.count

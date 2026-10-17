@@ -1,0 +1,76 @@
+name: Receipt stress test
+
+# Generates fake Puerto Rico receipts with known answers, scans them with the real Vision scanner on a macOS runner,
+# parses them and scores the parsed bill against the ground truth. Informational: not part of the required check.
+# Start it by hand (Actions tab or `gh workflow run receipt-stress.yml`) or wait for the weekly run.
+# See docs/OCR_BENCHMARK.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: Number of generated receipts
+        default: "224"
+      seed:
+        description: Generator seed
+        default: "2026"
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: receipt-stress-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stress:
+    name: Vision stress run
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+
+      - name: Cache SwiftPM
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-stress-swiftpm-${{ hashFiles('Package.swift', 'Sources/**') }}
+          restore-keys: |
+            ${{ runner.os }}-stress-swiftpm-
+
+      - name: Run the stress test (real Vision scanner, then parser)
+        env:
+          COUNT: ${{ inputs.count || '224' }}
+          SEED: ${{ inputs.seed || '2026' }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/stress"
+          swift run -c release EsplitealoOCRBenchmark stress \
+            --mode vision \
+            --count "$COUNT" \
+            --seed "$SEED" \
+            --output "$RUNNER_TEMP/stress/report.json" \
+            --markdown "$RUNNER_TEMP/stress/summary.md" \
+            --failures-dir "$RUNNER_TEMP/stress/failures"
+
+      - name: Job summary
+        if: ${{ always() }}
+        run: |
+          if [ -f "$RUNNER_TEMP/stress/summary.md" ]; then
+            cat "$RUNNER_TEMP/stress/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload the JSON report and failing cases
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: receipt-stress
+          path: ${{ runner.temp }}/stress
+          retention-days: 30
+          if-no-files-found: ignore

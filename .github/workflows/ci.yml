@@ -84,7 +84,8 @@ jobs:
         run: rm -rf "$RUNNER_TEMP/DerivedData" "$RUNNER_TEMP/xcresults"
 
   # The Esplitéalo app (App/Esplitealo.xcodeproj): the whole test plan of the Esplitealo scheme on an iOS 18 simulator:
-  # unit tests, snapshot tests (EsplitealoTests) and the UI smoke and flow tests (EsplitealoUITests).
+  # unit tests, snapshot tests (EsplitealoTests) and the UI smoke and flow tests (EsplitealoUITests, except the journeys,
+  # which run in the iOS Journeys job).
   # Not in branch protection and gated on the required "macOS" job, so it can never make the required check slower or flakier.
   ios-app:
     name: iOS App
@@ -140,7 +141,7 @@ jobs:
           Scripts/ci-xcodebuild.sh app-ui test-without-building \
             -project App/Esplitealo.xcodeproj \
             -scheme Esplitealo \
-            -only-testing:EsplitealoUITests \
+            $(Scripts/ui-test-selection.sh app) \
             -skip-testing:EsplitealoUITests/AccessibilityAuditUITests \
             -retry-tests-on-failure \
             -test-iterations 2 \
@@ -167,6 +168,80 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ios-app-xcresults
+          path: ${{ runner.temp }}/xcresults
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Clean up build output
+        if: ${{ always() }}
+        run: |
+          rm -rf "$RUNNER_TEMP/DerivedData" "$RUNNER_TEMP/xcresults"
+          xcrun simctl shutdown all || true
+
+  # The full-journey UI tests (App/EsplitealoUITests/Journeys): about 50 tests of 25 to 60 seconds each, so they run in
+  # three parallel shards. Scripts/ui-test-selection.sh derives the class lists from the folder, so every UI test class
+  # runs in exactly one job (iOS App or one shard here). Same gating as iOS App.
+  ios-journeys:
+    name: iOS Journeys (${{ matrix.shard }}/3)
+    runs-on: macos-26
+    timeout-minutes: 45
+    needs: macOS
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    env:
+      # Snapshot references are recorded on iOS 18.x; xcodebuild keeps its package checkouts in a cached folder.
+      SOURCE_PACKAGES: ${{ github.workspace }}/.spm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up the iOS 18 simulator
+        id: simulator
+        uses: ./.github/actions/setup-ios-simulator
+
+      # Only the downloaded packages are cached, under an exact key (the pinned versions in Package.resolved), so a
+      # cache hit gives the same sources a cold run would fetch. Build output is never cached: every run builds from scratch.
+      - name: Cache package checkouts (swift-snapshot-testing)
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .spm
+          key: ${{ runner.os }}-app-spm-${{ hashFiles('App/Esplitealo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      # Scripts/ci-xcodebuild.sh writes one .xcresult per step and prints the failed tests at the end of the step's log,
+      # so `Scripts/ci-logs.sh` shows why a test failed without a simulator.
+      - name: Build the app and its tests for the iOS Simulator (no signing)
+        id: build
+        run: |
+          Scripts/ci-xcodebuild.sh app-build build-for-testing \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            -clonedSourcePackagesDirPath "$SOURCE_PACKAGES" \
+            CODE_SIGNING_ALLOWED=NO
+
+      # Launching the app in a simulator is
+      # the flakiest part of any iOS CI, so a failed UI test is retried once before it fails the job.
+      - name: UI journey tests
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          Scripts/ci-xcodebuild.sh app-journeys-${{ matrix.shard }} test-without-building \
+            -project App/Esplitealo.xcodeproj \
+            -scheme Esplitealo \
+            $(Scripts/ui-test-selection.sh journeys ${{ matrix.shard }} 3) \
+            -retry-tests-on-failure \
+            -test-iterations 2 \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO
+
+      # The bundles hold the failure messages, the UI test screenshots and the snapshot diffs.
+      - name: Upload the test result bundles
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ios-journeys-xcresults-${{ matrix.shard }}
           path: ${{ runner.temp }}/xcresults
           retention-days: 7
           if-no-files-found: ignore

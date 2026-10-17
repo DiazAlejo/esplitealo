@@ -37,6 +37,8 @@ struct EsplitealoOCRBenchmarkCLI {
             let output = stringFlag("--output", in: args) ?? defaultOutputPath(name: "cord")
             let report = try await runCord(cacheDirectory: URL(fileURLWithPath: cache), limit: limit, output: output)
             printSummary(report)
+        case "stress":
+            try await StressCommand.run(args: args)
         case "compare":
             guard args.count >= 2 else {
                 fputs("compare requires <baseline.json> <candidate.json>\n", stderr)
@@ -171,6 +173,8 @@ struct EsplitealoOCRBenchmarkCLI {
 
             swift run EsplitealoOCRBenchmark synthetic [--limit N] [--output path.json]
             swift run EsplitealoOCRBenchmark cord [--cache dir] [--limit N] [--output path.json]
+            swift run EsplitealoOCRBenchmark stress [--count N] [--seed S] [--mode vision|ideal] [--output report.json]
+                                                    [--markdown summary.md] [--failures-dir dir]
             swift run EsplitealoOCRBenchmark compare baseline.json candidate.json
 
             CORD cache: Scripts/fetch-cord-benchmark.py (CC-BY 4.0, naver-clova-ix/cord-v2)
