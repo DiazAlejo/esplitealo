@@ -26,7 +26,6 @@ final class JourneyLargeTextUITests: JourneyTestCase {
         for (index, name) in names.enumerated() {
             let field = app.textFields["people.name"]
             XCTAssertTrue(field.waitForExistence(timeout: 10))
-            scrollTo(field, in: app)
             field.tap()
             field.typeText(name + "\n")
             waitFor(element(app, "people.row.\(index)"), "\(name) joining the table", in: app, timeout: 8)

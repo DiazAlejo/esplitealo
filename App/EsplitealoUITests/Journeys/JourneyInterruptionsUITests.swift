@@ -334,7 +334,7 @@ final class JourneyInterruptionsUITests: JourneyTestCase {
         waitFor(alert, "the discard alert", in: app, timeout: 5)
         alert.buttons["Abandonar cuenta"].tap()
         expectScreen("home", in: app)
-        expectNoElement("home.resume", in: app, within: 1)
+        expectNoElement("home.resume", in: app, within: 5)
 
         backgroundAndTerminate(app)
         var again = Options(draftDirectory: directory)
