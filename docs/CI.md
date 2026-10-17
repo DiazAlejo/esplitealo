@@ -60,7 +60,7 @@ gh run download <run-id> -R DiazAlejo/esplitealo -n ios-app-xcresults
 open ios-app-xcresults/app-ui.xcresult
 ```
 
-The scripts are tested without a runner or Xcode by `Scripts/tests/ci-scripts-test.sh` (stub `gh`, `xcrun` and `xcodebuild`).
+The scripts are tested without a runner or Xcode by `Scripts/tests/ci-scripts-test.sh` (stub `gh`, `xcrun` and `xcodebuild`); the store-screenshot scripts by `Scripts/tests/store-screenshots-test.sh`.
 
 ## Record snapshots
 
@@ -90,6 +90,10 @@ git status App/SnapshotReferences    # look at the new images before committing 
 With `commit=true` the commit lands on the branch: `git pull` it. Commits pushed with the built-in token do not trigger other workflows, so CI does not start on that commit by itself and a pull request would show no checks for it. Push any follow-up commit, or close and reopen the pull request, to run CI. Always look at the recorded images: a verified reference proves the app renders that way, not that it renders correctly.
 
 Security: the workflow has no secrets and no `pull_request_target`. The job that builds and runs the branch's code has a read-only token. A second job, which runs nothing from the branch, is the only one with `contents: write`, and it refuses the default branch and a branch that moved while recording.
+
+## Store screenshots
+
+The manual [Store screenshots](../.github/workflows/store-screenshots.yml) workflow takes the App Store screenshots (five screens, Spanish and English, light and dark) on a hosted simulator at the two iPhone sizes App Store Connect asks for, and uploads them as artifacts. It never runs by itself. How to start it and fetch the pictures: [store/README.md](store/README.md#screenshots).
 
 ## Caching and cleanup
 

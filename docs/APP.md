@@ -154,6 +154,8 @@ Every new screen ships with a snapshot of its states: build the screen view with
 | `BillStore`, routes, compiled strings | `App/EsplitealoTests` | CI simulator (`iOS App`) |
 | Component and screen snapshots | `App/EsplitealoTests/Snapshots` | CI simulator (`iOS App`) |
 | Launch and flow smoke | `App/EsplitealoUITests` | CI simulator (`iOS App`) |
+| App Store screenshots (skipped unless `STORE_SCREENSHOTS=1`) | `App/EsplitealoUITests/StoreScreenshotTests.swift` | the manual `Store screenshots` workflow ([store/README.md](store/README.md)) |
+| App Store listing limits and wording | `Tests/AppResourceTests/StoreListingTests.swift` | `swift test` (required CI check) |
 | Accessibility audits (`performAccessibilityAudit`, 44 pt targets) | `App/EsplitealoUITests/AccessibilityAuditUITests.swift` | CI simulator (`iOS App`) |
 | Accessibility snapshots (xxxLarge, AX3, AX5, small phone, landscape) | `App/EsplitealoTests/Snapshots/AccessibilitySnapshotTests.swift` | CI simulator (`iOS App`) |
 | Increase Contrast palette, pinned-bar policy | `Tests/EsplitealoDesignTests` | `swift test` |
