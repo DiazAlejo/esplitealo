@@ -36,7 +36,7 @@ struct AccessibilitySnapshotTests {
     // MARK: Home and capture
 
     @Test func home() {
-        snapshot(NavigationStack { HomeView(animatesMascot: false) }.environment(AppRouter()).environment(ScanFlow.preview()), "home")
+        snapshot(NavigationStack { HomeView(animatesMascot: false) }.environment(AppRouter()).environment(BillStore.live(arguments: ["--uitesting"])).environment(ScanFlow.preview()), "home")
     }
 
     @Test func howItWorks() {
@@ -127,7 +127,7 @@ struct AccessibilitySnapshotTests {
 
     private func screens() -> [(String, AnyView)] {
         [
-            ("home", AnyView(NavigationStack { HomeView(animatesMascot: false) }.environment(AppRouter()).environment(ScanFlow.preview()))),
+            ("home", AnyView(NavigationStack { HomeView(animatesMascot: false) }.environment(AppRouter()).environment(BillStore.live(arguments: ["--uitesting"])).environment(ScanFlow.preview()))),
             ("review", AnyView(NavigationStack { ReviewView() }.environment(store(ReviewSamples.parsedSession())).environment(AppRouter()))),
             ("people", AnyView(NavigationStack { PeopleView() }.environment(store(SampleBill.midway())).environment(AppRouter()))),
             ("mark", AnyView(NavigationStack { AssignScreen(model: assignModel(SampleBill.midway())) }.environment(AppRouter()))),

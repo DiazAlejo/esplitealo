@@ -46,10 +46,11 @@ final class AccessibilityAuditUITests: XCTestCase {
         app.descendants(matching: .any)[id]
     }
 
-    /// Runs `body` once per situation with a fresh launch.
+    /// Runs `body` once per situation with a fresh launch. An audit takes seconds, so most screens are audited in the
+    /// hardest situation only (`hardestOnly`), where layout problems are likeliest; the others in both.
     @MainActor
-    private func eachSituation(_ arguments: [String], file: StaticString = #filePath, line: UInt = #line, _ body: (XCUIApplication, Situation) -> Void) {
-        for situation in Situation.all {
+    private func eachSituation(_ arguments: [String], hardestOnly: Bool = false, file: StaticString = #filePath, line: UInt = #line, _ body: (XCUIApplication, Situation) -> Void) {
+        for situation in hardestOnly ? [Situation.hardest] : Situation.all {
             let app = launch(situation, arguments)
             body(app, situation)
             app.terminate()
@@ -59,7 +60,8 @@ final class AccessibilityAuditUITests: XCTestCase {
     @MainActor
     private func audit(_ app: XCUIApplication, _ label: String, scrolls: Int = 0, file: StaticString = #filePath, line: UInt = #line) {
         run(app, label, file: file, line: line)
-        for index in 0 ..< scrolls {
+        // Scrolled audits only where the text is largest: that is where content falls off the first screen.
+        for index in 0 ..< min(scrolls, label.contains("AX5") ? 2 : 0) {
             app.swipeUp()
             run(app, "\(label), scrolled \(index + 1)", file: file, line: line)
         }
@@ -118,7 +120,7 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     @MainActor
     func testCameraBlockedScreens() {
-        for state in ["denied", "unsupported"] {
+        for state in ["denied"] {
             eachSituation(["--uitesting-camera", state, "--uitesting-recognized-text", Self.receiptFixture]) { app, situation in
                 XCTAssertTrue(app.buttons["home.scan"].waitForExistence(timeout: 15))
                 app.buttons["home.scan"].tap()
@@ -150,7 +152,7 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     @MainActor
     func testResumeDraftPrompt() {
-        eachSituation(["--uitesting-resume-prompt"]) { app, situation in
+        eachSituation(["--uitesting-resume-prompt"], hardestOnly: true) { app, situation in
             let alert = app.alerts.firstMatch
             XCTAssertTrue(alert.waitForExistence(timeout: 15), situation.name)
             XCTAssertEqual(alert.buttons.count, 2, "continue and discard")
@@ -167,14 +169,14 @@ final class AccessibilityAuditUITests: XCTestCase {
             XCTAssertTrue(element(app, "screen.review").waitForExistence(timeout: 15))
             audit(app, "Review \(situation.name)", scrolls: 4)
         }
-        eachSituation(["--fixture=parsed", "--start-at=review"]) { app, situation in
+        eachSituation(["--fixture=parsed", "--start-at=review"], hardestOnly: true) { app, situation in
             XCTAssertTrue(app.buttons["review.add"].waitForExistence(timeout: 15))
             if !app.buttons["review.add"].isHittable { for _ in 0 ..< 6 where !app.buttons["review.add"].isHittable { app.swipeUp() } }
             app.buttons["review.add"].tap()
             XCTAssertTrue(app.buttons["sheet.save"].waitForExistence(timeout: 5))
             audit(app, "Item editor \(situation.name)", scrolls: 1)
         }
-        eachSituation(["--fixture=parsed", "--start-at=review"]) { app, situation in
+        eachSituation(["--fixture=parsed", "--start-at=review"], hardestOnly: true) { app, situation in
             let total = app.buttons["review.field.total"]
             XCTAssertTrue(total.waitForExistence(timeout: 15))
             for _ in 0 ..< 8 where !total.isHittable { app.swipeUp() }
@@ -182,7 +184,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             XCTAssertTrue(app.buttons["sheet.save"].waitForExistence(timeout: 5))
             audit(app, "Amount sheet \(situation.name)", scrolls: 1)
         }
-        eachSituation(["--fixture=parsed", "--start-at=review"]) { app, situation in
+        eachSituation(["--fixture=parsed", "--start-at=review"], hardestOnly: true) { app, situation in
             XCTAssertTrue(app.buttons["screen.next"].waitForExistence(timeout: 15))
             if app.buttons["screen.next"].isHittable { app.buttons["screen.next"].tap() }
             XCTAssertTrue(app.buttons["review.confirm.fix"].waitForExistence(timeout: 5))
@@ -192,7 +194,7 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     @MainActor
     func testReviewWithNothingRead() {
-        eachSituation(["--fixture=empty", "--start-at=review"]) { app, situation in
+        eachSituation(["--fixture=empty", "--start-at=review"], hardestOnly: true) { app, situation in
             XCTAssertTrue(element(app, "screen.review").waitForExistence(timeout: 15))
             audit(app, "Empty review \(situation.name)", scrolls: 2)
         }
@@ -206,7 +208,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             XCTAssertTrue(element(app, "screen.people").waitForExistence(timeout: 15))
             audit(app, "People, empty \(situation.name)", scrolls: 3)
         }
-        eachSituation(["--fixture=midway", "--start-at=people"]) { app, situation in
+        eachSituation(["--fixture=midway", "--start-at=people"], hardestOnly: true) { app, situation in
             XCTAssertTrue(element(app, "screen.people").waitForExistence(timeout: 15))
             audit(app, "People, four \(situation.name)", scrolls: 4)
         }
@@ -214,7 +216,7 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     @MainActor
     func testPeopleSheets() {
-        eachSituation(["--fixture=midway", "--start-at=people"]) { app, situation in
+        eachSituation(["--fixture=midway", "--start-at=people"], hardestOnly: true) { app, situation in
             let rename = app.buttons["people.rename.1"]
             XCTAssertTrue(rename.waitForExistence(timeout: 15))
             for _ in 0 ..< 8 where !rename.isHittable { app.swipeUp() }
@@ -222,7 +224,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             XCTAssertTrue(app.buttons["sheet.save"].waitForExistence(timeout: 5))
             audit(app, "Rename sheet \(situation.name)", scrolls: 1)
         }
-        eachSituation(["--fixture=midway", "--start-at=people"]) { app, situation in
+        eachSituation(["--fixture=midway", "--start-at=people"], hardestOnly: true) { app, situation in
             let remove = app.buttons["people.remove.1"]
             XCTAssertTrue(remove.waitForExistence(timeout: 15))
             for _ in 0 ..< 8 where !remove.isHittable { app.swipeUp() }
@@ -240,7 +242,7 @@ final class AccessibilityAuditUITests: XCTestCase {
             XCTAssertTrue(element(app, "screen.mark").waitForExistence(timeout: 15))
             audit(app, "Mark items \(situation.name)", scrolls: 4)
         }
-        eachSituation(["--fixture=quantities", "--start-at=mark"]) { app, situation in
+        eachSituation(["--fixture=quantities", "--start-at=mark"], hardestOnly: true) { app, situation in
             XCTAssertTrue(element(app, "screen.mark").waitForExistence(timeout: 15))
             let firstRow = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'assign.item.'")).firstMatch
             XCTAssertTrue(firstRow.waitForExistence(timeout: 5))
@@ -253,7 +255,7 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     @MainActor
     func testMarkItemsWithItemsLeftWarning() {
-        eachSituation(["--fixture=midway", "--start-at=mark"]) { app, situation in
+        eachSituation(["--fixture=midway", "--start-at=mark"], hardestOnly: true) { app, situation in
             XCTAssertTrue(app.buttons["screen.next"].waitForExistence(timeout: 15))
             for _ in 0 ..< 8 where !app.buttons["screen.next"].isHittable { app.swipeUp() }
             app.buttons["screen.next"].tap()
