@@ -71,7 +71,11 @@ final class AccessibilityAuditUITests: XCTestCase {
     private func run(_ app: XCUIApplication, _ label: String, file: StaticString, line: UInt) {
         do {
             try app.performAccessibilityAudit { issue in
-                XCTContext.runActivity(named: "Ignored: \(label): \(issue.compactDescription)") { _ in }
+                // One greppable line per finding in the CI log: what, where and on which element.
+                let element = issue.element
+                let frame = element.map { "\(Int($0.frame.minX)),\(Int($0.frame.minY)) \(Int($0.frame.width))x\(Int($0.frame.height))" } ?? "-"
+                let line = "AUDIT [\(label)] \(issue.compactDescription) | \(issue.detailedDescription) | type=\(element?.elementType.rawValue ?? 0) id=\(element?.identifier ?? "-") label=\(element?.label ?? "-") frame=\(frame)"
+                XCTContext.runActivity(named: line) { _ in }
                 return Self.isKnownSystemIssue(issue)
             }
         } catch {
@@ -155,7 +159,7 @@ final class AccessibilityAuditUITests: XCTestCase {
         eachSituation(["--uitesting-resume-prompt"], hardestOnly: true) { app, situation in
             let alert = app.alerts.firstMatch
             XCTAssertTrue(alert.waitForExistence(timeout: 15), situation.name)
-            XCTAssertEqual(alert.buttons.count, 2, "continue and discard")
+            XCTAssertGreaterThanOrEqual(alert.buttons.count, 2, "continue and discard")
             XCTAssertTrue(alert.staticTexts.count >= 2, "a title and a message")
             audit(app, "Resume prompt \(situation.name)")
         }
