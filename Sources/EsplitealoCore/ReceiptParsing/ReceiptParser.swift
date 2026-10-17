@@ -154,6 +154,13 @@ public struct ReceiptParser: Sendable {
             return DraftAmount(minorUnits: minor, sourceRect: rect, needsAttention: guessed)
         }
 
+        /// Reads a price on a row that is only a candidate (a lone amount); an unreadable one is not worth a warning.
+        func quietAmount(from tokens: [AmountToken], rect: PixelRect?) -> DraftAmount? {
+            guard let last = tokens.last, let minor = NumberFormatInference.minorUnits(last, format: numberFormat) else { return nil }
+            let guessed = numberFormat.isGuessed || last.shape == .integer && last.digits.count >= 4
+            return DraftAmount(minorUnits: minor, sourceRect: rect, needsAttention: guessed)
+        }
+
         func addItem(name: String, qty: Int, tokens: [AmountToken], rect: PixelRect?, flags: Set<ItemFlag> = [], entryIndex: Int) {
             guard !isPastTotalsSection(entryIndex) else { return }
             let warningsBefore = warnings.count
@@ -375,7 +382,7 @@ public struct ReceiptParser: Sendable {
             case .amountOnly:
                 guard !isPastTotalsSection(i) else {
                     // A price under the totals with its label dropped; it may be the total (checked after the loop).
-                    if let a = amount(from: line.amounts, rect: rect) { orphanAmounts.append(a) }
+                    if let a = quietAmount(from: line.amounts, rect: rect) { orphanAmounts.append(a) }
                     break
                 }
                 if let pending = pendingName, pendingNameIndex == i - 1 {
@@ -403,7 +410,7 @@ public struct ReceiptParser: Sendable {
                         entryIndex: i
                     )
                     i += 1
-                } else if let a = amount(from: line.amounts, rect: rect), !items.isEmpty, a.minorUnits > 0 {
+                } else if let a = quietAmount(from: line.amounts, rect: rect), !items.isEmpty, a.minorUnits > 0 {
                     let running = items.reduce(0) { $0 + $1.lineTotal.minorUnits } + adjustments.reduce(0) { $0 + $1.amount.minorUnits }
                     if subtotal == nil, items.count >= 2, a.minorUnits == running {
                         // The sum of the items above, whose "Subtotal" label was dropped.
