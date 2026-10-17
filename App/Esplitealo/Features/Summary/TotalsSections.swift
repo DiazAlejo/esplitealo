@@ -399,10 +399,6 @@ struct WhoOwesSection: View {
 struct ShareBar: View {
     let rows: [TotalsViewModel.PersonRow]
 
-    private var spoken: String {
-        rows.map { "\($0.name) \($0.percent)%" }.joined(separator: ", ")
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             VStack(spacing: 6) {
@@ -420,9 +416,8 @@ struct ShareBar: View {
                 .frame(height: 10)
                 Capsule().fill(Color.esp.pink).frame(height: 3)
             }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("totals.bar.aria"))
-            .accessibilityValue(Text(verbatim: spoken))
+            // The bar is a picture; the legend under it says the same in words, so VoiceOver reads the legend.
+            .accessibilityHidden(true)
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 110), alignment: .leading)], alignment: .leading, spacing: Spacing.xxs) {
                 ForEach(rows) { row in
@@ -431,11 +426,11 @@ struct ShareBar: View {
                         PersonAvatar(name: row.name, participantIndex: row.colorIndex, size: 20, announcesName: false)
                         Text(verbatim: "\(row.name) \(row.percent)%")
                     }
+                    .accessibilityElement(children: .combine)
                 }
             }
             .espText(.footnote)
             .foregroundStyle(Color.esp.inkSecondary)
-            .accessibilityHidden(true)
         }
     }
 }

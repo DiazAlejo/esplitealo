@@ -9,6 +9,7 @@ struct ItemEditorSheet: View {
     let onClose: () -> Void
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var name: String
     @State private var priceText: String
     @State private var quantity: Int
@@ -43,7 +44,9 @@ struct ItemEditorSheet: View {
                 }
 
                 SheetField("sheet.description", error: error == .missingName ? Text("sheet.errName") : nil) {
-                    TextField(text: $name, prompt: Text("sheet.descriptionPlaceholder").foregroundStyle(Color.esp.inkSecondary)) { Text("sheet.description") }
+                    // One line truncates a long name at accessibility sizes, so there the field grows to up to four.
+                    TextField(text: $name, prompt: Text("sheet.descriptionPlaceholder").foregroundStyle(Color.esp.inkSecondary), axis: dynamicTypeSize.isAccessibilitySize ? .vertical : .horizontal) { Text("sheet.description") }
+                        .lineLimit(1 ... 4)
                         .focused($focus, equals: .name)
                         .textInputAutocapitalization(.sentences)
                         .submitLabel(.next)

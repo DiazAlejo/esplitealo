@@ -128,6 +128,8 @@ struct ShareSheetContent: View {
 private struct RecipientsStack: View {
     let people: [(name: String, colorIndex: Int)]
 
+    @Environment(\.locale) private var locale
+
     var body: some View {
         HStack(spacing: -8) {
             ForEach(Array(people.prefix(4).enumerated()), id: \.offset) { _, person in
@@ -135,7 +137,9 @@ private struct RecipientsStack: View {
                     .overlay(Circle().strokeBorder(Color.esp.surface, lineWidth: 2))
             }
         }
-        .accessibilityHidden(true)
+        // One element that names everyone, instead of letters VoiceOver cannot reach.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: people.map(\.name).formatted(.list(type: .and).locale(locale))))
     }
 }
 

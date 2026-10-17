@@ -25,6 +25,8 @@ struct ProcessingContent: View {
                     .accessibilityAddTraits(.isHeader)
                 IndeterminateBar(animates: animates)
                     .accessibilityElement(children: .ignore)
+                    // Read like the line above it: a 6 pt bar is not a control, so it is not offered as one.
+                    .accessibilityAddTraits(.isStaticText)
                     .accessibilityLabel("processing.bar")
                     .accessibilityValue(messageText)
                     .accessibilityIdentifier("capture.progress")
