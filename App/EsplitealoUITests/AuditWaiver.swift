@@ -17,6 +17,9 @@ import CoreGraphics
 ///   element is checked and fails if it does not scale); the AX3 and AX5 snapshots show the screens at large sizes.
 /// - **Text that wraps but is reported as clipped**: a short, single-line footnote that has the room to wrap (the reading
 ///   screen's privacy line, the row hint on Mark items). Only the elements named in `wrappingTextIdentifiers`.
+/// - **The initial in a small avatar**: the letter in the legend's 20 pt circle is set in a text style and scales, but the
+///   circle is capped at 1.75 times its size so it never crowds the name, and the audit reports the letter (a single glyph
+///   no larger than `avatarLetterMaxSide`) as partly unsupported. Larger avatars pass.
 struct AuditWaiver {
     enum Reason: Equatable {
         case systemView
@@ -25,6 +28,7 @@ struct AuditWaiver {
         case screenBehindASheet
         case dynamicTypeWithoutAnElement
         case wrappingText
+        case avatarLetter
     }
 
     enum Kind: Equatable {
@@ -37,6 +41,9 @@ struct AuditWaiver {
 
     /// The identifiers of the footnotes that wrap (see the AX3 and AX5 snapshots of the reading screen and Mark items).
     static let wrappingTextIdentifiers: Set<String> = ["capture.privacy", "assign.rowHint"]
+
+    /// The largest side of the initial in a small avatar (8x13 pt at the default size).
+    static let avatarLetterMaxSide: CGFloat = 16
 
     /// The suggestion bar sits above the keyboard's own frame.
     static let keyboardSuggestionBarHeight: CGFloat = 50
@@ -67,6 +74,7 @@ struct AuditWaiver {
         if kind == .contrast, !isHittable || !window.insetBy(dx: -0.5, dy: -0.5).contains(elementFrame) || pinnedBars.contains(where: { $0.intersects(elementFrame) }) {
             return .contrastOfAHiddenElement
         }
+        if kind == .dynamicType, elementIdentifier.isEmpty, max(elementFrame.width, elementFrame.height) <= avatarLetterMaxSide { return .avatarLetter }
         if kind == .textClipped, wrappingTextIdentifiers.contains(elementIdentifier) { return .wrappingText }
         return nil
     }

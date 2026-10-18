@@ -153,15 +153,16 @@ class JourneyTestCase: XCTestCase {
             guard target.identifier != "screen.next", bar.exists, bar.isHittable else { return true }
             return !target.frame.intersects(bar.frame.insetBy(dx: 0, dy: -24))
         }
-        // Small drags in the direction of the target: at the largest text a row can be taller than the screen, and a
-        // full swipe would carry its centre past the visible part and never back.
+        // Small drags toward the target: at the largest text a row can be taller than the screen, and a full swipe would
+        // carry its centre past the visible part. Back down only when the target is above the screen: a downward drag
+        // on a sheet closes it.
         func drag(up: Bool) {
             let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.65 : 0.35))
             let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.4 : 0.6))
             from.press(forDuration: 0.05, thenDragTo: to)
         }
         for _ in 0 ..< 16 where !reachable() {
-            drag(up: target.frame.midY > app.frame.midY)
+            drag(up: target.frame.midY >= app.frame.minY)
         }
         var resting = target.frame
         for _ in 0 ..< 10 {

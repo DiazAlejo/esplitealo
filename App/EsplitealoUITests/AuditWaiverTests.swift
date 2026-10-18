@@ -76,4 +76,11 @@ final class AuditWaiverTests: XCTestCase {
         XCTAssertNil(reason(.textClipped, inContent, id: "review.item.1"))
         XCTAssertNil(reason(.other, inContent, id: "capture.privacy"))
     }
+
+    func testOnlyASingleGlyphSizedDynamicTypeFindingIsWaivedAsAnAvatarLetter() {
+        XCTAssertEqual(reason(.dynamicType, CGRect(x: 139, y: 624, width: 8, height: 13)), .avatarLetter)
+        XCTAssertNil(reason(.dynamicType, inContent), "text of any size is checked")
+        XCTAssertNil(reason(.dynamicType, CGRect(x: 139, y: 624, width: 8, height: 13), id: "totals.banner"))
+        XCTAssertNil(reason(.contrast, CGRect(x: 139, y: 624, width: 8, height: 13)))
+    }
 }
