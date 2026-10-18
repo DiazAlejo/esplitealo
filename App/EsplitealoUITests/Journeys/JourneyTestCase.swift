@@ -50,10 +50,13 @@ class JourneyTestCase: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        // A failed test leaves what it was looking at: a screenshot, and each line of Mark items with its state.
-        addTeardownBlock { @MainActor [self] in
-            guard let app = launchedApp, testRun?.hasSucceeded == false else { return }
-            attachDiagnostics(of: app, named: "state at the failure")
+    }
+
+    /// A failed test leaves what it was looking at: a screenshot, and each line of Mark items with its state.
+    override func tearDownWithError() throws {
+        guard testRun?.hasSucceeded == false else { return }
+        MainActor.assumeIsolated {
+            if let launchedApp { attachDiagnostics(of: launchedApp, named: "state at the failure") }
         }
     }
 

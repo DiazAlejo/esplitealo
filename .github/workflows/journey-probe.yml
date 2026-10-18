@@ -48,8 +48,10 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
       - name: Journey tests
+        env:
+          TESTS: ${{ github.event.inputs.tests }}
         run: |
-          tests="${{ github.event.inputs.tests }}"
+          tests="$TESTS"
           if [ -z "$tests" ]; then tests="$(tr '\n' ' ' < .github/journey-probe.txt)"; fi
           only=()
           for t in $tests; do only+=("-only-testing:EsplitealoUITests/$t"); done
