@@ -53,11 +53,10 @@ class JourneyTestCase: XCTestCase {
     }
 
     /// A failed test leaves what it was looking at: a screenshot, and each line of Mark items with its state.
-    override func tearDownWithError() throws {
-        guard testRun?.hasSucceeded == false else { return }
-        MainActor.assumeIsolated {
-            if let launchedApp { attachDiagnostics(of: launchedApp, named: "state at the failure") }
-        }
+    @MainActor
+    override func tearDown() async throws {
+        guard testRun?.hasSucceeded == false, let launchedApp else { return }
+        attachDiagnostics(of: launchedApp, named: "state at the failure")
     }
 
     /// Attaches a screenshot and logs the item rows (identifier, label with its assigned or unassigned state) and the
