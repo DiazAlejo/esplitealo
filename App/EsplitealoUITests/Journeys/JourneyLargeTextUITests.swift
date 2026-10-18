@@ -39,8 +39,17 @@ final class JourneyLargeTextUITests: JourneyTestCase {
         scrollTo(row, in: app)
         row.tap()
         XCTAssertTrue(element(app, "assign.sheet").waitForExistence(timeout: 5))
-        for person in people { tapReaching(app.buttons["assign.sheet.person.\(person)"], in: app) }
-        tapReaching(app.buttons["assign.sheet.done"], in: app)
+        // No drags in the sheet: a drag over its rows ticks or unticks them (the home indicator also makes Done report as
+        // not hittable, which sent the old helper dragging). XCTest scrolls a button into view by itself when it taps it.
+        for person in people {
+            let button = app.buttons["assign.sheet.person.\(person)"]
+            XCTAssertTrue(button.waitForExistence(timeout: 10), "\(button) never appeared")
+            button.tap()
+        }
+        attachDiagnostics(of: app, named: "sheet of \(item) before Done")
+        let done = app.buttons["assign.sheet.done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 10), "\(done) never appeared")
+        done.tap()
         expectNoElement("assign.sheet", in: app, within: 5)
         attachDiagnostics(of: app, named: "after marking \(item)")
     }
