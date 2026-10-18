@@ -42,6 +42,7 @@ final class JourneyLargeTextUITests: JourneyTestCase {
         for person in people { tapReaching(app.buttons["assign.sheet.person.\(person)"], in: app) }
         tapReaching(app.buttons["assign.sheet.done"], in: app)
         expectNoElement("assign.sheet", in: app, within: 5)
+        attachDiagnostics(of: app, named: "after marking \(item)")
     }
 
     @MainActor

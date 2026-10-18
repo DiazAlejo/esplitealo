@@ -45,8 +45,31 @@ class JourneyTestCase: XCTestCase {
         }
     }
 
+    /// The app the test launched last, for the diagnostics of a failed test.
+    private var launchedApp: XCUIApplication?
+
     override func setUpWithError() throws {
         continueAfterFailure = false
+        // A failed test leaves what it was looking at: a screenshot, and each line of Mark items with its state.
+        addTeardownBlock { @MainActor [self] in
+            guard let app = launchedApp, testRun?.hasSucceeded == false else { return }
+            attachDiagnostics(of: app, named: "state at the failure")
+        }
+    }
+
+    /// Attaches a screenshot and logs the item rows (identifier, label with its assigned or unassigned state) and the
+    /// pinned bar's label, so one failed run says which item is unmarked.
+    @MainActor
+    func attachDiagnostics(of app: XCUIApplication, named name: String) {
+        let rows = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'assign.item.' OR identifier BEGINSWITH 'assign.sheet.' OR identifier == 'screen.next'")).allElementsBoundByIndex
+        let lines = rows.map { "\($0.identifier) | \($0.label) | \($0.frame)" }
+        let summary = "DIAG [\(name)] sheet=\(app.otherElements["assign.sheet"].exists)\n" + lines.joined(separator: "\n")
+        XCTContext.runActivity(named: summary) { activity in
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = name
+            shot.lifetime = .keepAlways
+            activity.add(shot)
+        }
     }
 
     // MARK: Launching
@@ -79,6 +102,7 @@ class JourneyTestCase: XCTestCase {
         arguments += ["-AppleLanguages", "(\(options.language))", "-AppleLocale", "\(options.language)_\(options.region)"]
         app.launchArguments += arguments
         app.launch()
+        launchedApp = app
         return app
     }
 
