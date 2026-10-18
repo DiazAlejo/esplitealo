@@ -156,9 +156,10 @@ class JourneyTestCase: XCTestCase {
         // Small drags toward the target: at the largest text a row can be taller than the screen, and a full swipe would
         // carry its centre past the visible part. Back down only when the target is above the screen: a downward drag
         // on a sheet closes it.
+        // They start in the margin, beside the rows: a drag that starts on a row of a sheet's list ticked and unticked it.
         func drag(up: Bool) {
-            let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.65 : 0.35))
-            let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.4 : 0.6))
+            let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: up ? 0.65 : 0.35))
+            let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: up ? 0.4 : 0.6))
             from.press(forDuration: 0.05, thenDragTo: to)
         }
         for _ in 0 ..< 16 where !reachable() {

@@ -19,7 +19,8 @@ import CoreGraphics
 ///   screen's privacy line, the row hint on Mark items). Only the elements named in `wrappingTextIdentifiers`.
 /// - **The initial in a small avatar**: the letter in the legend's 20 pt circle is set in a text style and scales, but the
 ///   circle is capped at 1.75 times its size so it never crowds the name, and the audit reports the letter (a single glyph
-///   no larger than `avatarLetterMaxSide`) as partly unsupported. Larger avatars pass.
+///   no larger than `avatarLetterMaxSide`) as partly unsupported. Larger avatars pass. It is not a contrast or description finding: those are still checked on the
+///   letter, and the avatar's accessibility label is the person's name.
 struct AuditWaiver {
     enum Reason: Equatable {
         case systemView
