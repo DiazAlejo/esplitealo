@@ -177,7 +177,9 @@ class JourneyTestCase: XCTestCase {
         func reachable() -> Bool {
             guard target.isHittable else { return false }
             guard target.identifier != "screen.next", bar.exists, bar.isHittable else { return true }
-            return !target.frame.intersects(bar.frame.insetBy(dx: 0, dy: -24))
+            // The tap lands on the centre, so that is what must clear the bar: a row taller than the space above the bar
+            // always overlaps it at the largest text sizes, and asking for no overlap at all never succeeds.
+            return !bar.frame.insetBy(dx: 0, dy: -24).contains(CGPoint(x: target.frame.midX, y: target.frame.midY))
         }
         // Small drags toward the target: at the largest text a row can be taller than the screen, and a full swipe would
         // carry its centre past the visible part. Back down only when the target is above the screen: a downward drag

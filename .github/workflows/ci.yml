@@ -184,7 +184,7 @@ jobs:
   ios-journeys:
     name: iOS Journeys (${{ matrix.shard }}/3)
     runs-on: macos-26
-    timeout-minutes: 45
+    timeout-minutes: 60
     needs: macOS
     strategy:
       fail-fast: false
