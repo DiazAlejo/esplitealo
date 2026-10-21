@@ -318,6 +318,15 @@ final class AccessibilityAuditUITests: XCTestCase {
             for _ in 0 ..< 10 where !share.isHittable { app.swipeUp() }
             share.tap()
             XCTAssertTrue(app.buttons["share.send"].waitForExistence(timeout: 10))
+            // The sheet first opens at a guessed height and slides to the measured one: audit it once it rests, because
+            // the Dynamic Type check compares the text before and after a size change and a moving sheet looks unscaled.
+            var resting = app.buttons["share.send"].frame
+            for _ in 0 ..< 20 {
+                RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+                let now = app.buttons["share.send"].frame
+                if now == resting { break }
+                resting = now
+            }
             audit(app, "Share sheet \(situation.name)", scrolls: 2, underSheet: true)
             for _ in 0 ..< 6 where !app.buttons["share.send"].isHittable { app.swipeUp() }
             app.buttons["share.send"].tap()
