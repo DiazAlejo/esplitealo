@@ -18,10 +18,46 @@ struct SnapshotVariant: Sendable {
     static let darkSpanish = SnapshotVariant(name: "dark-es", colorScheme: .dark, language: "es", dynamicType: .large)
     static let lightEnglish = SnapshotVariant(name: "light-en", colorScheme: .light, language: "en", dynamicType: .large)
     static let darkEnglish = SnapshotVariant(name: "dark-en", colorScheme: .dark, language: "en", dynamicType: .large)
+    /// Named "xxxl" for historical reasons: this one is the accessibility size AX3.
     static let largeTextSpanish = SnapshotVariant(name: "light-es-xxxl", colorScheme: .light, language: "es", dynamicType: .accessibility3)
+
+    // The accessibility matrix (`AccessibilitySnapshotTests`): xxxLarge (the largest size that is not an accessibility
+    // size) and AX3 in every appearance and language, plus AX5, the largest size of all. Together with `.largeTextSpanish`
+    // (AX3, light, Spanish) every combination of size, appearance and language is covered.
+    static let xxxLargeLightSpanish = SnapshotVariant(name: "light-es-xxxLarge", colorScheme: .light, language: "es", dynamicType: .xxxLarge)
+    static let xxxLargeDarkEnglish = SnapshotVariant(name: "dark-en-xxxLarge", colorScheme: .dark, language: "en", dynamicType: .xxxLarge)
+    static let ax3LightEnglish = SnapshotVariant(name: "light-en-ax3", colorScheme: .light, language: "en", dynamicType: .accessibility3)
+    static let ax3DarkSpanish = SnapshotVariant(name: "dark-es-ax3", colorScheme: .dark, language: "es", dynamicType: .accessibility3)
+    static let ax3DarkEnglish = SnapshotVariant(name: "dark-en-ax3", colorScheme: .dark, language: "en", dynamicType: .accessibility3)
+    static let ax5LightSpanish = SnapshotVariant(name: "light-es-ax5", colorScheme: .light, language: "es", dynamicType: .accessibility5)
+
+    static let accessibilityMatrix: [SnapshotVariant] = [
+        .xxxLargeLightSpanish, .xxxLargeDarkEnglish, .ax3LightEnglish, .ax3DarkSpanish, .ax3DarkEnglish, .ax5LightSpanish,
+    ]
 
     /// The set every component is checked in: both appearances, both languages, and the largest type.
     static let standard: [SnapshotVariant] = [.lightSpanish, .darkSpanish, .lightEnglish, .largeTextSpanish]
+}
+
+extension DynamicTypeSize {
+    /// The UIKit category with the same size, so a hosting controller measures the view at the size the environment says.
+    var uiContentSizeCategory: UIContentSizeCategory {
+        switch self {
+        case .xSmall: .extraSmall
+        case .small: .small
+        case .medium: .medium
+        case .large: .large
+        case .xLarge: .extraLarge
+        case .xxLarge: .extraExtraLarge
+        case .xxxLarge: .extraExtraExtraLarge
+        case .accessibility1: .accessibilityMedium
+        case .accessibility2: .accessibilityLarge
+        case .accessibility3: .accessibilityExtraLarge
+        case .accessibility4: .accessibilityExtraExtraLarge
+        case .accessibility5: .accessibilityExtraExtraExtraLarge
+        @unknown default: .large
+        }
+    }
 }
 
 /// `App/SnapshotReferences/<test file name>`: kept out of the synchronized app folders so the PNGs are not bundled.
@@ -45,6 +81,7 @@ func assertDesignSnapshot(
     variants: [SnapshotVariant] = SnapshotVariant.standard,
     width: CGFloat = 390,
     fixedHeight: CGFloat? = nil,
+    compactHeight: Bool = false,
     fileID: StaticString = #fileID,
     file: StaticString = #filePath,
     testName: String = #function,
@@ -59,6 +96,7 @@ func assertDesignSnapshot(
             .environment(\.locale, Locale(identifier: variant.language))
             .environment(\.dynamicTypeSize, variant.dynamicType)
             .environment(\.colorScheme, variant.colorScheme)
+            .environment(\.verticalSizeClass, compactHeight ? .compact : .regular)
         let layout: SwiftUISnapshotLayout = fixedHeight.map { .fixed(width: width, height: $0) } ?? .sizeThatFits
         let style: UIUserInterfaceStyle = variant.colorScheme == .dark ? .dark : .light
         let failure = verifySnapshot(
@@ -71,7 +109,8 @@ func assertDesignSnapshot(
                     UITraitCollection(userInterfaceStyle: style),
                     UITraitCollection(displayScale: 2),
                     // SwiftUI measures the view with the UIKit size category, so it must match the environment.
-                    UITraitCollection(preferredContentSizeCategory: variant.dynamicType.isAccessibilitySize ? .accessibilityExtraExtraExtraLarge : .large),
+                    UITraitCollection(preferredContentSizeCategory: variant.dynamicType.uiContentSizeCategory),
+                    UITraitCollection(verticalSizeClass: compactHeight ? .compact : .regular),
                 ])
             ),
             named: "\(name).\(variant.name)",

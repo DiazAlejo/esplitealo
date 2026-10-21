@@ -23,10 +23,12 @@ extension RGBAColor {
 
 extension Color {
     /// A colour that follows the appearance of the view it is drawn in.
-    public static func dynamic(light: RGBAColor, dark: RGBAColor) -> Color {
+    public static func dynamic(light: RGBAColor, dark: RGBAColor, lightIncreased: RGBAColor? = nil, darkIncreased: RGBAColor? = nil) -> Color {
         #if canImport(UIKit)
         Color(uiColor: UIColor { traits in
-            traits.userInterfaceStyle == .dark ? dark.platformColor : light.platformColor
+            let increased = traits.accessibilityContrast == .high
+            if traits.userInterfaceStyle == .dark { return (increased ? darkIncreased ?? dark : dark).platformColor }
+            return (increased ? lightIncreased ?? light : light).platformColor
         })
         #elseif canImport(AppKit)
         Color(nsColor: NSColor(name: nil) { appearance in
@@ -46,7 +48,12 @@ public struct EspColors: Sendable {
     fileprivate init() {}
 
     private func role(_ keyPath: KeyPath<DesignPalette, RGBAColor>) -> Color {
-        .dynamic(light: DesignPalette.light[keyPath: keyPath], dark: DesignPalette.dark[keyPath: keyPath])
+        .dynamic(
+            light: DesignPalette.light[keyPath: keyPath],
+            dark: DesignPalette.dark[keyPath: keyPath],
+            lightIncreased: DesignPalette.palette(for: .light, contrast: .increased)[keyPath: keyPath],
+            darkIncreased: DesignPalette.palette(for: .dark, contrast: .increased)[keyPath: keyPath]
+        )
     }
 
     public var paper: Color { role(\.paper) }

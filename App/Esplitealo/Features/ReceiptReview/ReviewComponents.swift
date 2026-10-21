@@ -100,12 +100,8 @@ struct ReviewSectionHeader: View {
     var isWarning = false
 
     var body: some View {
-        HStack(spacing: Spacing.xxs) {
-            Text(title)
-            if let count {
-                Text(verbatim: "· \(count)")
-            }
-        }
+        // One run of text: the audit failed the contrast of the lone "· 7" run (15 pt wide) on its dot's pixels.
+        (count.map { Text(title) + Text(verbatim: " · \($0)") } ?? Text(title))
         .espText(.footnote)
         .fontWeight(.semibold)
         .foregroundStyle(isWarning ? Color.esp.warn : Color.esp.inkSecondary)
@@ -275,15 +271,9 @@ struct ReviewWarningRow: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center, spacing: Spacing.sm) {
-                message
-                dismissButton
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                message
-                dismissButton
-            }
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) {
+            message
+            dismissButton
         }
         .padding(.horizontal, Spacing.md)
         .padding(.vertical, Spacing.xs)
@@ -359,15 +349,9 @@ struct ReviewAdjustmentRow: View {
     let onRemove: () -> Void
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .center, spacing: Spacing.sm) {
-                label
-                removeButton
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                label
-                removeButton
-            }
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) {
+            label
+            removeButton
         }
         .padding(.horizontal, Spacing.md)
         .padding(.vertical, Spacing.xs)

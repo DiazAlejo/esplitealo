@@ -10,6 +10,12 @@ public enum DesignAppearance: Sendable, Hashable, CaseIterable {
 /// pink is only a shape, an icon accent, decoration or a large soft disc; text uses `pinkInk`; warn always
 /// comes with an icon or words and never as a big fill; green is the action colour; person colours only
 /// appear on avatars, dots and bars.
+/// Whether the person turned on Increase Contrast (Settings > Accessibility > Display & Text Size).
+public enum DesignContrast: Sendable, Hashable, CaseIterable {
+    case standard
+    case increased
+}
+
 public struct DesignPalette: Equatable, Sendable {
     // Brand inputs
     public var paper: RGBAColor
@@ -134,6 +140,42 @@ public struct DesignPalette: Equatable, Sendable {
         case .light: light
         case .dark: dark
         }
+    }
+
+    /// The palette for an appearance, with Increase Contrast applied: text reaches 7:1 (AAA), graphics 4.5:1, and the
+    /// borders and rules of cards and rows are drawn solid so they can be seen (3:1). The paper, the surfaces, the ink and
+    /// the text on the green button keep their values; only the secondary ink, the brand green, the warn colour, the
+    /// pink and the lines change. Person colours already pass 3:1 on every surface and do not change.
+    public static func palette(for appearance: DesignAppearance, contrast: DesignContrast) -> DesignPalette {
+        let base = palette(for: appearance)
+        guard contrast == .increased else { return base }
+        var palette = base
+        switch appearance {
+        case .light:
+            palette.inkSecondary = RGBAColor(hex: 0x2E3933)
+            palette.primary = RGBAColor(hex: 0x14543C)
+            palette.primaryLip = RGBAColor(hex: 0x0C3A2A)
+            palette.warn = RGBAColor(hex: 0x8E2410)
+            palette.line = RGBAColor(hex: 0x857A63)
+            palette.pink = RGBAColor(hex: 0xC8284E)
+            palette.pinkInk = RGBAColor(hex: 0x230D12)
+            palette.selection = RGBAColor(hex: 0x1F2A24, alpha: 0.09)
+            palette.okBackground = palette.primary.mixed(with: palette.surface, fraction: 0.09)
+            palette.okSoft = palette.primary.mixed(with: palette.surface, fraction: 0.08)
+        case .dark:
+            palette.inkSecondary = RGBAColor(hex: 0xE1E0D6)
+            palette.primary = RGBAColor(hex: 0x92EBC8)
+            palette.primaryLip = RGBAColor(hex: 0x4CC59A)
+            palette.warn = RGBAColor(hex: 0xFFA690)
+            palette.line = RGBAColor(hex: 0x71867A)
+            palette.pink = RGBAColor(hex: 0xFF8CA6)
+            palette.pinkInk = RGBAColor(hex: 0xFF8CA6)
+            palette.selection = RGBAColor(hex: 0xFFFFFF, alpha: 0.11)
+            palette.okBackground = palette.primary.mixed(with: palette.surface, fraction: 0.17)
+            palette.okSoft = palette.primary.mixed(with: palette.surface, fraction: 0.11)
+        }
+        palette.hairline = palette.line
+        return palette
     }
 
     // MARK: Pink uses (tokens.css section 3b). Each use points at one pink so it can be retired on its own.

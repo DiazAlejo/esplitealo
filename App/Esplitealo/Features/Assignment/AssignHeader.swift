@@ -8,6 +8,8 @@ struct AssignHeader: View {
     let people: [AssignViewModel.Person]
 
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let total = model.totalUnitCount
@@ -15,19 +17,14 @@ struct AssignHeader: View {
         let isComplete = total > 0 && done == total
         VStack(alignment: .leading, spacing: Spacing.xs) {
             VStack(alignment: .leading, spacing: Spacing.xs) {
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .firstTextBaseline) {
-                        EspTitle("assign.title")
-                        Spacer(minLength: Spacing.xs)
-                        progress(done: done, total: total, isComplete: isComplete)
-                    }
-                    VStack(alignment: .leading, spacing: Spacing.xxs) {
-                        EspTitle("assign.title")
-                        progress(done: done, total: total, isComplete: isComplete)
-                    }
+                AdaptiveStack(rowAlignment: .firstTextBaseline, rowSpacing: Spacing.xs, stackedSpacing: Spacing.xxs) {
+                    EspTitle("assign.title").frame(maxWidth: .infinity, alignment: .leading)
+                    progress(done: done, total: total, isComplete: isComplete)
                 }
                 ProgressView(value: Double(done), total: Double(max(total, 1)))
                     .tint(isComplete ? Color.esp.primary : Color.esp.pink)
+                    // A 4 pt bar is a reading, not a control: it is read like text and not offered as something to tap.
+                    .accessibilityAddTraits(.isStaticText)
                     .accessibilityLabel("assign.meter")
                     .accessibilityValue(Text(.assignProgress(done, total)))
                     .accessibilityIdentifier("assign.meter")
@@ -41,18 +38,28 @@ struct AssignHeader: View {
                     .foregroundStyle(Color.esp.inkSecondary)
                     .padding(.horizontal, Spacing.screenMargin)
                     .accessibilityAddTraits(.isHeader)
-                ScrollViewReader { proxy in
-                    ScrollView(.horizontal) {
-                        HStack(spacing: Spacing.xxs) {
-                            ForEach(people) { person in
-                                chip(person).id(person.id)
-                            }
+                if dynamicTypeSize.isAccessibilitySize {
+                    // A sideways strip would hide most of the table behind a swipe: the chips stack instead.
+                    VStack(alignment: .leading, spacing: Spacing.xxs) {
+                        ForEach(people) { person in
+                            chip(person)
                         }
-                        .padding(.horizontal, Spacing.xs)
                     }
-                    .scrollIndicators(.hidden)
-                    .onChange(of: model.paintingID) { _, id in
-                        if let id { withAnimation { proxy.scrollTo(id, anchor: .center) } }
+                    .padding(.horizontal, Spacing.xs)
+                } else {
+                    ScrollViewReader { proxy in
+                        ScrollView(.horizontal) {
+                            HStack(spacing: Spacing.xxs) {
+                                ForEach(people) { person in
+                                    chip(person).id(person.id)
+                                }
+                            }
+                            .padding(.horizontal, Spacing.xs)
+                        }
+                        .scrollIndicators(.hidden)
+                        .onChange(of: model.paintingID) { _, id in
+                            if let id { withAnimation(reduceMotion ? nil : .default) { proxy.scrollTo(id, anchor: .center) } }
+                        }
                     }
                 }
             }
@@ -118,12 +125,17 @@ struct AssignHeader: View {
                 .foregroundStyle(Color.esp.inkSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityIdentifier("assign.paintbar")
-            Button("assign.done") { model.togglePainting(painter.id) }
-                .espText(.subhead)
-                .fontWeight(.semibold)
-                .foregroundStyle(Color.esp.primary)
-                .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum)
-                .accessibilityIdentifier("assign.paintbar.done")
+            Button {
+                model.togglePainting(painter.id)
+            } label: {
+                Text("assign.done")
+                    .espText(.subhead)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color.esp.primary)
+                    .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityIdentifier("assign.paintbar.done")
         }
         .padding(.horizontal, Spacing.screenMargin)
     }
@@ -134,8 +146,14 @@ struct AssignWarningBanner: View {
     let count: Int
     let onSplitRest: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
-        HStack(alignment: .top, spacing: Spacing.sm) {
+        // At accessibility sizes the icon goes above the words instead of taking a quarter of the width.
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xs))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: Spacing.sm))
+        layout {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(Color.esp.warn)
                 .accessibilityHidden(true)

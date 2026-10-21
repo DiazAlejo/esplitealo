@@ -57,14 +57,28 @@ struct ShareSheetContent: View {
         showsActivity = true
     }
 
+    /// The recipients go under the title when the title has no room beside them (large text).
     private var header: some View {
+        AdaptiveStack(rowSpacing: Spacing.sm, stackedSpacing: Spacing.xs) {
+            HStack(alignment: .top, spacing: Spacing.sm) {
+                headerIcon
+                headerTitle
+            }
+            RecipientsStack(people: model.people)
+        }
+    }
+
+    private var headerIcon: some View {
+        Image(systemName: "text.document")
+            .font(.title3)
+            .foregroundStyle(Color.esp.primary)
+            .frame(width: 44, height: 44)
+            .background(Color.esp.okBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .accessibilityHidden(true)
+    }
+
+    private var headerTitle: some View {
         HStack(spacing: Spacing.sm) {
-            Image(systemName: "text.document")
-                .font(.title3)
-                .foregroundStyle(Color.esp.primary)
-                .frame(width: 44, height: 44)
-                .background(Color.esp.okBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
                 Group {
                     if model.merchantName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -81,7 +95,6 @@ struct ShareSheetContent: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isHeader)
-            RecipientsStack(people: model.people)
         }
     }
 
@@ -108,6 +121,8 @@ struct ShareSheetContent: View {
 private struct RecipientsStack: View {
     let people: [(name: String, colorIndex: Int)]
 
+    @Environment(\.locale) private var locale
+
     var body: some View {
         HStack(spacing: -8) {
             ForEach(Array(people.prefix(4).enumerated()), id: \.offset) { _, person in
@@ -115,7 +130,9 @@ private struct RecipientsStack: View {
                     .overlay(Circle().strokeBorder(Color.esp.surface, lineWidth: 2))
             }
         }
-        .accessibilityHidden(true)
+        // One element that names everyone, instead of letters VoiceOver cannot reach.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: people.map(\.name).formatted(.list(type: .and).locale(locale))))
     }
 }
 
@@ -167,6 +184,7 @@ struct ShareSuccessView: View {
     @Environment(\.locale) private var locale
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var settled = false
+    @AccessibilityFocusState private var titleFocused: Bool
 
     var body: some View {
         GeometryReader { proxy in
@@ -179,6 +197,7 @@ struct ShareSuccessView: View {
                         .espText(.title)
                         .multilineTextAlignment(.center)
                         .accessibilityAddTraits(.isHeader)
+                        .accessibilityFocused($titleFocused)
                         .accessibilityIdentifier("success.title")
                     Text(.successBody(peopleCount, MoneyFormatter(locale: locale).string(cents: totalCents)))
                         .espText(.subhead)
@@ -201,6 +220,8 @@ struct ShareSuccessView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .espScreenBackground()
         .onAppear {
+            // The picture comes first on screen, but the good news is the title: VoiceOver starts there.
+            titleFocused = true
             guard !reduceMotion else { return }
             withAnimation(.easeOut(duration: 0.9)) { settled = true }
         }

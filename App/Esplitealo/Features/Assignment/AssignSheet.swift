@@ -43,16 +43,9 @@ struct AssignSheet: View {
     // MARK: Parts
 
     private func header(_ content: AssignViewModel.SheetContent) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .firstTextBaseline, spacing: Spacing.sm) {
-                title(content.itemName)
-                Spacer(minLength: Spacing.xs)
-                MoneyText(cents: content.totalCents, style: .amount)
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                title(content.itemName)
-                MoneyText(cents: content.totalCents, style: .amount)
-            }
+        AdaptiveStack(rowAlignment: .firstTextBaseline, rowSpacing: Spacing.sm, stackedSpacing: Spacing.xxs) {
+            title(content.itemName).frame(maxWidth: .infinity, alignment: .leading)
+            MoneyText(cents: content.totalCents, style: .amount)
         }
     }
 
@@ -69,13 +62,16 @@ struct AssignSheet: View {
                 .espText(.subhead)
                 .foregroundStyle(Color.esp.inkSecondary)
             Spacer(minLength: Spacing.xs)
-            Button(content.everyoneSelected ? "assign.clear" : "assign.everyone") {
+            Button {
                 model.toggleEveryone(on: itemID, scope: content.scope)
+            } label: {
+                Text(content.everyoneSelected ? "assign.clear" : "assign.everyone")
+                    .espText(.subhead)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color.esp.primary)
+                    .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum, alignment: .trailing)
+                    .contentShape(Rectangle())
             }
-            .espText(.subhead)
-            .fontWeight(.semibold)
-            .foregroundStyle(Color.esp.primary)
-            .frame(minWidth: TapTarget.minimum, minHeight: TapTarget.minimum, alignment: .trailing)
             .accessibilityIdentifier("assign.sheet.everyone")
         }
     }
@@ -119,16 +115,16 @@ struct AssignSheet: View {
         } label: {
             Group {
                 if dynamicTypeSize.isAccessibilitySize {
-                    // Narrow columns would break the name and the amount: the amount goes under the name.
-                    HStack(alignment: .top, spacing: Spacing.sm) {
-                        checkmark(person.mark)
-                        PersonAvatar(name: person.name, participantIndex: person.colorIndex, size: 40, announcesName: false)
-                        VStack(alignment: .leading, spacing: Spacing.xxs) {
-                            Text(verbatim: person.name).espText(.headline).multilineTextAlignment(.leading)
-                            trailing(person, units: model.sheetContent?.unitCount ?? 1, alignment: .leading)
+                    // A narrow column would break the name and the amount: the mark and the avatar go above them.
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
+                        HStack(spacing: Spacing.sm) {
+                            checkmark(person.mark)
+                            PersonAvatar(name: person.name, participantIndex: person.colorIndex, size: 40, announcesName: false)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(verbatim: person.name).espText(.headline).multilineTextAlignment(.leading)
+                        trailing(person, units: model.sheetContent?.unitCount ?? 1, alignment: .leading)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
                     HStack(spacing: Spacing.sm) {
                         checkmark(person.mark)
@@ -164,7 +160,7 @@ struct AssignSheet: View {
         Circle()
             .fill(mark == .none ? Color.clear : Color.esp.primary)
             .overlay {
-                Circle().strokeBorder(mark == .none ? Color.esp.inkSecondary.opacity(0.7) : Color.esp.primary, lineWidth: 1.5)
+                Circle().strokeBorder(mark == .none ? Color.esp.inkSecondary : Color.esp.primary, lineWidth: 1.5)
             }
             .overlay {
                 switch mark {

@@ -15,6 +15,8 @@ struct PeopleView: View {
 
 private struct PeopleScreen: View {
     @Environment(AppRouter.self) private var router
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model: PeopleViewModel
     @FocusState private var nameFocused: Bool
 
@@ -52,6 +54,8 @@ private struct PeopleScreen: View {
                 } else {
                     table
                 }
+
+                if !pinsNext { nextButton.padding(.top, Spacing.xs) }
             }
             .padding(.horizontal, Spacing.screenMargin)
             .padding(.vertical, Spacing.md)
@@ -60,14 +64,12 @@ private struct PeopleScreen: View {
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom) {
-            Button("people.next") { router.advance() }
-                .buttonStyle(.espPrimary(showsDivisionCoin: true))
-                .disabled(!model.canContinue)
-                .accessibilityHint(model.canContinue ? Text(verbatim: "") : Text("people.needOne"))
-                .accessibilityIdentifier("screen.next")
-                .padding(.horizontal, Spacing.screenMargin)
-                .padding(.vertical, Spacing.sm)
-                .background(Color.esp.paper)
+            if pinsNext {
+                nextButton
+                    .padding(.horizontal, Spacing.screenMargin)
+                    .padding(.vertical, Spacing.sm)
+                    .background(Color.esp.paper)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .espScreenBackground()
@@ -89,23 +91,30 @@ private struct PeopleScreen: View {
         .accessibilityIdentifier(AppRoute.people.accessibilityIdentifier)
     }
 
+    /// At the two largest text sizes the button would cover half the screen, so it scrolls with the page.
+    private var pinsNext: Bool {
+        ChromePolicy.pinsActionBar(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass)
+    }
+
+    private var nextButton: some View {
+        Button("people.next") { router.advance() }
+            .buttonStyle(.espPrimary(showsDivisionCoin: true))
+            .disabled(!model.canContinue)
+            .accessibilityHint(model.canContinue ? Text(verbatim: "") : Text("people.needOne"))
+            .accessibilityIdentifier("screen.next")
+    }
+
     // MARK: Parts
 
     private func addPersonRow(name: Binding<String>) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: Spacing.xs) {
-                nameField(name)
-                addButton.fixedSize(horizontal: true, vertical: false)
-            }
-            VStack(spacing: Spacing.xs) {
-                nameField(name)
-                addButton
-            }
+        AdaptiveStack(rowAlignment: .top, stackedAlignment: .center, rowSpacing: Spacing.xs, stacksFrom: .xLarge) { stacked in
+            nameField(name)
+            addButton.fixedSize(horizontal: !stacked, vertical: false)
         }
     }
 
     private func nameField(_ name: Binding<String>) -> some View {
-        TextField(text: name, prompt: Text("people.placeholder")) { Text("people.placeholder") }
+        TextField(text: name, prompt: Text("people.placeholder").foregroundStyle(Color.esp.inkSecondary)) { Text("people.placeholder") }
             .focused($nameFocused)
             .textInputAutocapitalization(.words)
             .autocorrectionDisabled()
@@ -115,6 +124,7 @@ private struct PeopleScreen: View {
             .padding(.horizontal, Spacing.sm)
             .frame(minHeight: TapTarget.secondaryButtonHeight)
             .background(Color.esp.well, in: RoundedRectangle(cornerRadius: Radius.smallButton, style: .continuous))
+            .espFieldOutline()
             .accessibilityIdentifier("people.name")
     }
 
@@ -176,18 +186,12 @@ private struct PersonRow: View {
     let onRemove: () -> Void
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: Spacing.xs) {
-                who
+        AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: Spacing.xxs) {
+            who
+            // Side by side up to the accessibility sizes; one above the other from there.
+            AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: 0, stacksFrom: .accessibility1) {
                 rename
                 remove
-            }
-            VStack(alignment: .leading, spacing: Spacing.xxs) {
-                who
-                HStack(spacing: Spacing.xs) {
-                    rename
-                    remove
-                }
             }
         }
         .padding(.leading, Spacing.sm)

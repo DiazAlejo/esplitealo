@@ -82,9 +82,10 @@ struct AssignItemRow: View {
     private var status: some View {
         switch row.state {
         case .unassigned:
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: Spacing.xs) { unassignedMark; Text("assign.tapChoose").espText(.footnote).foregroundStyle(Color.esp.inkSecondary) }
-                VStack(alignment: .leading, spacing: Spacing.xxs) { unassignedMark; Text("assign.tapChoose").espText(.footnote).foregroundStyle(Color.esp.inkSecondary) }
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
+                unassignedMark
+                Text("assign.tapChoose").espText(.footnote).foregroundStyle(Color.esp.inkSecondary)
+                    .accessibilityIdentifier("assign.rowHint")
             }
         case .partlyAssigned:
             VStack(alignment: .leading, spacing: Spacing.xxs) {
@@ -123,9 +124,9 @@ struct AssignItemRow: View {
     }
 
     private var assignedSummary: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: Spacing.xs) { AvatarStack(people: people); summaryText }
-            VStack(alignment: .leading, spacing: Spacing.xxs) { AvatarStack(people: people); summaryText }
+        AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: Spacing.xxs, stacksFrom: .xxLarge) {
+            AvatarStack(people: people)
+            summaryText
         }
     }
 

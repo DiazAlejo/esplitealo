@@ -15,25 +15,22 @@ struct HomeView: View {
     @Environment(BillStore.self) private var store
     @Environment(AppRouter.self) private var router
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var showsHowItWorks = false
     @State private var confirmsDiscard = false
 
-    /// At accessibility sizes the buttons would take half the screen if they stayed pinned, so they scroll with the page.
-    private var pinsActions: Bool { !dynamicTypeSize.isAccessibilitySize }
+    /// At accessibility sizes, and in landscape, the buttons would take half the screen if they stayed pinned, so they
+    /// scroll with the page.
+    private var pinsActions: Bool {
+        ChromePolicy.pinsExtraActions(dynamicTypeSize: dynamicTypeSize, verticalSizeClass: verticalSizeClass)
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.lg) {
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .center) {
-                        EspWordmark()
-                        Spacer(minLength: Spacing.xs)
-                        howItWorksButton
-                    }
-                    VStack(alignment: .leading, spacing: Spacing.xs) {
-                        EspWordmark()
-                        howItWorksButton
-                    }
+                AdaptiveStack(rowSpacing: Spacing.xs, stackedSpacing: Spacing.xs) {
+                    EspWordmark().frame(maxWidth: .infinity, alignment: .leading)
+                    howItWorksButton
                 }
                 if let bill = store.billInProgress {
                     ResumeBillCard(
@@ -99,8 +96,10 @@ struct HomeView: View {
             Label("home.how", systemImage: "questionmark.circle")
                 .espText(.subhead)
                 .foregroundStyle(Color.esp.primary)
+                // The frame is inside the label: a frame around the button is not part of what can be tapped.
+                .frame(minHeight: TapTarget.minimum)
+                .contentShape(Rectangle())
         }
-        .frame(minHeight: TapTarget.minimum)
         .accessibilityIdentifier("home.how")
     }
 

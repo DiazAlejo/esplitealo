@@ -45,8 +45,36 @@ class JourneyTestCase: XCTestCase {
         }
     }
 
+    /// The app the test launched last, for the diagnostics of a failed test.
+    private var launchedApp: XCUIApplication?
+
     override func setUpWithError() throws {
         continueAfterFailure = false
+    }
+
+    /// A failed test leaves what it was looking at: a screenshot, and each line of Mark items with its state.
+    @MainActor
+    override func tearDown() async throws {
+        // `hasSucceeded` only settles after tearDown, so a passing test looked failed here; the failure count is live.
+        guard (testRun?.totalFailureCount ?? 0) > 0, let launchedApp else { return }
+        attachDiagnostics(of: launchedApp, named: "state at the failure")
+    }
+
+    /// Attaches a screenshot and logs the item rows (identifier, label with its assigned or unassigned state) and the
+    /// pinned bar's label, so one failed run says which item is unmarked.
+    @MainActor
+    func attachDiagnostics(of app: XCUIApplication, named name: String) {
+        // Querying an app the test already terminated fails the test and can hang the runner.
+        guard app.state != .notRunning else { return }
+        let rows = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'assign.item.' OR identifier BEGINSWITH 'assign.sheet.' OR identifier == 'screen.next'")).allElementsBoundByIndex
+        let lines = rows.map { "\($0.identifier) | \($0.label) | \($0.frame)" }
+        let summary = "DIAG [\(name)] sheet=\(app.otherElements["assign.sheet"].exists)\n" + lines.joined(separator: "\n")
+        XCTContext.runActivity(named: summary) { activity in
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = name
+            shot.lifetime = .keepAlways
+            activity.add(shot)
+        }
     }
 
     // MARK: Launching
@@ -79,6 +107,7 @@ class JourneyTestCase: XCTestCase {
         arguments += ["-AppleLanguages", "(\(options.language))", "-AppleLocale", "\(options.language)_\(options.region)"]
         app.launchArguments += arguments
         app.launch()
+        launchedApp = app
         return app
     }
 
@@ -151,10 +180,21 @@ class JourneyTestCase: XCTestCase {
         func reachable() -> Bool {
             guard target.isHittable else { return false }
             guard target.identifier != "screen.next", bar.exists, bar.isHittable else { return true }
-            return !target.frame.intersects(bar.frame.insetBy(dx: 0, dy: -24))
+            // The tap lands on the centre, so that is what must clear the bar: a row taller than the space above the bar
+            // always overlaps it at the largest text sizes, and asking for no overlap at all never succeeds.
+            return !bar.frame.insetBy(dx: 0, dy: -24).contains(CGPoint(x: target.frame.midX, y: target.frame.midY))
         }
-        for _ in 0 ..< 8 where !reachable() {
-            app.swipeUp()
+        // Small drags toward the target: at the largest text a row can be taller than the screen, and a full swipe would
+        // carry its centre past the visible part. Back down only when the target is above the screen: a downward drag
+        // on a sheet closes it.
+        // They start in the margin, beside the rows: a drag that starts on a row of a sheet's list ticked and unticked it.
+        func drag(up: Bool) {
+            let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: up ? 0.65 : 0.35))
+            let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: up ? 0.4 : 0.6))
+            from.press(forDuration: 0.05, thenDragTo: to)
+        }
+        for _ in 0 ..< 16 where !reachable() {
+            drag(up: target.frame.midY >= app.frame.minY)
         }
         var resting = target.frame
         for _ in 0 ..< 10 {
