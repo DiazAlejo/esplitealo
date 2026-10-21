@@ -55,7 +55,8 @@ class JourneyTestCase: XCTestCase {
     /// A failed test leaves what it was looking at: a screenshot, and each line of Mark items with its state.
     @MainActor
     override func tearDown() async throws {
-        guard testRun?.hasSucceeded == false, let launchedApp else { return }
+        // `hasSucceeded` only settles after tearDown, so a passing test looked failed here; the failure count is live.
+        guard (testRun?.totalFailureCount ?? 0) > 0, let launchedApp else { return }
         attachDiagnostics(of: launchedApp, named: "state at the failure")
     }
 
@@ -63,6 +64,8 @@ class JourneyTestCase: XCTestCase {
     /// pinned bar's label, so one failed run says which item is unmarked.
     @MainActor
     func attachDiagnostics(of app: XCUIApplication, named name: String) {
+        // Querying an app the test already terminated fails the test and can hang the runner.
+        guard app.state != .notRunning else { return }
         let rows = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'assign.item.' OR identifier BEGINSWITH 'assign.sheet.' OR identifier == 'screen.next'")).allElementsBoundByIndex
         let lines = rows.map { "\($0.identifier) | \($0.label) | \($0.frame)" }
         let summary = "DIAG [\(name)] sheet=\(app.otherElements["assign.sheet"].exists)\n" + lines.joined(separator: "\n")

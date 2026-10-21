@@ -1,1 +1,1 @@
-AccessibilityAuditUITests/testShareSheetAndSuccess
+JourneyScanRecoveryUITests
